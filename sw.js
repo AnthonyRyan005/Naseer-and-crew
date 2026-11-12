@@ -1,6 +1,6 @@
 // Keeps the game playable offline. Change VERSION whenever the game files change.
-const VERSION = 'naseer-crew-2026-11-12-1';
-const FILES = ["./", "./index.html", "./manifest.webmanifest", "./fonts/fredoka-latin-400-normal.woff2", "./fonts/fredoka-latin-500-normal.woff2", "./fonts/fredoka-latin-600-normal.woff2", "./fonts/fredoka-latin-700-normal.woff2", "./fonts/lilita-one-latin-400-normal.woff2", "./icons/apple-touch-icon.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png"];
+const VERSION = 'naseer-crew-2026-11-12-2';
+const FILES = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./fredoka-latin-400-normal.woff2", "./fredoka-latin-500-normal.woff2", "./fredoka-latin-600-normal.woff2", "./fredoka-latin-700-normal.woff2", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./lilita-one-latin-400-normal.woff2"];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
