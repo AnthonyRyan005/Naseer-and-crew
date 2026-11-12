@@ -1,0 +1,11 @@
+Naseer and the Crew: installing on iPad and iPhone
+
+1. Put this whole folder online. One easy way is Netlify Drop (app.netlify.com/drop).
+   Sign in or create a free account, then drag this folder onto the page.
+   Netlify gives you a web link for the game.
+2. On the iPad or iPhone, open that link in Safari.
+3. Tap Share, then Add to Home Screen. Leave "Open as Web App" on, then tap Add.
+4. Open Naseer & Crew from the Home Screen. It plays full screen and works offline after the first visit.
+
+Stars and looks are saved on each device separately.
+To update the game later, drag the new folder onto your Netlify project's deploys page.
