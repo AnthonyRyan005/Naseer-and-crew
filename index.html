@@ -229,7 +229,15 @@ h2.title {
 .por .you.p2 { background: var(--p2); }
 .por.need { animation: need 0.8s ease-in-out infinite; }
 @keyframes need { 50% { transform: scale(1.14); box-shadow: 0 0 0 4px var(--sun), 0 3px 0 var(--ink); } }
-.por.flash { animation: shake 0.3s; }
+.por.flash, .chip.flash { animation: shake 0.3s; }
+.por .hm { display: none; position: absolute; left: -8px; bottom: -8px; width: 26px; height: 26px; }
+.por.home { background: #c9cce0; cursor: default; }
+.por.home canvas { filter: grayscale(1); opacity: 0.45; }
+.por.home .cd, .por.home .k { display: none; }
+.por.home .hm { display: block; animation: hmpop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes hmpop { from { transform: scale(0) rotate(-30deg); } to { transform: scale(1) rotate(0); } }
+.lostmsg { margin: 0; text-align: center; font-family: var(--font-display); font-size: 22px; line-height: 1.2; }
+.lostmsg small { display: block; margin-top: 8px; font-family: inherit; font-family: Fredoka, sans-serif; font-weight: 600; font-size: 15px; }
 @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 #crewbar .meter { max-width: 320px; }
 .meter { width: 100%; height: 12px; border: 2px solid var(--ink); border-radius: 8px; background: rgba(255, 255, 255, 0.85); overflow: hidden; box-sizing: border-box; }
@@ -478,6 +486,7 @@ h2.title {
           <li>You play one hero. The rest of the crew follows you and helps out.</li>
           <li>Tap a friend's face at the top to call for help. Frankie smashes, Spencer hacks, Jaxxs pranks, James pulls you up, Ollie kicks, and Naseer slows time.</li>
           <li>Jump on Glitch Bots to bop them, throw your object at them, or use your special move. Pick what each hero throws on the "Pick your hero" screen.</li>
+          <li>If a baddie gets you, a friend is sent home. Lose 4 friends and you start the level again.</li>
           <li>Teachers can't be fought. Stand still in an open locker to hide, sneak behind them, or get Jaxxs to distract them.</li>
           <li>Bopping bots and teaming up fills the crew meter. When it's full, use Crew Charge!</li>
         </ul>
@@ -524,6 +533,7 @@ function loadSave() {
     }
     delete SAVE.looks;
     if (!SAVE.throws) SAVE.throws = {};
+    for (const k in SAVE.throws) if (SAVE.throws[k] === 'boomerang') SAVE.throws[k] = 'soccer'; // the boomerang became a soccer ball
   } catch (e) { /* storage unavailable: play without saving */ }
 }
 function writeSave() {
@@ -637,6 +647,12 @@ const SND = {
       case 'whack': this.noise(0.12, 0.3, 1500); this.tone(160, 0.12, 'triangle', 0.25, -60); break;
       case 'honk': this.tone(330, 0.22, 'square', 0.08); this.tone(330, 0.3, 'square', 0.08, 0, 0.28); break;
       case 'thud': this.noise(0.12, 0.2, 500); break;
+      case 'senthome': // bonk, a slide whistle up into the sky, then a twinkle
+        this.noise(0.1, 0.3, 1500); this.tone(170, 0.14, 'triangle', 0.25, -70);
+        this.tone(420, 1.0, 'sine', 0.13, 1300, 0.38);
+        [2093, 2637, 3136].forEach((f, i) => this.tone(f, 0.18, 'sine', 0.07, 0, 1.5 + i * 0.07)); break;
+      case 'sad': [392, 370, 349].forEach((f, i) => this.tone(f, 0.32, 'triangle', 0.14, -12, i * 0.34)); this.tone(330, 0.9, 'triangle', 0.14, -40, 1.02); break;
+      case 'bounce': this.tone(210, 0.07, 'triangle', 0.16, -80); this.noise(0.03, 0.06, 1400); break;
       case 'meow': this.tone(700, 0.3, 'sine', 0.1, 200); this.tone(900, 0.2, 'sine', 0.06, -300, 0.18); break;
       case 'chain': { const k = Math.min(n || 2, 6); for (let i = 0; i < k; i++) this.tone(523 * Math.pow(1.1225, i + k), 0.09, 'square', 0.08, 0, i * 0.045); break; }
     }
@@ -2020,7 +2036,8 @@ function startLevel() {
     cp: 0, trail: [], cd: {}, lastHelp: {}, combos: {}, fade: 0, fadeTo: 0, freeze: 0, after: null, flash: 0,
     needHero: null, need: null, chargeFlash: 0, winT: 0, pulse: null, hackTalk: 0, eshots: [], boss: null, hits: 0, ropeFrom: null, puddles: [],
     goop: [], darkK: L.dark ? 1 : 0, darkTo: L.dark ? 1 : 0, flashT: 0, boltT: rand(5, 9), chain: 0, chainT: -9, callouts: [], scene: null, party: null, chaseX: 0, thief: null,
-    sp: null, movers: [], gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, boltFlash: 0
+    sp: null, movers: [], gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, boltFlash: 0,
+    lost: 0, homeIds: [], sent: [], lose: null
   };
   HERO_IDS.forEach((id) => { G.crew.push(makeHero(id)); G.cd[id] = 0; });
   const picks = STATE.players === 2 ? STATE.picks.slice(0, 2) : [STATE.picks[0]];
@@ -2202,7 +2219,7 @@ function updatePlayer(p, dt) {
   }
 
   if (c.actionP && p.actCd <= 0) doMove(p);
-  if (c.throwP && p.throwCd <= 0 && !p.boomOut) doThrow(p);
+  if (c.throwP && p.throwCd <= 0) doThrow(p);
   if (p.pound) p.vy = 1100;
   movePhys(p, dt, solids, p.climbing);
   if (G.wind && !p.hidden) { const dx = G.wind * (p.onGround ? 0.85 : 1.1) * dt; p.x += dx; if (solids.some((s) => !s.shutter && overlap(p, s))) p.x -= dx; }
@@ -2307,22 +2324,9 @@ function hurt(p, src) {
     else floatText(cxOf(p), p.y - 10, 'Blocked!', '#bff6ff');
     p.inv = 0.7; p.vx = dirAway * 260; p.vy = -260; p.bonkT = 0.3; SND.sfx('shield'); return;
   }
-  p.hp--; G.hits++; p.inv = 1.4; p.vx = dirAway * 330; p.vy = -380; p.bonkT = 0.35; p.dashT = p.chargeT = 0; p.climbing = false;
-  G.shake = 0.25; SND.sfx('hurt');
-  if (p.hp <= 0) playerDown(p);
-}
-
-function playerDown(p) {
-  G.oops++;
-  const other = G.players.find((q) => q !== p);
-  if (other) { // two players: pop back in next to your friend
-    puff(cxOf(p), p.y + p.h / 2, 14, '#fff');
-    p.x = other.x - other.face * 40; p.y = other.y + other.h - p.h; p.vx = p.vy = 0; p.hp = p.maxHp; p.inv = 2;
-    say(p, 'I\'m back!', 1.5); return;
-  }
-  say(p, 'Ouch!', 1.2);
-  G.freeze = 0.7;
-  G.after = () => startTrans(() => { doRespawn(); toast(null, 'Ouch! The crew regroups at the last checkpoint.'); });
+  G.hits++; p.inv = 1.8; p.hitAt = G.t; p.vx = dirAway * 330; p.vy = -380; p.bonkT = 0.35; p.dashT = p.chargeT = 0; p.climbing = false;
+  G.shake = 0.3; SND.sfx('hurt');
+  sendHome(); // a random friend takes the hit and gets sent home
 }
 
 function setPose(e, dt) {
@@ -2487,7 +2491,7 @@ function updateBot(b, dt) {
   else if (b.state === 'dance') b.vx = 0;
   else if (b.chase || b.hunt) {
     const A = G.L.arena;
-    const tx = b.hunt ? cxOf(nearestPlayer(cxOf(b))) : A && A.type === 'defend' ? A.obj.cx : cxOf(heroById('spencer'));
+    const tx = b.hunt ? cxOf(nearestPlayer(cxOf(b))) : A && A.type === 'defend' ? A.obj.cx : hackX();
     if (Math.abs(tx - cxOf(b)) > 6) b.dir = sign(tx - cxOf(b));
     b.vx = b.dir * b.speed * 1.2;
   } else {
@@ -2516,18 +2520,12 @@ function updateBot(b, dt) {
 function updateTeacher(T, wdt, dt) {
   T.sayT -= dt;
   if (T.distract > 0) {
-    T.distract -= dt; T.state = 'distracted'; T.alert = 0;
+    T.distract -= dt; T.state = 'distracted'; T.alert = 0; T.look = null;
     if (T.distract <= 0) { T.state = T.mode === 'guard' ? 'pause' : 'walk'; T.dir = T.mode === 'guard' ? T.sdir : T.dir; say(T, 'Hmm? Where did those kids go?', 2); }
     return;
   }
   if (T.state === 'catch') return;
-  if (T.mode === 'patrol') {
-    if (T.state === 'walk') {
-      T.x += T.dir * T.speed * wdt; T.walk += wdt * 6;
-      if (T.x <= T.minX && T.dir < 0) { T.x = T.minX; T.state = 'pause'; T.pauseT = 1.4; }
-      if (T.x >= T.maxX && T.dir > 0) { T.x = T.maxX; T.state = 'pause'; T.pauseT = 1.4; }
-    } else if (T.state === 'pause') { T.pauseT -= wdt; if (T.pauseT <= 0) { T.dir *= -1; T.state = 'walk'; } }
-  }
+  if (T.mode === 'patrol') patrolStep(T, wdt);
   let seen = null;
   for (const p of G.players) if (canSee(T, p)) seen = p;
   if (seen) {
@@ -2535,6 +2533,34 @@ function updateTeacher(T, wdt, dt) {
     T.alert += dt * 2.4;
   } else T.alert = Math.max(0, T.alert - dt * 1.4);
   if (T.alert >= 1 && seen) catchCrew(T, seen);
+}
+// Patrols wander: they walk to random spots at random speeds, stop, sometimes look back, then carry on either way.
+// They always stop before turning round, and say "Hmm?" before a quick look back, so kids get a warning.
+function patrolStep(T, wdt) {
+  if (T.goal == null) patrolNext(T);
+  if (T.state === 'walk') {
+    const d = T.goal - T.x;
+    T.dir = sign(d) || T.dir; T.x += T.dir * Math.min(Math.abs(d), T.legSpeed * wdt); T.walk += wdt * 6 * T.legSpeed / T.speed;
+    if (Math.abs(T.goal - T.x) < 0.5) {
+      T.state = 'pause'; T.pauseT = rand(0.9, 1.9);
+      T.look = Math.random() < 0.35 ? { t: -rand(0.1, 0.5), dur: rand(0.7, 1.1) } : null;
+    }
+  } else if (T.state === 'pause') {
+    T.pauseT -= wdt;
+    const K = T.look;
+    if (K) {
+      K.t += wdt;
+      if (!K.said && K.t >= 0) { K.said = true; say(T, 'Hmm?', 0.9); }
+      if (!K.turned && K.t >= 0.6) { K.turned = true; T.dir = -T.dir; }
+      if (K.turned && K.t >= 0.6 + K.dur) { T.dir = -T.dir; T.look = null; }
+    } else if (T.pauseT <= 0) { patrolNext(T); T.state = 'walk'; }
+  }
+}
+function patrolNext(T) {
+  const span = T.maxX - T.minX, gap = Math.min(110, span * 0.3);
+  let g = T.minX + Math.random() * span;
+  for (let i = 0; i < 8 && Math.abs(g - T.x) < gap; i++) g = T.minX + Math.random() * span;
+  T.goal = g; T.legSpeed = T.speed * rand(0.7, 1.35);
 }
 function canSee(T, p) {
   if (p.hidden || p.invis > 0 || p.pull || T.distract > 0) return false;
@@ -2562,6 +2588,7 @@ function catchCrew(T, p) {
 function update(dt) {
   G.t += dt; chatterCd -= dt;
   updateFx(dt);
+  if (G.sent.length) updateSent(dt);
   if (G.trans) {
     G.trans.t += dt;
     if (!G.trans.midDone && G.trans.t >= 0.4) { G.trans.midDone = true; G.trans.mid(); }
@@ -2575,6 +2602,7 @@ function update(dt) {
     if (G.freeze <= 0 && G.after) { const f = G.after; G.after = null; f(); }
     return;
   }
+  if (G.lose) { updateLose(dt); return; }
   updateDark(dt);
   if (G.over) { if (G.party) updateParty(dt); return; }
   const wdt = dt * (G.slow > 0 ? 0.35 : 1);
@@ -2749,21 +2777,21 @@ function hitBots(q, r, many) {
 }
 
 /* ===================== Team obstacles ===================== */
-function smashBarrier(B, by) {
+function smashBarrier(B, by, sub) {
   if (!B || B.broken) return;
   B.broken = true; G.shake = 0.5; SND.sfx('smash'); meterAdd(10);
   for (let i = 0; i < 26; i++) G.parts.push({ x: B.x + rand(0, B.w), y: B.y + rand(0, B.h), vx: rand(-80, 420), vy: rand(-600, -100), life: rand(0.8, 1.4), max: 1.4, r: rand(6, 13), col: ['#c8955a', '#a8743f', '#e0b77a', '#8ecae6'][i % 4], kind: 'chunk', g: 1500, rot: rand(0, 6) });
   say(by, by.id === 'frankie' ? 'Not a scratch.' : 'Smashed it!', 1.8); by.cheer = 0.6;
-  banner('SMASH!', 'Frankie cleared the way');
+  banner('SMASH!', sub || 'Frankie cleared the way');
   [60, 130].forEach((dx) => G.bots.push(makeBot({ sx: B.x + B.w + dx, sy: GROUND, minX: B.x + B.w + 20, maxX: B.x + B.w + 260 })));
 }
 function nearestBarrier(x, range) { return G.L.barriers.find((B) => !B.broken && Math.abs(x - B.x) < range); }
-function pressButton(gt) {
+function pressButton(gt, sub) {
   const Bt = gt.button;
   Bt.hit = true; gt.opening = true; SND.sfx('gate'); meterAdd(10);
   sparks(Bt.x + 17, Bt.y + 17, 14, '#ff6150');
-  banner('GOAL!', 'Ollie hit the button. The gate is open');
-  const o = heroById('ollie'); say(o, 'Back of the net!', 1.8); o.cheer = 0.8;
+  banner(sub ? 'TEAMWORK!' : 'GOAL!', sub || 'Ollie hit the button. The gate is open');
+  const o = heroById('ollie'); if (o) { say(o, 'Back of the net!', 1.8); o.cheer = 0.8; }
   if (G.t - (G.lastHelp.james ?? -99) < 8) combo('Kick and Swing');
 }
 function spiderLands(T) {
@@ -2774,7 +2802,7 @@ function spiderLands(T) {
     setTimeout(() => {
       if (G !== g0 || G.over) return;
       const ld = leader(), j = heroById('jaxxs');
-      say(j, 'Oops... that set off the alarm!', 2.2); SND.sfx('oops');
+      if (j) say(j, 'Oops... that set off the alarm!', 2.2); SND.sfx('oops');
       [-1, 1].forEach((k) => {
         const x = cxOf(ld) + k * 260, gy = groundBelow(x, ld.y + ld.h - 4) ?? GROUND;
         G.bots.push(makeBot({ sx: x, sy: gy, minX: x - 140, maxX: x + 140 }));
@@ -2806,6 +2834,7 @@ function callHelp(id) {
   if (!G || STATE.screen !== 'play' || G.trans || G.freeze > 0 || G.over) return;
   if (G.cd[id] > 0) { portraitShake(id); SND.sfx('nope'); return; }
   const h = heroById(id), ld = leader();
+  if (!h) { portraitShake(id); SND.sfx('nope'); toast(id, `${HEROES[id].name} was sent home and can't help this time.`); return; }
   if (h.pull) return;
   const res = HELP[id](h, ld);
   if (res === false) { portraitShake(id); SND.sfx('nope'); return; }
@@ -2893,9 +2922,9 @@ const HELP = {
   }
 };
 
-function ropePull(j, An) {
+function ropePull(j, An, sub) {
   An.used = true; SND.sfx('rope'); meterAdd(10);
-  banner('Grab on!', 'James pulls the crew up');
+  banner(sub ? 'TEAMWORK!' : 'Grab on!', sub || 'James pulls the crew up');
   G.ropeFrom = An;
   const order = G.crew.slice().sort((a, b) => (a === j ? -1 : b === j ? 1 : 0));
   order.forEach((e, i) => {
@@ -2931,7 +2960,7 @@ function startHack() {
   const A = G.L.arena;
   if (!A || A.started) return;
   A.started = true; A.spawnT = 1.6; SND.sfx('hack');
-  if (A.type === 'hack') say(heroById('spencer'), 'Hacking in. Keep them off me!', 2.4);
+  const sp = heroById('spencer'); if (A.type === 'hack' && sp) say(sp, 'Hacking in. Keep them off me!', 2.4);
 }
 function updateArena(dt) {
   const L = G.L, A = L.arena;
@@ -2947,18 +2976,19 @@ function updateArena(dt) {
     else if (A.type === 'survive') { banner('SURVIVE!', 'Hold out until the sun comes up'); A.started = true; showHint({ kind: 'survive' }); }
     else if (A.type === 'defend') { banner(n.start, n.startSub); startHack(); }
     else if (isPlayer('spencer')) { banner('Spencer, you\'re up!', 'Get to it and start the hack'); toast('spencer', touchOrKey('Stand right next to it and tap the star to start the hack.', 'Stand right next to it and press your special move key to start the hack.', `Stand right next to it and press ${padNames().move} to start the hack.`)); }
+    else if (friendGone('spencer')) { banner('Hold them off!', 'Spencer went home, so it works by itself. Keep the baddies away!'); startHack(); }
     else { banner(n.start, n.startSub); startHack(); }
   }
   if (G.pulse) {
     G.pulse.r += dt * 1400;
-    G.bots.forEach((b) => { if (Math.abs(cxOf(b) - G.pulse.x) < G.pulse.r) { if (live(b)) bop(b, heroById('spencer'), true); else if (b.state !== 'ko') { b.dead = true; puff(cxOf(b), b.y + b.h - 6, 8, '#7a5a3a'); } } });
+    G.bots.forEach((b) => { if (Math.abs(cxOf(b) - G.pulse.x) < G.pulse.r) { if (live(b)) bop(b, heroById('spencer') || leader(), true); else if (b.state !== 'ko') { b.dead = true; puff(cxOf(b), b.y + b.h - 6, 8, '#7a5a3a'); } } });
     if (G.pulse.r > 2200) G.pulse = null;
   }
   if (!A.active || A.done || A.type === 'boss') return;
   if (A.type === 'food' || A.type === 'survive') { updateSpecialArena(A, dt); return; }
-  const O = A.obj, sp = heroById('spencer');
+  const O = A.obj, sp = heroById('spencer'), auto = A.type === 'hack' && !sp; // Spencer went home: the computer hacks itself
   let gaining = false;
-  if (A.type === 'hack') {
+  if (A.type === 'hack' && !auto) {
     const near = Math.abs(cxOf(sp) - O.cx) < 120 && sp.y + sp.h > 400;
     if (sp.ctrl >= 0) sp.hacking = A.started && near && Math.abs(sp.vx) < 40;
     gaining = A.started && near;
@@ -2977,14 +3007,14 @@ function updateArena(dt) {
     }
     for (const b of G.bots) {
       if (!live(b) || !b.chase || b.state === 'dance') continue;
-      const hitObj = A.type === 'defend' ? Math.abs(cxOf(b) - O.cx) < 34 && b.y + b.h > 400 : sp.ctrl < 0 && overlap(b, sp);
+      const hitObj = A.type === 'defend' || auto ? Math.abs(cxOf(b) - O.cx) < 34 && b.y + b.h > 400 : sp.ctrl < 0 && overlap(b, sp);
       if (!hitObj) continue;
       b.state = 'ko'; b.vy = -380; b.vx = (cxOf(b) < O.cx ? -1 : 1) * 200; b.t = 0;
       sparks(cxOf(b), b.y + 18, 8, '#ff6150');
       if (G.shield > 0) { floatText(O.cx, O.y - 20, 'Blocked!', '#bff6ff'); if (A.type === 'hack') combo('Guard the Hack'); }
       else {
         A.progress = Math.max(0, A.progress - 4); floatText(O.cx, O.y - 20, '-4%', '#ff8a7a', true); SND.sfx('hurt');
-        if (A.type === 'hack') say(sp, 'Ouch! Keep them off me!', 1.6);
+        if (A.type === 'hack' && sp) say(sp, 'Ouch! Keep them off me!', 1.6);
       }
     }
   }
@@ -3029,8 +3059,9 @@ function updateHints() {
     if (n.type === 'guard') { const T = G.teachers[n.t]; if (!T || T.distract > 0 || x > T.x + 20) continue; }
     need = n; break;
   }
+  if (need && friendGone(need.hero)) { teamEffort(need); need = null; }
   const A = L.arena;
-  if (!need && A && A.active && !A.done && A.type === 'hack') need = { hero: 'spencer', type: 'hack' };
+  if (!need && A && A.active && !A.done && A.type === 'hack' && !friendGone('spencer')) need = { hero: 'spencer', type: 'hack' };
   G.need = need; G.needHero = need ? need.hero : null;
 }
 
@@ -3280,7 +3311,7 @@ function drawEShot(c, q, t) {
 const THROWS = {
   balloon: { name: 'Water Balloon', desc: 'Lob it high. SPLASH! It soaks every baddie nearby.', cd: 0.8 },
   plane: { name: 'Paper Plane', desc: 'Glides straight and far, right across the screen.', cd: 0.55 },
-  boomerang: { name: 'Boomerang', desc: 'Flies out and comes back. Bops baddies both ways!', cd: 0.3 },
+  soccer: { name: 'Soccer Ball', desc: 'Kick it! It bounces off walls and bops three baddies in a row.', cd: 0.5 },
   slime: { name: 'Slime Ball', desc: 'Leaves a sticky puddle that traps baddies.', cd: 0.8 },
   star: { name: 'Foam Ninja Star', desc: 'Super fast. Zips through three baddies in a row.', cd: 0.45 },
   chicken: { name: 'Rubber Chicken', desc: 'Squeaks, spins and bounces. Very silly.', cd: 0.7 },
@@ -3289,7 +3320,8 @@ const THROWS = {
 };
 const THROW_IDS = Object.keys(THROWS);
 const THROW_DEFAULT = { naseer: 'plane', frankie: 'snowball', spencer: 'disc', jaxxs: 'balloon', james: 'star', ollie: 'chicken' };
-function heroThrow(id) { const k = SAVE.throws && SAVE.throws[id]; return THROWS[k] ? k : THROW_DEFAULT[id]; }
+function heroThrow(id) { let k = SAVE.throws && SAVE.throws[id]; if (k === 'boomerang') k = 'soccer'; return THROWS[k] ? k : THROW_DEFAULT[id]; }
+function throwSfx(kind) { return kind === 'chicken' ? 'squeak' : kind === 'soccer' ? 'kick' : 'throw'; }
 
 function doThrow(p) {
   const kind = heroThrow(p.id), f = p.face;
@@ -3297,7 +3329,7 @@ function doThrow(p) {
   switch (kind) {
     case 'balloon': q.vx = f * 430; q.vy = -540; q.g = 1300; q.r = 12; break;
     case 'plane': q.vx = f * 640; q.life = 1.6; break;
-    case 'boomerang': q.vx = f * 780; q.vy = -40; q.r = 13; q.life = 3; q.maxHits = 99; p.boomOut = true; break;
+    case 'soccer': q.x = cxOf(p) + f * 18; q.y = p.y + p.h - 14; q.vx = f * 620; q.vy = -270; q.g = 1300; q.r = 11; q.life = 2.4; q.maxHits = 3; break;
     case 'slime': q.vx = f * 480; q.vy = -400; q.g = 1300; q.r = 11; break;
     case 'star': q.vx = f * 1000; q.r = 10; q.life = 0.9; q.maxHits = 3; break;
     case 'chicken': q.vx = f * 520; q.vy = -470; q.g = 1400; q.r = 13; q.maxHits = 3; break;
@@ -3305,8 +3337,9 @@ function doThrow(p) {
     case 'disc': q.vx = f * 780; q.vy = -60; q.g = -120; q.r = 12; q.life = 1.3; q.maxHits = 2; break;
   }
   G.proj.push(q);
-  p.throwCd = THROWS[kind].cd; p.punchT = 0.2;
-  SND.sfx(kind === 'chicken' ? 'squeak' : 'throw');
+  p.throwCd = THROWS[kind].cd;
+  if (kind === 'soccer') p.kickT = 0.25; else p.punchT = 0.2;
+  SND.sfx(throwSfx(kind));
 }
 
 function throwBurst(q) {
@@ -3326,46 +3359,53 @@ function throwBurst(q) {
 }
 
 function updateThrow(q, dt) {
-  q.t += dt; q.spin += dt * 14;
-  if (q.obj === 'boomerang') {
-    if (q.t < 0.6) q.vx -= q.dir * 1000 * dt;
-    else {
-      const o = q.owner, dx = cxOf(o) - q.x, dy = o.y + 24 - q.y, d = Math.hypot(dx, dy) || 1;
-      q.vx = lerp(q.vx, (dx / d) * 860, Math.min(1, dt * 6)); q.vy = lerp(q.vy, (dy / d) * 860, Math.min(1, dt * 6));
-      if (d < 34 || q.life < 0.1) { q.life = 0; o.boomOut = false; return; }
-    }
-  }
+  const ball = q.obj === 'soccer';
+  q.t += dt; q.spin += ball ? q.vx * dt / 20 : dt * 14;
   q.vy += q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt;
   if (q.obj === 'plane') q.y += Math.sin(q.t * 9) * 1.2;
   // the ground and walls
   const gy = groundBelow(q.x, q.y - 12);
   if (gy !== null && q.y + q.r > gy && q.vy >= 0) {
-    if (q.obj === 'chicken' && q.bounces < 2) { q.y = gy - q.r; q.vy = -q.vy * 0.6; q.bounces++; SND.sfx('squeak'); }
+    if (ball) { // bounces, then rolls
+      q.y = gy - q.r;
+      if (q.vy > 110) { q.vy = -q.vy * 0.78; q.vx *= 0.94; ballBounce(q); }
+      else { q.vy = 0; q.vx *= Math.max(0, 1 - dt * 1.6); }
+    }
+    else if (q.obj === 'chicken' && q.bounces < 2) { q.y = gy - q.r; q.vy = -q.vy * 0.6; q.bounces++; SND.sfx('squeak'); }
     else if (['balloon', 'slime', 'snowball', 'chicken'].includes(q.obj)) { throwBurst(q); return; }
     else { q.y = gy - q.r; q.vy = 0; }
   }
   const walls = G.L.solids.concat(G.L.barriers.filter((B) => !B.broken));
   for (const s of walls) {
     if (s.skin === 'floor' || q.x < s.x || q.x > s.x + s.w || q.y < s.y || q.y > s.y + s.h) continue;
-    if (q.obj === 'boomerang') { q.t = Math.max(q.t, 0.6); q.vx = -q.vx * 0.3; } else { throwBurst(q); return; }
+    if (!ball) { throwBurst(q); return; }
+    // the soccer ball bounces off walls and ceilings
+    if (q.y - q.vy * dt >= s.y + s.h) { q.y = s.y + s.h + 1; q.vy = Math.abs(q.vy) * 0.5; }
+    else { q.x = q.vx > 0 ? s.x - 1 : s.x + s.w + 1; q.vx = -q.vx * 0.75; }
+    ballBounce(q);
   }
   // baddies and bosses (grown-ups can't be hit)
   for (const b of G.bots) {
+    if (q.hits >= q.maxHits) break;
     if (!live(b) || q.hitList.includes(b)) continue;
     if (q.x > b.x - q.r && q.x < b.x + b.w + q.r && q.y > b.y - q.r && q.y < b.y + b.h + q.r) {
       q.hitList.push(b); q.hits++;
       if (q.obj === 'balloon' || q.obj === 'slime' || q.obj === 'snowball') { bop(b, q.owner); throwBurst(q); return; }
       bop(b, q.owner);
       if (q.obj === 'chicken') SND.sfx('squeak');
-      if (q.hits >= q.maxHits) { q.life = 0; if (q.obj === 'boomerang') q.owner.boomOut = false; return; }
+      if (ball) { if (q.vy > 0) q.vy = -q.vy * 0.5; q.vx *= 0.9; if (q.hits >= q.maxHits) q.life = Math.min(q.life, 0.5); }
+      else if (q.hits >= q.maxHits) { q.life = 0; return; }
     }
   }
   const B = G.boss;
   if (B && B.state !== 'ko' && !q.hitBoss && q.x > B.x - q.r && q.x < B.x + B.w + q.r && q.y > B.y - q.r && q.y < B.y + B.h + q.r) {
     q.hitBoss = true; hitBoss(1, q.owner);
-    if (q.obj !== 'boomerang') { throwBurst(q); return; }
+    if (ball) { q.vx = -q.vx * 0.6; q.vy = -360; ballBounce(q); } else { throwBurst(q); return; }
   }
-  if (q.life <= 0 && q.obj === 'boomerang') q.owner.boomOut = false;
+}
+function ballBounce(q) {
+  q.bounces++;
+  if (G.t - (G.ballSnd ?? -1) > 0.07) { G.ballSnd = G.t; SND.sfx('bounce'); }
 }
 
 function updatePuddles(dt) {
@@ -3397,11 +3437,22 @@ function drawThrowable(c, kind, x, y, spin, s) {
       c.strokeStyle = '#9aa0c0'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(16, 0); c.lineTo(-8, 0); c.stroke();
       c.fillStyle = '#d9dbe8'; c.beginPath(); c.moveTo(16, 0); c.lineTo(-8, 0); c.lineTo(-14, 9); c.closePath(); c.fill(); c.stroke();
       break;
-    case 'boomerang':
-      c.rotate(spin);
-      c.beginPath(); c.moveTo(-14, 10); c.quadraticCurveTo(-2, -2, 0, -14); c.quadraticCurveTo(4, -2, 14, 10); c.quadraticCurveTo(2, 4, -14, 10); c.closePath(); blob(c, '#ff8a1f', 2.5);
-      c.fillStyle = '#ffd23d'; c.beginPath(); c.arc(0, 1, 2.5, 0, 7); c.fill();
+    case 'soccer': {
+      c.beginPath(); c.arc(0, 0, 11, 0, 7); c.fillStyle = '#dfe3f0'; c.fill();
+      c.save(); c.clip();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(-2, -2, 10, 0, 7); c.fill();
+      c.rotate(spin); c.fillStyle = INK; c.strokeStyle = INK; c.lineWidth = 1.3;
+      const pent = (x0, y0, r, rot) => { c.beginPath(); for (let i = 0; i < 5; i++) { const a = rot + i * 1.2566; c.lineTo(x0 + Math.cos(a) * r, y0 + Math.sin(a) * r); } c.closePath(); c.fill(); };
+      pent(0, 0, 4.4, -Math.PI / 2);
+      for (let i = 0; i < 5; i++) {
+        const a = -Math.PI / 2 + i * 1.2566;
+        c.beginPath(); c.moveTo(Math.cos(a) * 4.4, Math.sin(a) * 4.4); c.lineTo(Math.cos(a) * 8, Math.sin(a) * 8); c.stroke();
+        pent(Math.cos(a) * 11.5, Math.sin(a) * 11.5, 4.4, a + Math.PI);
+      }
+      c.restore();
+      c.beginPath(); c.arc(0, 0, 11, 0, 7); c.lineWidth = 2.5; c.strokeStyle = INK; c.stroke();
       break;
+    }
     case 'slime':
       c.beginPath(); c.moveTo(-11, 2); c.quadraticCurveTo(-12, -12, 0, -11); c.quadraticCurveTo(12, -12, 11, 2); c.quadraticCurveTo(9, 10, 4, 8); c.quadraticCurveTo(2, 14, -1, 9); c.quadraticCurveTo(-8, 11, -11, 2); c.closePath(); blob(c, '#7fff6a', 2.5);
       c.fillStyle = INK; c.beginPath(); c.arc(-4, -3, 1.8, 0, 7); c.arc(4, -3, 1.8, 0, 7); c.fill();
@@ -3489,7 +3540,7 @@ function updateGhost(b, dt) {
   }
   if (b.chase || b.hunt) {
     const A = G.L.arena;
-    const tx = b.hunt ? cxOf(nearestPlayer(cxOf(b))) : A && A.type === 'defend' ? A.obj.cx : cxOf(heroById('spencer'));
+    const tx = b.hunt ? cxOf(nearestPlayer(cxOf(b))) : A && A.type === 'defend' ? A.obj.cx : hackX();
     if (Math.abs(tx - cxOf(b)) > 6) b.dir = sign(tx - cxOf(b));
     b.x += b.dir * b.speed * 1.1 * dt;
   } else {
@@ -3545,7 +3596,7 @@ function startSig(B, tgt) {
 function fireSig(B, tgt) {
   const A = G.L.arena;
   if (B.kind === 'megabot') { B.state = 'laser'; B.laserT = 0.7; SND.sfx('laser'); G.shake = Math.max(G.shake, 0.2); return; }
-  if (B.kind === 'king') { B.state = 'rush'; SND.sfx('dash'); say(heroById('frankie'), 'Jump over him!', 1.4); return; }
+  if (B.kind === 'king') { B.state = 'rush'; SND.sfx('dash'); const fk = heroById('frankie'); if (fk) say(fk, 'Jump over him!', 1.4); return; }
   if (B.kind === 'goo') { // goo rains down from the ceiling and leaves sticky puddles
     const n = B.phase2 ? 6 : 4;
     for (let i = 0; i < n; i++) {
@@ -3828,7 +3879,7 @@ function updateChase(dt, wdt) {
   if (!C.got && T.bikeX && G.players.some((p) => cxOf(p) > T.bikeX - 40)) {
     C.got = true; G.winT = 1.8; SND.sfx('win'); confetti(T.bikeX, GROUND - 120, 40);
     banner('GOT IT BACK!', 'Ollie\'s bike is safe');
-    const o = heroById('ollie'); say(o, 'My bike!', 2); G.crew.forEach((e) => (e.cheer = 2.5));
+    const o = heroById('ollie'); if (o) say(o, 'My bike!', 2); G.crew.forEach((e) => (e.cheer = 2.5));
     T.state = 'run'; T.say = 'Sorry!'; T.sayT = 1.5;
   }
 }
@@ -4113,6 +4164,7 @@ const PHOTO_SKY = { school: ['#4fc3f7', '#d8f3ff'], park: ['#6fd0ff', '#e6ffd8']
 function drawPhoto(now) {
   const cvp = $('photo'); if (!cvp || !G) return;
   const c = cvp.getContext('2d'), W = cvp.width, H = cvp.height, L = G.L, P = G.party || {};
+  if (G.lose) { drawLostPhoto(c, W, H, now - (G.lose.shownAt || now)); return; }
   const ls = LOOK_SKY[L.look], t = now - (P.shownAt || now), sky = ls ? [ls[0], ls[ls.length - 1]] : PHOTO_SKY[L.theme] || PHOTO_SKY.school;
   const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]);
   c.fillStyle = g; c.fillRect(0, 0, W, H);
@@ -5167,6 +5219,185 @@ function drawJack(c, b, t) {
   c.restore(); void t;
 }
 
+/* ===================== Friends sent home ===================== */
+// Every hit from a baddie, boss or hazard sends one random friend home. It's never a player's own hero.
+// Lose more than 3 friends and the level is lost.
+const LOSE_AT = 4;
+const HOME_LINES = {
+  naseer: ['I forgot my bag!', 'Nooo, my game!'],
+  frankie: ['Not the outfit!', 'Ugh, seriously?!'],
+  spencer: ['Error 404!', 'System crash!'],
+  jaxxs: ['It wasn\'t me!', 'I was framed!'],
+  james: ['Worth it!', 'Wheeeee!'],
+  ollie: ['Red card?!', 'See ya, crew!']
+};
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+function sendHome() {
+  const pool = followers();
+  if (!pool.length || G.lose) return;
+  const f = pick(pool), name = HEROES[f.id].name;
+  G.crew = G.crew.filter((e) => e !== f);
+  G.homeIds.push(f.id); G.lost++;
+  followers().forEach((e, i) => { e.slot = i; });
+  // start where the friend is, but keep it on screen so you always see them go
+  const x = clamp(cxOf(f), G.cam.x + 95, G.cam.x + VIEW.w - 95), y = clamp(f.y + f.h, VIEW.top + 170, GROUND + 30);
+  G.sent.push({ id: f.id, x, y, t: 0, face: f.face || 1, line: pick(HOME_LINES[f.id]), trail: [] });
+  SND.sfx('senthome');
+  const left = LOSE_AT - G.lost;
+  if (left <= 0) { startLose(name); return; }
+  banner('SENT HOME!', left === 1 ? `${name} flew home. One more and it's game over!` : `${name} flew all the way home`);
+  const o = pick(followers());
+  if (o) setTimeout(() => { if (G && !G.over && G.crew.includes(o)) say(o, pick(['Noooo!', `Bye, ${name}!`, `Not ${name}!`]), 1.5); }, 500);
+  G.players.forEach((p, i) => { const el = $('hp' + i); if (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } });
+}
+
+function updateSent(dt) {
+  for (const E of G.sent) {
+    E.t += dt;
+    if (E.t >= 0.4 && E.t < 1.5) { const P = sentPath(E); E.trail.push({ x: P.x, y: P.y, a: 0, s: P.s }); }
+    for (const q of E.trail) q.a += dt;
+    E.trail = E.trail.filter((q) => q.a < 0.5);
+  }
+  G.sent = G.sent.filter((E) => E.t < 2.4);
+}
+function sentEnd() {
+  const yTop = (hudBottom() - VIEW.offY) / VIEW.scale;
+  return { x: G.cam.x + VIEW.w * 0.8, y: Math.max(VIEW.top + 40, yTop + 44) };
+}
+// up, up and away: a big arc into the sky that shrinks into the distance
+function sentPath(E) {
+  const k = clamp((E.t - 0.4) / 1.1, 0, 1), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(2 - 2 * k, 2) / 2, u = 1 - e;
+  const end = sentEnd(), x0 = E.x, y0 = E.y - 34, x1 = (x0 + end.x) / 2, y1 = Math.min(y0, end.y) - 220;
+  return { x: u * u * x0 + 2 * u * e * x1 + e * e * end.x, y: u * u * y0 + 2 * u * e * y1 + e * e * end.y, s: lerp(1, 0.16, e) };
+}
+
+function drawSentHome(c, t) {
+  if (!G.sent.length) return;
+  const d = VIEW.dpr, s = VIEW.scale;
+  c.save(); c.setTransform(d * s, 0, 0, d * s, (-G.cam.x * s + VIEW.shx) * d, (VIEW.offY + VIEW.shy) * d);
+  for (const E of G.sent) drawSent(c, E, t);
+  c.restore();
+}
+function spikyPath(c, n, r1, r2) {
+  c.beginPath();
+  for (let i = 0; i < n * 2; i++) { const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? r2 : r1; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+  c.closePath();
+}
+function drawSent(c, E, t) {
+  const col = HEROES[E.id].color;
+  if (E.t < 0.4) { // BONK!
+    const k = E.t / 0.4, pop = k < 0.3 ? lerp(0.4, 1.25, k / 0.3) : lerp(1.25, 1, (k - 0.3) / 0.7);
+    c.save(); c.translate(E.x, E.y - 36); c.rotate(E.t * 2); c.scale(pop, pop); c.globalAlpha = 1 - k * 0.5;
+    spikyPath(c, 8, 58, 30); blob(c, '#ffd23d', 3); c.restore();
+    drawHero(c, E.id, E.x, E.y - Math.sin(k * Math.PI) * 20, { t, pose: 'flail', face: E.face, scale: 1.05 });
+    c.save(); c.translate(E.x, E.y - 104); c.scale(pop, pop); c.rotate(-0.08);
+    c.font = '30px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
+    c.lineWidth = 8; c.strokeStyle = INK; c.strokeText('BONK!', 0, 0); c.fillStyle = '#ff6150'; c.fillText('BONK!', 0, 0); c.restore();
+  } else if (E.t < 1.5) { // flying home
+    const tr = E.trail; c.lineCap = 'round';
+    for (const [w, k0, cl] of [[18, 3, col], [6, 1, '#fff']]) { // a comet streak in their colour with a bright core
+      c.strokeStyle = cl;
+      for (let i = 1; i < tr.length; i++) {
+        const q0 = tr[i - 1], q = tr[i], a = 1 - q.a / 0.5;
+        c.globalAlpha = a * 0.9; c.lineWidth = (w * q.s + k0) * a; c.beginPath(); c.moveTo(q0.x, q0.y); c.lineTo(q.x, q.y); c.stroke();
+      }
+    }
+    for (let i = 0; i < tr.length; i += 3) { // sparkles
+      const q = tr[i], a = 1 - q.a / 0.5;
+      c.globalAlpha = a; c.fillStyle = ['#ffd23d', '#ff8ad8', '#7fd3ff', '#9bff8a'][i % 4];
+      c.save(); c.translate(q.x + Math.sin(i * 2.3) * (8 + q.a * 40) * q.s, q.y + Math.cos(i * 1.7) * (8 + q.a * 40) * q.s); c.rotate(q.a * 8);
+      spikyPath(c, 4, 6, 2); c.fill(); c.restore();
+    }
+    c.globalAlpha = 1;
+    const P = sentPath(E);
+    c.save(); c.translate(P.x, P.y); c.rotate((E.t - 0.4) * 13);
+    drawHero(c, E.id, 0, 34 * P.s, { t, pose: 'flail', face: E.face, scale: P.s });
+    c.restore();
+  } else { // ...and a twinkle as they land at home
+    const end = sentEnd(), k = (E.t - 1.5) / 0.9, sz = k < 0.25 ? k / 0.25 * 1.4 : lerp(1.4, 0, (k - 0.25) / 0.75);
+    c.save(); c.translate(end.x, end.y); c.rotate(k * 2.5);
+    c.shadowColor = '#fff'; c.shadowBlur = 16; spikyPath(c, 4, 32 * sz, 7 * sz); blob(c, '#ffe066', 2.5); c.shadowBlur = 0;
+    c.globalAlpha = clamp(1 - k, 0, 1); c.strokeStyle = col; c.lineWidth = 3; c.beginPath(); c.arc(0, 0, 10 + k * 46, 0, 7); c.stroke();
+    c.restore();
+    if (k < 0.85) { // a little house pops up so you know where they went
+      const hs = k < 0.2 ? lerp(0, 1.15, k / 0.2) : k < 0.3 ? lerp(1.15, 1, (k - 0.2) / 0.1) : 1;
+      c.save(); c.translate(end.x, end.y + 30); c.scale(hs, hs); c.globalAlpha = clamp((0.85 - k) / 0.25, 0, 1);
+      c.beginPath(); c.moveTo(-17, -2); c.lineTo(0, -18); c.lineTo(17, -2); c.closePath(); blob(c, '#ff6150', 2.5);
+      rrect(c, -13, -3, 26, 20, 2); blob(c, '#fff3d6', 2.5);
+      rrect(c, -4, 5, 8, 12, 2); blob(c, col, 2);
+      c.restore();
+    }
+  }
+  if (E.t < 1.0) { // what they shout as they go
+    c.globalAlpha = clamp((1.0 - E.t) / 0.2, 0, 1); bubble(c, E.x, E.y - 128, E.line, true); c.globalAlpha = 1;
+  }
+}
+
+/* ---------- Losing the level ---------- */
+function startLose(name) {
+  G.lose = { t: 0, name };
+  banner('OH NO!', `${name} was the 4th friend sent home`);
+}
+function updateLose(dt) {
+  const Z = G.lose; Z.t += dt;
+  if (Z.t > 1.9 && !Z.sad) { Z.sad = true; SND.sfx('sad'); }
+  if (Z.t > 3.0 && !Z.shown) { Z.shown = true; Z.shownAt = performance.now() / 1000; G.over = true; showLost(); }
+}
+// The picture on the "Sent home!" screen: each friend waving from their own house
+function drawLostPhoto(c, W, H, t) {
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#3b2d6b'); g.addColorStop(1, '#ff9f7a');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.fillStyle = '#f6f0c8'; c.beginPath(); c.arc(W - 64, 48, 24, 0, 7); c.fill();
+  for (let i = 0; i < 14; i++) { c.fillStyle = 'rgba(255,255,255,' + (0.4 + 0.4 * Math.sin(t * 2 + i)) + ')'; c.fillRect((i * 137) % W, (i * 41) % 90 + 8, 3, 3); }
+  c.fillStyle = '#2f7a4a'; c.fillRect(0, H - 34, W, 34); c.fillStyle = INK; c.fillRect(0, H - 35, W, 3);
+  const ids = G.homeIds, n = ids.length, gap = Math.min(150, (W - 40) / Math.max(1, n));
+  ids.forEach((id, i) => {
+    const x = W / 2 + (i - (n - 1) / 2) * gap, y = H - 34, col = HEROES[id].color, bob = Math.sin(t * 3 + i) * 2;
+    c.save(); c.translate(x, y);
+    c.beginPath(); c.moveTo(-62, -96); c.lineTo(0, -150); c.lineTo(62, -96); c.closePath(); blob(c, '#ff6150', 3);
+    rrect(c, -50, -100, 100, 100, 4); blob(c, '#fff3d6', 3);
+    rrect(c, 14, -48, 24, 48, 3); blob(c, col, 2.5);
+    c.beginPath(); c.arc(-16, -56 + bob, 24, 0, 7); c.fillStyle = '#ffe9a8'; c.fill();
+    c.save(); c.clip(); c.drawImage(portraitFor(id), -40, -80 + bob, 48, 48); c.restore();
+    c.beginPath(); c.arc(-16, -56, 24, 0, 7); c.lineWidth = 3; c.strokeStyle = INK; c.stroke();
+    c.font = '600 15px Fredoka, sans-serif'; c.textAlign = 'center'; c.fillStyle = '#fff'; c.lineWidth = 4; c.strokeStyle = INK; c.lineJoin = 'round';
+    c.strokeText(HEROES[id].name, 0, 22 - 34 + 30); c.fillText(HEROES[id].name, 0, 22 - 34 + 30);
+    c.restore();
+  });
+  c.save(); c.translate(18, 18); c.rotate(-0.04); c.font = '22px "Lilita One", sans-serif';
+  const w = c.measureText(G.L.name).width + 26; rrect(c, 0, 0, w, 36, 9); blob(c, '#d9d6ec', 3);
+  c.fillStyle = INK; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(G.L.name, 13, 19); c.restore();
+}
+
+/* ---------- When a needed friend has gone home, the crew teams up instead ---------- */
+const NEED_HINT = { barrier: 'frankie', shutters: 'naseer', wall: 'james', guard: 'jaxxs', gate: 'ollie' };
+function friendGone(id) { return !!G && G.homeIds.includes(id); }
+function teamEffort(n) {
+  if (n.type === 'shutters' || n.teamDone) return; // you can still time a run through the shutters
+  if (n.teamAt == null) {
+    n.teamAt = G.t;
+    toast(null, `${HEROES[n.hero].name} went home, so the crew teams up instead!`);
+    followers().forEach((f) => { f.cheer = 1.4; });
+    return;
+  }
+  if (G.t - n.teamAt < (n.type === 'guard' ? 0.25 : 1.8)) return; // a guard is distracted straight away
+  n.teamDone = true;
+  const ld = leader();
+  if (n.type === 'barrier') smashBarrier(n.ref, ld, 'The crew smashed it together');
+  else if (n.type === 'anchor') ropePull(ld, n.ref, 'The crew gives everyone a boost');
+  else if (n.type === 'gate') pressButton(n.ref, 'The crew hit the button together');
+  else if (n.type === 'guard') {
+    const T = G.teachers[n.t];
+    if (T) { T.distract = 7; T.alert = 0; say(T, 'What was that noise?!', 2); SND.sfx('eek'); banner('TEAMWORK!', `The crew distracted ${T.name}`); }
+  }
+  meterAdd(10);
+}
+function hackX() {
+  const sp = heroById('spencer'), A = G.L.arena;
+  return sp ? cxOf(sp) : A && A.obj ? A.obj.cx : cxOf(leader());
+}
+
 /* ===================== Backgrounds & platforms ===================== */
 const ZONE_SKY = { yard: ['#6fd0ff', '#d8f3ff'], court: ['#7bd4ff', '#ffe9c2'] };
 
@@ -5449,7 +5680,7 @@ function render() {
   drawFloor(c, camX, VIEW.w, bottom);
   if (playing) drawWorld(c, t, camX); else drawMenuCrew(c, t);
   c.setTransform(1, 0, 0, 1, 0, 0);
-  if (playing) { drawWeather(c, t); surpriseDraw(c, t, 'screen'); drawDarkness(c, t); drawScreenFx(c, t); drawBossPointer(c, t); }
+  if (playing) { drawWeather(c, t); surpriseDraw(c, t, 'screen'); drawDarkness(c, t); drawSentHome(c, t); drawScreenFx(c, t); drawBossPointer(c, t); }
   if (VIEW.portrait && touchControlsOn() && (STATE.screen === 'play' || STATE.screen === 'pause')) {
     const y = VIEW.ctlTop * d;
     const g = c.createLinearGradient(0, y, 0, cv.height); g.addColorStop(0, 'rgba(22,24,58,0.55)'); g.addColorStop(1, 'rgba(22,24,58,0.92)');
@@ -5588,7 +5819,7 @@ function drawCrewMember(c, e, t) {
   if (e.hidden) alpha = 0.4;
   if (e.invis > 0) alpha = 0.22 + Math.sin(t * 20) * 0.08;
   if (e.ctrl < 0 && e.sneak) alpha = Math.min(alpha, 0.55);
-  if (e.inv > 0 && e.ctrl >= 0 && e.hp < e.maxHp && Math.floor(t * 14) % 2) alpha *= 0.35;
+  if (e.inv > 0 && e.ctrl >= 0 && G.t - (e.hitAt ?? -99) < 1.8 && Math.floor(t * 14) % 2) alpha *= 0.35;
   const pose = e.pose, bike = e.id === 'ollie' && !['climb', 'dash', 'kick', 'cheer'].includes(pose) && !(G.L.chase && !G.L.chase.got);
   if (e.ctrl >= 0 || e.sneak) { c.fillStyle = 'rgba(29,27,58,0.2)'; c.beginPath(); c.ellipse(cxOf(e), e.y + e.h, 18, 5, 0, 0, 7); c.fill(); }
   if (partyDancing(e)) { drawDancer(c, e.id, cxOf(e), e.y + e.h, G.party.t - 0.6 + e.party.i * 0.13, 1, e.id === 'ollie' && !!G.L.chase); return; }
@@ -5657,7 +5888,7 @@ function drawMainframe(c, t) {
   }
 }
 function drawProj(c, q, t) {
-  if (q.kind === 'throw') { drawThrowable(c, q.obj, q.x, q.y, q.spin, 1); return; }
+  if (q.kind === 'throw') { c.save(); c.globalAlpha = clamp(q.life / 0.25, 0, 1); drawThrowable(c, q.obj, q.x, q.y, q.spin, 1); c.restore(); return; }
   if (q.kind === 'ball' || q.kind === 'homer' || q.kind === 'super') {
     c.save(); c.translate(q.x, q.y); c.rotate(q.spin || 0);
     if (q.kind === 'super' || q.glow) { c.shadowColor = '#ffd23d'; c.shadowBlur = 16; }
@@ -6028,7 +6259,7 @@ function refreshCrewSelect() {
       <p class="throw-desc"><b>${THROWS[cur].name}.</b> ${THROWS[cur].desc}</p></div>`;
   $('crewDetail').querySelectorAll('.thr').forEach((b) => {
     const c = b.querySelector('canvas').getContext('2d'); drawThrowable(c, b.dataset.throw, 44, 44, 0.6, 2.2);
-    b.addEventListener('click', () => { SAVE.throws[id] = b.dataset.throw; writeSave(); SND.sfx(b.dataset.throw === 'chicken' ? 'squeak' : 'throw'); refreshCrewSelect(); if (STATE.pad) focusPad($('crewDetail').querySelector('.thr.on')); });
+    b.addEventListener('click', () => { SAVE.throws[id] = b.dataset.throw; writeSave(); SND.sfx(throwSfx(b.dataset.throw)); refreshCrewSelect(); if (STATE.pad) focusPad($('crewDetail').querySelector('.thr.on')); });
   });
 }
 function animateCrewCards(t) {
@@ -6045,6 +6276,7 @@ function animateCrewCards(t) {
 /* ---------- HUD ---------- */
 const HEART = (on) => `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="${on ? '#ff4d6d' : '#d9d6ec'}" stroke="#1d1b3a" stroke-width="2.4"/></svg>`;
 let hudCache = {};
+const HOUSE_SVG = '<svg class="hm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12 L12 3.5 L21.5 12 Z" fill="#ff6150" stroke="#1d1b3a" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="11" width="14" height="10" rx="1" fill="#fff3d6" stroke="#1d1b3a" stroke-width="2"/><rect x="10" y="14.5" width="4" height="6.5" fill="#ffc83d" stroke="#1d1b3a" stroke-width="1.5"/></svg>';
 function buildHUD() {
   hudCache = {};
   $('statBox').innerHTML = G.players.map((p, i) => `<div class="chip" id="hp${i}"><canvas width="48" height="48"></canvas><span class="hearts"></span></div>`).join('') +
@@ -6053,7 +6285,7 @@ function buildHUD() {
   $('portraits').innerHTML = HERO_IDS.map((id, i) => {
     const pl = G.players.findIndex((p) => p.id === id);
     const tag = pl < 0 ? '' : `<span class="you ${pl ? 'p2' : ''}">${G.players.length === 1 ? 'YOU' : 'P' + (pl + 1)}</span>`;
-    return `<button class="por" data-por="${id}" aria-label="Call ${HEROES[id].name}"><canvas width="96" height="96"></canvas><span class="cd"></span>${tag}${STATE.touch || STATE.pad ? '' : `<span class="k">${i + 1}</span>`}<span class="padk">${padNames().call}</span></button>`;
+    return `<button class="por" data-por="${id}" aria-label="Call ${HEROES[id].name}"><canvas width="96" height="96"></canvas><span class="cd"></span>${tag}${STATE.touch || STATE.pad ? '' : `<span class="k">${i + 1}</span>`}<span class="padk">${padNames().call}</span>${HOUSE_SVG}</button>`;
   }).join('');
   $('portraits').querySelectorAll('.por').forEach((el) => {
     el.querySelector('canvas').getContext('2d').drawImage(portraitFor(el.dataset.por), 0, 0);
@@ -6067,8 +6299,8 @@ function portraitShake(id) {
 function updateHUD() {
   if (!G) return;
   G.players.forEach((p, i) => {
-    const key = 'hp' + i, v = p.hp + '/' + p.maxHp;
-    if (hudCache[key] !== v) { hudCache[key] = v; $('hp' + i).querySelector('.hearts').innerHTML = Array.from({ length: p.maxHp }, (_, k) => HEART(k < p.hp)).join(''); }
+    const key = 'hp' + i, left = Math.max(0, LOSE_AT - G.lost);
+    if (hudCache[key] !== left) { hudCache[key] = left; $('hp' + i).querySelector('.hearts').innerHTML = Array.from({ length: LOSE_AT }, (_, k) => HEART(k < left)).join(''); }
   });
   if (STATE.pad) {
     if (G.needHero && G.needHero !== PAD.lastNeed) PAD.sel = HERO_IDS.indexOf(G.needHero);
@@ -6081,6 +6313,7 @@ function updateHUD() {
     const k = id + 'cd';
     if (hudCache[k] !== pct) { hudCache[k] = pct; el.querySelector('.cd').style.background = pct ? `conic-gradient(rgba(22,24,58,0.62) ${pct}%, transparent 0)` : 'none'; }
     el.classList.toggle('need', G.needHero === id && cd <= 0);
+    el.classList.toggle('home', G.homeIds.includes(id));
     el.classList.toggle('sel', STATE.pad && HERO_IDS[PAD.sel] === id);
   });
   const m = Math.round(G.meter);
@@ -6097,7 +6330,7 @@ function updateHUD() {
       if (hudCache.prog !== 'b' + pr) { hudCache.prog = 'b' + pr; $('hackFill').style.width = pr + '%'; $('hackLabel').textContent = B.name; }
     } else {
       const pr = Math.floor(A.progress);
-      const lab = A.type === 'food' ? `Bops: ${A.count || 0} of ${A.goal}` : A.type === 'survive' ? `Sunrise: ${pr}%` : `${THEMES[G.L.theme].n.obj}: ${pr}%`;
+      const lab = A.type === 'food' ? `Bops: ${A.count || 0} of ${A.goal}` : A.type === 'survive' ? `Sunrise: ${pr}%` : `${A.type === 'hack' && friendGone('spencer') ? 'Working by itself' : THEMES[G.L.theme].n.obj}: ${pr}%`;
       if (hudCache.prog !== lab) { hudCache.prog = lab; $('hackFill').style.width = pr + '%'; $('hackLabel').textContent = lab; }
     }
   }
@@ -6155,17 +6388,19 @@ function showHint(h) {
   const N = padNames(), moveKey = touchOrKey('Tap the star', one ? 'Press ↓, S or X' : 'Player 1 presses S, Player 2 presses ↓', `Press ${N.move}`);
   const T = h.t != null ? (G.teachers[h.t] || L.teachers[h.t]) : null, low = (x) => x.charAt(0).toLowerCase() + x.slice(1);
   let id = null, text = '';
+  const gone = NEED_HINT[h.kind];
+  if (gone && friendGone(gone)) { toast(null, `${HEROES[gone].name} went home. ${h.kind === 'shutters' ? 'Time your run through the gaps!' : 'Keep going and the crew will team up!'}`); return; }
   switch (h.kind) {
     case 'goal': text = L.goal; break;
     case 'move': text = touchOrKey('Slide your thumb on the left side of the screen to run. Tap the up arrow to jump.', one ? 'Run with ← → or A D. Jump with ↑, W or Space.' : 'Player 1: A D to run, W to jump. Player 2: arrow keys.', `Run with the left stick and press ${N.jump} to jump.`); break;
     case 'special': id = me.id; text = one ? `${H.name}'s special move is ${H.move}. ${moveKey} to use it.` : `Every hero has a special move. ${moveKey} to use yours.`; break;
-    case 'enemy': text = `${n.enemies}! ${n.enemyTip}`; break;
-    case 'throw': { const ob = THROWS[heroThrow(me.id)].name; id = me.id; text = touchOrKey(`Tap the ${ob} button to throw your ${ob} at baddies.`, one ? `Press Q to throw your ${ob} at baddies.` : 'Player 1 throws with Q. Player 2 throws with Enter.', `Press ${N.throw} to throw your ${ob} at baddies.`); break; }
+    case 'enemy': text = `${n.enemies}! ${n.enemyTip} If one gets you, a friend is sent home.`; break;
+    case 'throw': { const tk = heroThrow(me.id), ob = THROWS[tk].name, vb = tk === 'soccer' ? 'kick' : 'throw'; id = me.id; text = touchOrKey(`Tap the ${ob} button to ${vb} your ${ob} at baddies.`, one ? `Press Q to ${vb} your ${ob} at baddies.` : 'Player 1 throws with Q. Player 2 throws with Enter.', `Press ${N.throw} to ${vb} your ${ob} at baddies.`); break; }
     case 'chase': id = 'ollie'; text = 'Keep up with the screen! Jump over the tyres and catch the bike thief.'; break;
     case 'survive': text = 'Zombies pop up from the ground! Keep moving and bop them until the sun comes up.'; break;
     case 'dark': text = 'It\'s dark in here! Stay close to your crew. Grown-ups carry lanterns, so you can see them coming.'; break;
     case 'spring': text = h.shed ? 'Springboards bounce you up high. Can you reach the bike shed roof?' : 'Springboards bounce you up high. What\'s up on that roof?'; break;
-    case 'patrol': if (T) text = `${T.name} is on patrol. Don't let ${T.them} see you! Stand still in ${n.hide} to hide.`; break;
+    case 'patrol': if (T) text = `${T.name} is on patrol and could turn around any time. Don't let ${T.them} see you! Stand still in ${n.hide} to hide.`; break;
     case 'barrier': id = 'frankie'; text = isPlayer('frankie') ? `Frankie, punch ${low(n.barrier)} with your special move!` : `${n.barrier} is blocking the way! To smash it, ${callTip('frankie')}.`; break;
     case 'shutters': id = 'naseer'; text = isPlayer('naseer') ? `${n.blocker} are super fast. To use your Turbo Controller, ${callTip('naseer')}.` : `${n.blocker} are super fast! To slow down time, ${callTip('naseer')}.`; break;
     case 'wall': id = 'james'; text = isPlayer('james') ? `James, hold toward the climbing wall to climb it. To pull up the whole crew, ${callTip('james')}.` : `${n.wall} is too high! To use James's Swing Rope, ${callTip('james')}.`; break;
@@ -6176,14 +6411,24 @@ function showHint(h) {
 }
 
 function showDone(stars) {
-  const labels = ['Finished the level', 'Found the Gold Star', G.L.star3 === 'nohit' ? 'No hearts lost' : 'Never caught by a grown-up'];
+  const labels = ['Finished the level', 'Found the Gold Star', G.L.star3 === 'nohit' ? 'No friends sent home' : 'Never caught by a grown-up'];
   const nx = nextLevelId(G.L.id);
+  $('againBtn').textContent = 'Play again'; $('photo').setAttribute('aria-label', 'Crew photo: the friends dancing');
   $('doneTitle').textContent = nx ? 'Level complete!' : 'Adventure complete!';
   $('nextBtn').hidden = !nx;
   $('doneStars').innerHTML = stars.map((s, i) => `<div class="bigstar ${s ? 'got' : ''}"><svg viewBox="0 0 48 48"><path d="M24 3l6.2 13.6 14.8 1.6-11.1 10 3.2 14.6L24 35.3 10.9 42.8l3.2-14.6L3 18.2l14.8-1.6z" fill="${s ? '#ffc83d' : '#d9d6ec'}" stroke="#1d1b3a" stroke-width="3" stroke-linejoin="round"/></svg>${labels[i]}</div>`).join('');
   const sec = Math.floor(G.time), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0');
   $('doneStats').innerHTML = `<div><b>${G.coins}</b><span>coins</span></div><div><b>${G.bopped}</b><span>baddies bopped</span></div><div><b>${mm}:${ss}</b><span>time</span></div>`;
   if (G && G.over) showScreen('done');
+}
+function showLost() {
+  $('doneTitle').textContent = 'Sent home!';
+  $('nextBtn').hidden = true; $('againBtn').textContent = 'Try again';
+  $('photo').setAttribute('aria-label', 'The friends who were sent home, waving from their houses');
+  $('doneStars').innerHTML = `<p class="lostmsg">Too many friends were sent home.<small>Jump on baddies, throw at them, or dodge them to keep your crew together.</small></p>`;
+  const sec = Math.floor(G.time), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0');
+  $('doneStats').innerHTML = `<div><b>${G.coins}</b><span>coins</span></div><div><b>${G.bopped}</b><span>baddies bopped</span></div><div><b>${mm}:${ss}</b><span>time</span></div>`;
+  showScreen('done');
 }
 
 /* ---------- Touch controls ---------- */
