@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Naseer &amp; Crew">
 <meta name="theme-color" content="#16183a">
-<meta name="description" content="A side-scrolling adventure starring Naseer and his five friends.">
+<meta name="description" content="A side-scrolling adventure starring Naseer and his six friends.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -145,8 +145,8 @@ h2.title {
 .seg button { font-family: var(--font-display); font-size: 18px; padding: 8px 16px; border: 0; background: #fff; color: var(--ink); cursor: pointer; }
 .seg button + button { border-left: 3px solid var(--ink); }
 .seg button.on { background: var(--sun); }
-.crewgrid { display: grid; gap: 10px; width: 100%; grid-template-columns: repeat(6, minmax(0, 1fr)); }
-@media (max-width: 820px) { .crewgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.crewgrid { display: grid; gap: 10px; width: 100%; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+@media (max-width: 820px) { .crewgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } }
 .hero {
   background: var(--paper); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink);
   padding: 6px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
@@ -157,6 +157,15 @@ h2.title {
 .hero span { font-size: 12px; color: var(--muted); font-weight: 600; text-align: center; }
 .hero.sel1 { outline: 5px solid var(--p1); outline-offset: 0; }
 .hero.home canvas { filter: grayscale(1); opacity: 0.5; }
+.hero.dim { opacity: 0.55; }
+.hero.friend { outline: 4px solid #22c993; outline-offset: 0; }
+.hero .badge.bf { background: #22c993; }
+.hero .badge.bn { background: #ff8a1f; }
+.jobs { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; font-size: 14px; font-weight: 600; text-align: center; }
+.jobs .job { display: inline-flex; align-items: center; gap: 5px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 2px 10px 2px 2px; }
+.jobs .job canvas { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink); }
+.jobs > b { color: #fff; text-shadow: 0 1px 0 var(--ink); }
+@media (max-width: 400px) { #crewTitle { font-size: 27px; padding: 0 44px; } }
 .hero .homebadge { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 3px; background: #fff; border: 2px solid var(--ink);
   border-radius: 8px; padding: 1px 6px 1px 2px; font-size: 12px; font-weight: 700; color: var(--ink); }
 .hero .homebadge svg { width: 18px; height: 18px; }
@@ -334,7 +343,7 @@ h2.title {
   .path { gap: 10px; }
   .node { width: 124px; }
   .node .num { width: 44px; height: 44px; font-size: 28px; }
-  .crewgrid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .crewgrid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
   .hero { padding: 4px 4px 6px; }
   .hero canvas { max-width: 66px; }
   .hero b { font-size: 16px; }
@@ -390,7 +399,7 @@ h2.title {
   <section class="screen" id="s-title">
     <div class="inner">
       <h1 class="logo">Naseer<small>and the</small>Crew</h1>
-      <p class="tag">Six friends. One crew. Total school chaos.</p>
+      <p class="tag">Seven friends. One crew. Total school chaos.</p>
       <div class="title-gap"></div>
       <div class="row">
         <button class="btn big go" id="playBtn">Play</button>
@@ -418,17 +427,18 @@ h2.title {
   </section>
 
   <section class="screen dim" id="s-crew" hidden>
-    <div class="inner">
-      <h2 class="title">Pick your hero</h2>
+    <div class="inner" id="crewScreen">
+      <h2 class="title" id="crewTitle">Pick your hero</h2>
       <div class="seg" role="group" aria-label="Number of players">
         <button id="p1Btn" class="on">1 Player</button><button id="p2Btn">2 Players</button>
       </div>
-      <p class="hint-line" id="crewHint">Tap a hero to play as them. The computer runs the rest of the crew.</p>
+      <p class="hint-line" id="crewHint">Tap a hero to play as them.</p>
+      <div class="jobs" id="crewJobs"></div>
       <div class="crewgrid" id="crewGrid"></div>
       <div class="detail" id="crewDetail"></div>
       <div class="row stick">
-        <button class="btn alt small" data-go="levels">Back</button>
-        <button class="btn big go" id="startBtn">Start!</button>
+        <button class="btn alt small" id="crewBack">Back</button>
+        <button class="btn big go" id="startBtn">Next</button>
       </div>
     </div>
   </section>
@@ -441,7 +451,7 @@ h2.title {
         <div id="storyBody">
           <p>Glitch Bots have stormed the school! Get the crew to the computer lab so Spencer can use the AI to shut them all down.</p>
           <p><b>Bop the bots.</b> Jump on them, throw your object at them or use your special move.</p>
-          <p><b>Dodge the teachers.</b> You can't fight them. If one spots you, it's back to class! Hide in lockers, sneak behind them, or get a friend to distract them.</p>
+          <p><b>Dodge the teachers.</b> You can't fight them. If one catches you, they march a friend home! Hide in lockers or sneak behind them.</p>
           <p><b>Call your crew.</b> Tap a friend's face at the top of the screen when you need their help.</p>
         </div>
         <div class="row stick"><button class="btn big go" id="storyGo">Let's go!</button></div>
@@ -490,9 +500,11 @@ h2.title {
         <h2>How to play</h2>
         <ul>
           <li>You play one hero. The rest of the crew follows you and helps out.</li>
-          <li>Tap a friend's face at the top to call for help. Frankie smashes, Spencer hacks, Jaxxs pranks, James pulls you up, Ollie kicks, and Naseer slows time.</li>
+          <li>Tap a friend's face at the top to call for help. Frankie smashes, Spencer hacks, Jaxxs pranks, James pulls you up, Ollie kicks, Ben freezes baddies with a spell, and Naseer slows time.</li>
           <li>Jump on Glitch Bots to bop them, throw your object at them, or use your special move. Pick what each hero throws on the "Pick your hero" screen.</li>
-          <li>If a baddie gets you, a friend is sent home. Lose 4 friends and you start the level again.</li>
+          <li>Before each level, pick your hero and up to 3 friends. Friends with a job in that level always come along.</li>
+          <li>If a baddie gets you, a friend is sent home and you lose a heart. Lose all 4 hearts and you start the level again.</li>
+          <li>Watch out for Crusher the bully! Only special moves can stop him. If you take too long, a grown-up comes and everyone gets sent home.</li>
           <li>If a grown-up catches you, they march a friend home. Win them back in a promise battle at the end of a level.</li>
           <li>Teachers can't be fought. Stand still in an open locker to hide, sneak behind them, or get Jaxxs to distract them.</li>
           <li>Bopping bots and teaming up fills the crew meter. When it's full, use Crew Charge!</li>
@@ -513,7 +525,7 @@ h2.title {
 'use strict';
 /* ===================== Core constants & helpers ===================== */
 const VIEW_H = 540, GRAV = 2200, STEP = 1 / 60, GROUND = 460, MAXFALL = 1150;
-const HERO_IDS = ['naseer', 'frankie', 'spencer', 'jaxxs', 'james', 'ollie'];
+const HERO_IDS = ['naseer', 'frankie', 'spencer', 'jaxxs', 'james', 'ollie', 'ben'];
 const INK = '#1d1b3a';
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -617,6 +629,9 @@ const SND = {
       case 'dash': this.noise(0.18, 0.12, 3000); this.tone(300, 0.15, 'sawtooth', 0.06, 600); break;
       case 'kick': this.tone(160, 0.1, 'triangle', 0.35, -60); this.noise(0.05, 0.2, 2000); break;
       case 'zap': this.tone(1400, 0.15, 'sawtooth', 0.08, -1100); break;
+      case 'spell': [988, 1319, 1760].forEach((f, i) => this.tone(f, 0.12, 'sine', 0.08, 300, i * 0.04)); this.noise(0.08, 0.05, 4000); break;
+      case 'freeze': this.tone(2600, 0.6, 'sine', 0.07, -1800); [2093, 2637, 3136, 3951].forEach((f, i) => this.tone(f, 0.1, 'triangle', 0.05, 0, i * 0.06)); break;
+      case 'ribbit': this.tone(220, 0.07, 'square', 0.08, -60); this.tone(260, 0.09, 'square', 0.08, -80, 0.09); break;
       case 'hack': [880, 1175, 988, 1319].forEach((f, i) => this.tone(f, 0.05, 'square', 0.06, 0, i * 0.05)); break;
       case 'turbo': this.tone(600, 0.6, 'sine', 0.15, -450); break;
       case 'shield': [392, 523, 659].forEach((f, i) => this.tone(f, 0.25, 'sine', 0.13, 0, i * 0.05)); break;
@@ -749,7 +764,7 @@ TRACKS.survive = Object.assign({}, TRACKS.zombie, { beat: 0.14, drums: DRUMS.roc
 
 /* ===================== The crew ===================== */
 const SKINS = ['#ffe1c9', '#f3c9a3', '#dba57b', '#b97c50', '#8c5a3a', '#5e3b25'];
-const HAIRS = ['#1c1714', '#3b2516', '#6b4226', '#9a6a3a', '#d8aa5c', '#b4482a', '#3a6df0', '#e0559a'];
+const HAIRS = ['#1c1714', '#3b2516', '#6b4226', '#9a6a3a', '#d8aa5c', '#b4482a', '#3a6df0', '#e0559a', '#f6d860'];
 
 const HEROES = {
   naseer: {
@@ -793,6 +808,13 @@ const HEROES = {
     object: 'Super Soccer Ball', objectDesc: 'A glowing ball that bounces from bot to bot.',
     skin: 1, hair: 5, hairStyle: 'helmet', top: '#e7302a', top2: '#ffffff', pants: '#1b1b2f', shoes: '#1b1b2f',
     lines: ['Keepy-uppy record: 47!', 'Back of the net!', 'Race you there!'], color: '#e7302a'
+  },
+  ben: {
+    name: 'Ben', role: 'The Wizard', speed: 290, jump: 850, hp: 3, w: 32, h: 62, size: 1,
+    move: 'Magic Bolt', moveDesc: 'Zaps a sparkly spell that turns a baddie into a frog. Hold jump in the air to float down slowly.',
+    object: 'Spell Book', objectDesc: 'A freeze spell that stops every baddie on screen for a few seconds.',
+    skin: 0, hair: 8, hairStyle: 'wizard', top: '#6a3fc0', top2: '#ffd23d', pants: '#3b2d6b', shoes: '#8a5a3c',
+    lines: ['Abracadabra!', 'Wands at the ready!', 'That was meant to happen.'], color: '#7b4fd6'
   }
 };
 function heroSkin(id) { return SKINS[HEROES[id].skin]; }
@@ -894,6 +916,10 @@ function drawHero(c, id, x, y, o) {
     c.beginPath(); c.arc(hxp, hyp, 3.7, 0, Math.PI * 2); blob(c, skin, 2);
     return [hxp, hyp];
   };
+  if (id === 'ben') { // wizard's cape
+    const fl = (pose === 'run' ? -7 : 0) + Math.sin(t * 4) * 2;
+    c.beginPath(); c.moveTo(-6, shY - 3); c.quadraticCurveTo(-16 + fl * 0.5, hipY - 4, -15 + fl, hipY + legLen - 3); c.lineTo(5, hipY + legLen - 6); c.lineTo(7, shY - 3); c.closePath(); blob(c, '#4a2f8f', 2.5);
+  }
   // back arm + back leg
   const sleeve = id === 'frankie' ? H.top : id === 'spencer' ? H.top : H.top;
   arm(-4, ab, sleeve, true);
@@ -911,9 +937,13 @@ function drawHero(c, id, x, y, o) {
     c.fillStyle = '#fff'; c.beginPath(); c.arc(fA[0] + 6, fA[1] - 5, 2, 0, 7); c.fill();
   }
 
+  if (id === 'ben') { // the robe hangs over his legs
+    c.beginPath(); c.moveTo(-tw / 2, hipY - 6); c.lineTo(tw / 2, hipY - 6); c.lineTo(tw / 2 + 4, hipY + 9); c.quadraticCurveTo(0, hipY + 12, -tw / 2 - 4, hipY + 9); c.closePath(); blob(c, H.top, 2.5);
+    c.strokeStyle = H.top2; c.lineWidth = 2; c.beginPath(); c.moveTo(tw / 2 + 2, hipY + 7); c.quadraticCurveTo(0, hipY + 9.5, -tw / 2 - 2, hipY + 7); c.stroke();
+  }
   const armBehind = Math.abs(aa) > 1.95 || pose === 'climb';
   let hand = null;
-  if (armBehind) hand = arm(5, aa, H.top, false);
+  if (armBehind) { hand = arm(5, aa, H.top, false); if (id === 'ben') drawWand(c, hand, aa, pose, t); }
   /* --- torso --- */
   rrect(c, -tw / 2, shY - 4, tw, hipY - shY + 8, 7); blob(c, H.top);
   c.save(); rrect(c, -tw / 2, shY - 4, tw, hipY - shY + 8, 7); c.clip();
@@ -932,6 +962,9 @@ function drawHero(c, id, x, y, o) {
     c.fillStyle = H.top2; c.beginPath(); c.moveTo(3, shY + 1); c.lineTo(-2, shY + 9); c.lineTo(2, shY + 9); c.lineTo(-1, shY + 17); c.lineTo(7, shY + 6); c.lineTo(3, shY + 6); c.lineTo(6, shY + 1); c.closePath(); c.fill();
   } else if (id === 'james') {
     c.fillStyle = H.top2; c.save(); c.translate(0, shY + 8); c.rotate(-0.5); c.fillRect(-20, -2.5, 40, 5); c.restore();
+  } else if (id === 'ben') { // gold belt and a star on his robe
+    c.fillStyle = H.top2; c.fillRect(-tw / 2, hipY - 1, tw, 3);
+    starPath(c, 4, shY + 9, 4.6, 2); c.fill();
   } else if (id === 'ollie') {
     c.fillStyle = H.top2; c.fillRect(-tw / 2, shY - 4, tw, 4);
     c.font = 'bold 11px ' + 'sans-serif'; c.fillText('10', -6, shY + 14);
@@ -977,7 +1010,7 @@ function drawHero(c, id, x, y, o) {
   }
 
   /* --- front arm (+ held things) --- */
-  if (!armBehind) hand = arm(5, aa, H.top, false);
+  if (!armBehind) { hand = arm(5, aa, H.top, false); if (id === 'ben') drawWand(c, hand, aa, pose, t); }
   if (id === 'spencer' && pose === 'hack') {
     c.save(); c.translate(hand[0] + 3, hand[1] - 2); c.rotate(-0.2); rrect(c, -2, -9, 14, 11, 2); blob(c, '#2a2d4a', 2);
     c.fillStyle = Math.sin(t * 20) > 0 ? '#7ff3ff' : '#b9ffcf'; c.fillRect(0, -7, 10, 7); c.restore();
@@ -994,6 +1027,14 @@ function drawHero(c, id, x, y, o) {
   c.restore();
 }
 
+function drawWand(c, hand, aa, pose, t) { // Ben's wand, with a star that glows when he casts
+  const wa = aa + 0.9, tx = hand[0] + Math.sin(wa) * 17, ty = hand[1] + Math.cos(wa) * 17, cast = pose === 'punch' || pose === 'cheer';
+  limb(c, [hand[0], hand[1], tx, ty], 3.2, '#8a5a3c');
+  c.save(); c.translate(tx, ty); c.rotate(t * 2);
+  if (cast) { c.shadowColor = '#fff6a8'; c.shadowBlur = 10; }
+  starPath(c, 0, 0, cast ? 6.5 : 4.5, cast ? 2.8 : 2); blob(c, '#ffe066', 1.5);
+  c.restore();
+}
 function drawHair(c, id, hx, hy, r, hair, t) {
   const H = HEROES[id];
   c.save();
@@ -1030,6 +1071,16 @@ function drawHair(c, id, hx, hy, r, hair, t) {
     c.fillStyle = hair; c.strokeStyle = INK; c.lineWidth = 2;
     for (let k = 0; k < 3; k++) { c.beginPath(); c.moveTo(hx + 4 + k * 4, hy - r + 4); c.lineTo(hx + 8 + k * 4, hy - r + 12); c.lineTo(hx + 10 + k * 4, hy - r + 3); c.closePath(); c.fill(); c.stroke(); }
     c.beginPath(); c.arc(hx, hy, r + 1.5, 140 * D, 210 * D); c.lineTo(hx - 6, hy - 4); c.closePath(); blob(c, hair, 2);
+  } else if (id === 'ben') { // blond hair: a floppy fringe and locks poking out under the hat
+    cap(150 * D, 350 * D, r + 2);
+    c.beginPath(); c.arc(hx, hy, r + 2.5, 118 * D, 205 * D); c.lineTo(hx - 4, hy - 3); c.closePath(); blob(c, hair, 2); // longer at the back
+    c.fillStyle = hair; c.strokeStyle = INK; c.lineWidth = 2;
+    for (let k = 0; k < 4; k++) { const fx = hx - 1 + k * 5; c.beginPath(); c.moveTo(fx - 3, hy - r + 3); c.quadraticCurveTo(fx + 1, hy - r + 14 - k, fx + 5, hy - r + 4); c.closePath(); c.fill(); c.stroke(); }
+    for (let k = 0; k < 3; k++) {
+      const a = (128 + k * 18) * D;
+      c.beginPath(); c.moveTo(hx + Math.cos(a) * (r - 2), hy + Math.sin(a) * (r - 2)); c.lineTo(hx + Math.cos(a + 0.12) * (r + 6), hy + Math.sin(a + 0.12) * (r + 6));
+      c.lineTo(hx + Math.cos(a + 0.26) * (r - 1), hy + Math.sin(a + 0.26) * (r - 1)); c.closePath(); c.fill(); c.stroke();
+    }
   } else if (id === 'james') { // smooth hair swept forward, no spikes
     cap(150 * D, 350 * D, r + 3);
     c.beginPath(); c.moveTo(hx - 2, hy - r - 2); c.quadraticCurveTo(hx + 10, hy - r - 5, hx + 17, hy - 11);
@@ -1058,6 +1109,12 @@ function drawHeadgear(c, id, hx, hy, r, hair, t) {
     c.save(); c.beginPath(); c.arc(hx, hy, r, 0, Math.PI * 2); c.clip();
     c.fillStyle = '#ff4d4d'; c.fillRect(hx - r, hy - 12, r * 2, 5); c.fillStyle = '#fff'; c.fillRect(hx - r, hy - 10.5, r * 2, 1.2); c.restore();
     c.beginPath(); c.arc(hx, hy, r, 0, Math.PI * 2); c.lineWidth = 2.5; c.strokeStyle = INK; c.stroke();
+  } else if (id === 'ben') { // pointy wizard hat with a gold band and a star
+    c.translate(hx - 1, hy - r * 0.6); c.rotate(-0.12 + Math.sin(t * 2) * 0.04);
+    c.beginPath(); c.moveTo(-r + 2, -1); c.quadraticCurveTo(-5, -22, -15, -42); c.quadraticCurveTo(-1, -26, r - 1, -1); c.closePath(); blob(c, H.top, 2.5);
+    c.beginPath(); c.moveTo(-r + 3, -3); c.lineTo(r - 2, -3); c.lineTo(r - 5, -9); c.lineTo(-r + 6, -9); c.closePath(); blob(c, H.top2, 2);
+    starPath(c, -4, -21, 5, 2.2); blob(c, H.top2, 1.5);
+    ell(c, 0, 0, r + 10, 4.5); blob(c, shade(H.top, -0.08), 2.5);
   } else if (id === 'ollie') { // bike helmet
     c.beginPath(); c.arc(hx - 1, hy - 2, r + 4, 175 * D, 365 * D); c.quadraticCurveTo(hx + 4, hy - 6, hx - r - 4, hy - 3); c.closePath(); blob(c, '#ff8a1f');
     c.strokeStyle = INK; c.lineWidth = 2;
@@ -1712,8 +1769,7 @@ function buildLevel() {
   B(5260, GROUND, 5070, 5340);
 
   L.teachers.push(
-    { key: 'whistle', name: 'Mr Whistle', them: 'him', line: 'Back to class!', lk: ADULTS.whistle.lk, mode: 'patrol', sx: 2200, y: GROUND, minX: 1830, maxX: 2200, dir: -1, speed: 75, range: 250 },
-    { key: 'clip', name: 'Ms Clipboard', them: 'her', line: 'Back to class!', lk: ADULTS.clip.lk, mode: 'guard', sx: 4620, y: 190, minX: 4620, maxX: 4620, dir: -1, speed: 0, range: 330 }
+    { key: 'whistle', name: 'Mr Whistle', them: 'him', line: 'Back to class!', lk: ADULTS.whistle.lk, mode: 'patrol', sx: 2200, y: GROUND, minX: 1830, maxX: 2200, dir: -1, speed: 75, range: 250 }
   );
 
   L.powerups.push({ x: 780, y: 340 }, { x: 3010, y: 330 }, { x: 5190, y: 330 });
@@ -1723,19 +1779,15 @@ function buildLevel() {
   L.barrier = { x: 2680, y: 150, w: 100, h: 310, broken: false, needs: 'frankie' };
   L.shutters = [{ x: 3180, w: 34, phase: 0 }, { x: 3400, w: 34, phase: 0.74 }].map((s) => Object.assign(s, { top: 150, bottom: GROUND, y: 150, h: 310, low: GROUND }));
   L.anchor = { x: 3900, y: 190, landX: 3935, used: false, needs: 'james' };
-  L.gate = { x: 5400, y: 190, w: 26, h: 270, open: 0, opening: false };
-  L.button = { x: 5546, y: 288, w: 34, h: 34, hit: false };
   L.mainframe = { x: 6130, y: 296, w: 104, h: 164, cx: 6182 };
   L.arena = { x0: 5620, x1: 6690, trigger: 5770, active: false, done: false, progress: 0, spawnT: 1.5, side: 0, finished: 0 };
-  L.barriers = [L.barrier]; L.anchors = [L.anchor]; L.gates = [Object.assign(L.gate, { button: L.button })];
+  L.barriers = [L.barrier]; L.anchors = [L.anchor]; L.gates = [];
   Object.assign(L.arena, { type: 'hack', obj: Object.assign({ kind: 'mainframe' }, L.mainframe), vents: true, dur: 22, started: false });
   Object.assign(L, { theme: 'school', hideKind: 'locker', barrierKind: 'crates', blockerKind: 'shutter', exit: null });
   L.needs = [
     { hero: 'frankie', type: 'barrier', x0: 2300, x1: 2700, ref: L.barrier },
     { hero: 'naseer', type: 'shutters', x0: 2990, x1: 3440 },
-    { hero: 'james', type: 'anchor', x0: 3520, x1: 3905, ref: L.anchor, minFeet: 300 },
-    { hero: 'jaxxs', type: 'guard', x0: 3950, x1: 4640, t: 1, maxFeet: 260 },
-    { hero: 'ollie', type: 'gate', x0: 4960, x1: 5400, ref: L.gates[0], minFeet: 300 }
+    { hero: 'james', type: 'anchor', x0: 3520, x1: 3905, ref: L.anchor, minFeet: 300 }
   ];
 
   // Coins
@@ -1754,7 +1806,7 @@ function buildLevel() {
   L.hints = [
     { x: 0, kind: 'move' }, { x: 470, kind: 'enemy' }, { x: 640, kind: 'throw' }, { x: 860, kind: 'special' }, { x: 1040, kind: 'spring', shed: true },
     { x: 1480, kind: 'patrol', t: 0 }, { x: 2470, kind: 'barrier' }, { x: 3050, kind: 'shutters' },
-    { x: 3600, kind: 'wall', minFeet: 300 }, { x: 4030, kind: 'guard', maxFeet: 260, t: 1 }, { x: 5120, kind: 'gate' }
+    { x: 3600, kind: 'wall', minFeet: 300 }
   ].map((h) => Object.assign(h, { done: false }));
   return L;
 }
@@ -2007,7 +2059,7 @@ const SEG = {
 };
 
 /* ===================== Game state ===================== */
-const STATE = { screen: 'title', players: 1, picks: ['naseer', 'frankie'], focus: 'naseer', touch: false, paused: false, adv: 'school', level: 'school-1' };
+const STATE = { screen: 'title', players: 1, picks: ['naseer', 'frankie'], friends: null, crewStep: 'hero', focus: 'naseer', touch: false, paused: false, adv: 'school', level: 'school-1' };
 let G = null;
 
 function makeHero(id) {
@@ -2045,14 +2097,13 @@ function startLevel() {
     needHero: null, need: null, chargeFlash: 0, winT: 0, pulse: null, hackTalk: 0, eshots: [], boss: null, hits: 0, ropeFrom: null, puddles: [],
     goop: [], darkK: L.dark ? 1 : 0, darkTo: L.dark ? 1 : 0, flashT: 0, boltT: rand(5, 9), chain: 0, chainT: -9, callouts: [], scene: null, party: null, chaseX: 0, thief: null,
     sp: null, movers: [], gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, boltFlash: 0,
-    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null
+    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null
   };
-  HERO_IDS.forEach((id) => { G.crew.push(makeHero(id)); G.cd[id] = 0; });
-  const picks = STATE.players === 2 ? STATE.picks.slice(0, 2) : [STATE.picks[0]];
+  G.bullyPlan = planBully(L); // Crusher the bully may turn up somewhere in this level
+  // your hero (or two players' heroes) and up to 3 friends, always including friends with a job here
+  const picks = STATE.players === 2 ? STATE.picks.slice(0, 2) : [STATE.picks[0]], friends = crewFriends(picks, L.id);
+  HERO_IDS.forEach((id) => { G.cd[id] = 0; if (picks.includes(id) || friends.includes(id)) G.crew.push(makeHero(id)); });
   picks.forEach((id, i) => { const e = G.crew.find((h) => h.id === id); e.ctrl = i; G.players.push(e); });
-  // friends a grown-up marched home stay home until the crew wins them back
-  G.crew = G.crew.filter((e) => e.ctrl >= 0 || !isGrounded(e.id));
-  G.homeIds = HERO_IDS.filter((id) => !G.crew.some((e) => e.id === id));
   let slot = 0;
   G.crew.forEach((e) => { if (e.ctrl < 0) e.slot = slot++; });
   L.bots.forEach((b) => G.bots.push(makeBot(b)));
@@ -2219,6 +2270,10 @@ function updatePlayer(p, dt) {
     p.vy = -620; p.jumps--; p.jumpBuf = 0; p.boost = false; SND.sfx('djump'); puff(cxOf(p), p.y + p.h, 8, '#c6ff3d', 140);
   }
   if (!c.jump && p.vy < -320 && !p.boost) p.vy = -320;
+  if (p.id === 'ben' && c.jump && !p.onGround && !p.climbing && p.vy > 140) { // Ben floats down gently while you hold jump
+    p.vy = 140;
+    if (Math.random() < 0.35) G.parts.push({ x: cxOf(p) + rand(-12, 12), y: p.y + p.h, vx: rand(-20, 20), vy: rand(20, 60), life: 0.4, max: 0.4, r: rand(2, 3.5), col: pick(['#ffd23d', '#c9a6ff', '#ffffff']), kind: 'spark' });
+  }
   if (p.vy >= 0) p.boost = false;
 
   // James climbs the gym climbing wall
@@ -2275,6 +2330,7 @@ function doMove(p) {
         G.bots.forEach((b) => { if (live(b) && overlap(hit, b)) bop(b, p); });
         for (const B of G.L.barriers) if (!B.broken && overlap({ x: hit.x - 10, y: hit.y, w: hit.w + 20, h: hit.h }, B)) smashBarrier(B, p);
         if (G.boss && overlap(hit, G.boss)) hitBoss(1, p);
+        if (G.bully && overlap(hit, G.bully)) bullyHit(p, 'smash');
       }
       break;
     case 'spencer': {
@@ -2291,6 +2347,16 @@ function doMove(p) {
       p.chargeT = 0.38; p.actCd = 0.7; p.inv = Math.max(p.inv, 0.4); SND.sfx('dash');
       break;
     case 'ollie': kickBall(p, false); p.actCd = 0.5; break;
+    case 'ben': { // Magic Bolt: zaps the nearest baddie in front and turns it into a frog
+      const front = (e) => sign(cxOf(e) - cxOf(p)) === f || Math.abs(cxOf(e) - cxOf(p)) < 30;
+      let tgt = G.bots.filter((b) => live(b) && front(b) && Math.abs(cxOf(b) - cxOf(p)) < 560 && Math.abs(b.y + b.h / 2 - (p.y + p.h / 2)) < 170)
+        .sort((a, b) => Math.abs(cxOf(a) - cxOf(p)) - Math.abs(cxOf(b) - cxOf(p)))[0] || null;
+      if (!tgt && bullyActive() && front(G.bully)) tgt = G.bully;
+      if (!tgt && bossActive() && front(G.boss)) tgt = G.boss;
+      G.proj.push({ kind: 'spell', x: cxOf(p) + f * 20, y: p.y + 16, vx: f * 640, vy: 0, life: 1.1, target: tgt, owner: p, t: 0 });
+      p.punchT = 0.25; p.actCd = 0.55; SND.sfx('spell');
+      break;
+    }
   }
 }
 
@@ -2311,6 +2377,7 @@ function poundImpact(p) {
   G.shake = 0.35; SND.sfx('smash'); puff(cxOf(p), p.y + p.h, 16, '#fff', 260);
   G.parts.push({ x: cxOf(p), y: p.y + p.h, r: 10, life: 0.4, max: 0.4, kind: 'ring', col: '#fff' });
   G.bots.forEach((b) => { if (live(b) && Math.abs(cxOf(b) - cxOf(p)) < 170 && Math.abs(b.y + b.h - (p.y + p.h)) < 70) bop(b, p); });
+  if (G.bully && Math.abs(cxOf(G.bully) - cxOf(p)) < 180 && Math.abs(G.bully.y + G.bully.h - (p.y + p.h)) < 90) bullyHit(p, 'smash');
   for (const B of G.L.barriers) if (!B.broken && Math.abs(cxOf(p) - (B.x + B.w / 2)) < 110) smashBarrier(B, p);
   if (G.boss && Math.abs(cxB(G.boss) - cxOf(p)) < 180 && G.boss.y + G.boss.h > p.y + p.h - 40) hitBoss(1, p);
 }
@@ -2323,7 +2390,7 @@ function playerVsBots(p) {
       bop(b, p);
       if (stomp && !p.pound) { p.vy = -560; p.boost = true; }
     } else if (p.invis > 0) { /* sneaks straight through */ }
-    else if (b.state !== 'stun' && b.state !== 'dance') hurt(p, b);
+    else if (b.state !== 'stun' && b.state !== 'dance' && !(b.frozenT > 0)) hurt(p, b);
   }
 }
 
@@ -2448,6 +2515,7 @@ function aiAttack(f, b) {
     case 'spencer': G.proj.push({ kind: 'drone', x: from.x, y: from.y - 20, vx: 0, vy: 0, life: 1.5, target: b, owner: f }); SND.sfx('zap'); break;
     case 'jaxxs': G.proj.push({ kind: 'peel', x: from.x, y: from.y, vx: 0, vy: 0, life: 1.4, target: b, owner: f, t: 0, sx: from.x, sy: from.y }); break;
     case 'ollie': f.kickT = 0.25; G.proj.push({ kind: 'homer', x: from.x, y: f.y + f.h - 12, vx: 0, vy: 0, life: 1.4, target: b, owner: f, r: 9, spin: 0 }); SND.sfx('kick'); break;
+    case 'ben': f.punchT = 0.25; G.proj.push({ kind: 'spell', x: from.x + f.face * 14, y: from.y - 4, vx: f.face * 300, vy: 0, life: 1.5, target: b, owner: f, t: 0 }); SND.sfx('spell'); break;
   }
 }
 
@@ -2485,6 +2553,7 @@ function updateBot(b, dt) {
     b.vy += GRAV * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.spin += 13 * dt;
     if (b.t > 1.4) b.dead = true; return;
   }
+  if (b.frozenT > 0) { b.frozenT -= dt; b.vx = 0; return; } // frozen solid by Ben's spell
   if (b.kind === 'ghost') { updateGhost(b, dt); return; }
   if (b.kind === 'bat') { updateBat(b, dt); return; }
   if (b.state === 'under') { wakeZombie(b); return; }
@@ -2627,6 +2696,7 @@ function update(dt) {
     return;
   }
   if (G.lose) { updateLose(dt); return; }
+  if (G.bully && G.bully.state === 'trouble') { updateBully(dt); updateCamera(dt); return; }
   updateDark(dt);
   if (G.over) { if (G.party) updateParty(dt); else if (G.battleNext) updateBattleQueue(dt); return; }
   const wdt = dt * (G.slow > 0 ? 0.35 : 1);
@@ -2649,10 +2719,12 @@ function update(dt) {
   updateItems(dt);
   if (G.L.surprise) { if (G.L.surprise.kind === 'ramp') updateRamp(dt); updateSurprise(dt); }
   updateProj(dt, wdt);
+  if (G.bully) updateBully(dt);
   if (G.puddles.length) updatePuddles(dt);
   updateObstacles(dt);
   updateArena(dt);
   updateHints();
+  updateBullyPlan();
   updateCamera(dt);
   if (G.battle) updateBattle(dt);
   if (G.winT > 0) { G.winT -= dt; if (G.winT <= 0) levelComplete(); }
@@ -2755,6 +2827,15 @@ function updateProj(dt, wdt) {
       if (q.bounces > 4) q.life = Math.min(q.life, 0.3);
     } else if (q.kind === 'throw') {
       updateThrow(q, dt);
+    } else if (q.kind === 'spell') {
+      q.t += dt;
+      const T = q.target;
+      if (T && (T === G.boss ? T.state !== 'ko' : live(T))) homeIn(q, T, 720, dt);
+      q.x += q.vx * dt; q.y += q.vy * dt;
+      if (Math.random() < 0.7) G.parts.push({ x: q.x, y: q.y, vx: rand(-50, 50), vy: rand(-50, 50), life: 0.35, max: 0.35, r: rand(1.5, 3.5), col: pick(['#ffe066', '#c9a6ff', '#9fe8ff']), kind: 'spark' });
+      const hit = hitBots(q, 14);
+      if (hit) { q.life = 0; if (hit === 'boss') sparks(q.x, q.y, 10, '#c9a6ff'); else frogPop(q.x, q.y); }
+      else if (L.solids.some((s) => s.skin !== 'floor' && s.skin !== 'none' && q.x > s.x && q.x < s.x + s.w && q.y > s.y && q.y < s.y + s.h)) { q.life = 0; puff(q.x, q.y, 6, '#c9a6ff', 100); }
     } else if (q.kind === 'drone') {
       if (q.target) homeIn(q, q.target, 820, dt);
       q.x += q.vx * dt; q.y += q.vy * dt;
@@ -2841,7 +2922,7 @@ function updateObstacles(dt) {
 }
 
 /* ===================== Calling the crew for help ===================== */
-const HELP_CD = { naseer: 15, frankie: 12, spencer: 10, jaxxs: 10, james: 8, ollie: 8 };
+const HELP_CD = { naseer: 15, frankie: 12, spencer: 10, jaxxs: 10, james: 8, ollie: 8, ben: 12 };
 function heroById(id) { return G.crew.find((h) => h.id === id); }
 function bringOver(h, ld) {
   if (h.ctrl >= 0) return;
@@ -2930,6 +3011,15 @@ const HELP = {
     say(h, 'Up you go!', 1.4); SND.sfx('rope');
     return 5;
   },
+  ben(h, ld) { // freeze spell: every baddie on screen freezes solid for a few seconds
+    const bots = botsOnScreen(), bz = bullyActive();
+    if (!bots.length && !bossActive() && !bz) { toast('ben', 'No baddies in sight to freeze.'); return false; }
+    if (bz) { G.bully.frozenT = 3; G.bully.vx = 0; floatText(cxOf(G.bully), G.bully.y - 20, 'Frozen!', '#bff6ff', true); }
+    bringOver(h, ld); h.punchT = 0.4; say(h, 'Freezio Maximo!', 1.6); SND.sfx('freeze');
+    bots.forEach((b) => { b.frozenT = 5; b.vx = 0; sparks(cxOf(b), b.y + b.h / 2, 10, '#bff6ff'); });
+    if (bossActive()) { const B = G.boss; B.state = 'stun'; B.stunT = 2.5; B.vx = 0; floatText(cxB(B), B.y - 20, 'Frozen!', '#bff6ff', true); }
+    G.freezeFlash = 0.5;
+  },
   ollie(h, ld) {
     const gt = G.L.gates.find((g) => !g.button.hit && Math.abs(cxOf(ld) - g.button.x) < 760 && ld.y + ld.h > 300 && cxOf(ld) < g.x);
     if (gt) {
@@ -2946,6 +3036,11 @@ const HELP = {
     G.proj.push({ kind: 'super', x: cxOf(h), y: h.y + h.h - 14, vx: h.face * 300, vy: -300, life: 4, list, target: null, owner: h, r: 11, spin: 0 });
   }
 };
+
+function frogPop(x, y) { // a baddie zapped by Ben hops away as a frog
+  puff(x, y, 8, '#7fff6a', 120); floatText(x, y - 20, 'Ribbit!', '#9bff8a'); SND.sfx('ribbit');
+  G.parts.push({ kind: 'frog', x, y, vx: rand(-70, 70), vy: -280, g: 900, life: 1.1, max: 1.1, r: 9, col: '#5fd35f' });
+}
 
 function ropePull(j, An, sub) {
   An.used = true; SND.sfx('rope'); meterAdd(10);
@@ -2977,6 +3072,7 @@ function crewCharge() {
   const g0 = G;
   botsOnScreen().forEach((b, i) => setTimeout(() => { if (G === g0 && b.state !== 'ko') bop(b, G.players[0]); }, 120 + i * 90));
   if (bossActive()) hitBoss(3, G.players[0], true);
+  if (bullyActive()) bullyHit(G.players[0], 'crew');
   G.teachers.forEach((T) => { if (onScreen({ x: T.x - 20, w: 40 })) { T.distract = 6; say(T, 'What on earth?!', 1.8); } });
 }
 
@@ -3001,7 +3097,7 @@ function updateArena(dt) {
     else if (A.type === 'survive') { banner('SURVIVE!', 'Hold out until the sun comes up'); A.started = true; showHint({ kind: 'survive' }); }
     else if (A.type === 'defend') { banner(n.start, n.startSub); startHack(); }
     else if (isPlayer('spencer')) { banner('Spencer, you\'re up!', 'Get to it and start the hack'); toast('spencer', touchOrKey('Stand right next to it and tap the star to start the hack.', 'Stand right next to it and press your special move key to start the hack.', `Stand right next to it and press ${padNames().move} to start the hack.`)); }
-    else if (friendGone('spencer')) { banner('Hold them off!', 'Spencer went home, so it works by itself. Keep the baddies away!'); startHack(); }
+    else if (friendGone('spencer')) { banner('Hold them off!', `${awayText('spencer')}, so it works by itself. Keep the baddies away!`); startHack(); }
     else { banner(n.start, n.startSub); startHack(); }
   }
   if (G.pulse) {
@@ -3096,6 +3192,8 @@ function camTarget() {
   const P = G.players, w = VIEW.w;
   if (G.L.chase) return clamp(G.chaseX, 0, Math.max(0, G.L.width - w));
   if (G.L.battle) return w >= G.L.width ? (G.L.width - w) / 2 : clamp(cxOf(P[0]) - w / 2, 0, G.L.width - w);
+  const Bz = G.bully;
+  if (Bz && G.L.solids.includes(Bz.walls[0])) { const lo2 = Bz.x0 - 30, hi2 = Bz.x1 + 30 - w; const bx = P.length === 2 ? (cxOf(P[0]) + cxOf(P[1])) / 2 : cxOf(P[0]); return hi2 < lo2 ? (Bz.x0 + Bz.x1) / 2 - w / 2 : clamp(bx - w * 0.45, lo2, hi2); } // stuck with Crusher
   const px = P.length === 2 ? (cxOf(P[0]) + cxOf(P[1])) / 2 : cxOf(P[0]);
   let cam = px + (P.length === 2 ? 0 : P[0].face * 60) - w * 0.45, lo = -w * 0.35, hi = G.L.width - w;
   const A = G.L.arena;
@@ -3114,7 +3212,7 @@ function updateCamera(dt) {
   G.cam.x += (camTarget() - G.cam.x) * Math.min(1, dt * 5);
 }
 function updateFx(dt) {
-  G.shake = Math.max(0, G.shake - dt); G.chargeFlash = Math.max(0, G.chargeFlash - dt); G.boltFlash = Math.max(0, G.boltFlash - dt);
+  G.shake = Math.max(0, G.shake - dt); G.chargeFlash = Math.max(0, G.chargeFlash - dt); G.freezeFlash = Math.max(0, (G.freezeFlash || 0) - dt); G.boltFlash = Math.max(0, G.boltFlash - dt);
   for (const q of G.parts) {
     q.life -= dt;
     if (q.kind === 'ring') { q.r += dt * 260; continue; }
@@ -3346,7 +3444,7 @@ const THROWS = {
   disc: { name: 'Flying Disc', desc: 'Floats up as it flies and hits two baddies.', cd: 0.6 }
 };
 const THROW_IDS = Object.keys(THROWS);
-const THROW_DEFAULT = { naseer: 'plane', frankie: 'snowball', spencer: 'disc', jaxxs: 'balloon', james: 'star', ollie: 'chicken' };
+const THROW_DEFAULT = { naseer: 'plane', frankie: 'snowball', spencer: 'disc', jaxxs: 'balloon', james: 'star', ollie: 'chicken', ben: 'slime' };
 function heroThrow(id) { let k = SAVE.throws && SAVE.throws[id]; if (k === 'boomerang') k = 'soccer'; return THROWS[k] ? k : THROW_DEFAULT[id]; }
 function throwSfx(kind) { return kind === 'chicken' ? 'squeak' : kind === 'soccer' ? 'kick' : 'throw'; }
 
@@ -3705,6 +3803,12 @@ function drawEnemyExtra(c, b, t) {
   if (b.kind === 'ghost' && b.baseY != null && b.state !== 'ko') {
     const gap = b.baseY - (b.y + b.h), k = clamp(1 - gap / 160, 0.25, 1);
     c.fillStyle = `rgba(29,27,58,${0.22 * k})`; c.beginPath(); c.ellipse(cxOf(b), b.baseY - 2, 20 * k + 6, 5, 0, 0, 7); c.fill();
+  }
+  if (b.frozenT > 0 && b.state !== 'ko') { // frozen in a block of ice
+    const a = Math.min(1, b.frozenT * 2);
+    c.save(); rrect(c, b.x - 6, b.y - 6, b.w + 12, b.h + 10, 6);
+    c.globalAlpha = 0.5 * a; c.fillStyle = '#bff6ff'; c.fill(); c.globalAlpha = 0.9 * a; c.strokeStyle = '#fff'; c.lineWidth = 2.5; c.stroke();
+    c.beginPath(); c.moveTo(b.x, b.y + 6); c.lineTo(b.x + 9, b.y - 1); c.moveTo(b.x + 2, b.y + 14); c.lineTo(b.x + 14, b.y + 2); c.stroke(); c.restore();
   }
   if (b.state === 'wind') mark(c, cxOf(b), b.y - 22, '!', '#ff6150');
   if (b.state === 'aim') { c.save(); c.translate(cxOf(b) + b.dir * 6, b.y - 14); drawFoodShape(c, 'pie', 0, 0.8); c.restore(); }
@@ -4164,13 +4268,14 @@ function updateParty(dt) {
 // Each friend has their own dance
 function drawDancer(c, id, x, y, t, sc, bike) {
   const o = { t, pose: 'cheer', face: 1, scale: sc, phase: 0 };
-  let dx = 0, dy = 0, rot = 0, ball = false;
+  let dx = 0, dy = 0, rot = 0, ball = false, magic = false;
   switch (id) {
     case 'naseer': o.pose = 'run'; o.phase = t * 14; o.face = Math.floor(t * 3) % 2 ? 1 : -1; dy = -Math.abs(Math.sin(t * 6)) * 6; break; // the shuffle
     case 'frankie': o.pose = Math.floor(t * 2.5) % 2 ? 'punch' : 'cheer'; o.face = Math.floor(t * 1.25) % 2 ? 1 : -1; break; // flexing
     case 'spencer': o.pose = 'hack'; o.drone = true; rot = Math.floor(t * 4) % 2 ? 0.12 : -0.12; dy = Math.floor(t * 4) % 2 ? -3 : 0; break; // the robot
     case 'jaxxs': o.pose = 'run'; o.phase = t * 10; dx = Math.sin(t * 1.6) * 22; o.face = Math.cos(t * 1.6) > 0 ? -1 : 1; o.halo = true; break; // moonwalk
     case 'james': { const cy = t % 1.6; if (cy < 0.6) { const k = cy / 0.6; dy = -Math.sin(k * Math.PI) * 70; rot = k * Math.PI * 2; o.pose = 'jump'; } break; } // backflips
+    case 'ben': dy = -14 - Math.sin(t * 2.5) * 10; o.pose = Math.floor(t * 2) % 2 ? 'cheer' : 'punch'; o.face = Math.floor(t) % 2 ? 1 : -1; magic = true; break; // floats and casts sparkles
     case 'ollie':
       if (bike) { o.bike = true; o.pose = 'idle'; rot = -0.2 - Math.abs(Math.sin(t * 3)) * 0.15; } // wheelies
       else { o.pose = Math.floor(t * 3) % 2 ? 'kick' : 'idle'; ball = true; } // keepy-uppies
@@ -4180,6 +4285,11 @@ function drawDancer(c, id, x, y, t, sc, bike) {
   if (rot) { c.translate(0, -34 * sc); c.rotate(rot); c.translate(0, 34 * sc); }
   drawHero(c, id, 0, 0, o);
   c.restore();
+  if (magic) for (let k = 0; k < 4; k++) {
+    const a = t * 3 + k * Math.PI / 2;
+    c.save(); c.translate(x + Math.cos(a) * 30 * sc, y + (dy - 40 + Math.sin(a) * 14) * sc); c.rotate(t * 4);
+    starPath(c, 0, 0, 5 * sc, 2.2 * sc); c.fillStyle = ['#ffe066', '#c9a6ff', '#9fe8ff', '#ff8ad8'][k]; c.fill(); c.restore();
+  }
   if (ball) {
     const by = y - (40 + Math.abs(Math.sin(t * 6)) * 46) * sc;
     c.save(); c.translate(x + 14 * sc, by); c.rotate(t * 8); c.beginPath(); c.arc(0, 0, 9 * sc, 0, 7); blob(c, '#fff', 2);
@@ -5258,7 +5368,8 @@ const HOME_LINES = {
   spencer: ['Error 404!', 'System crash!'],
   jaxxs: ['It wasn\'t me!', 'I was framed!'],
   james: ['Worth it!', 'Wheeeee!'],
-  ollie: ['Red card?!', 'See ya, crew!']
+  ollie: ['Red card?!', 'See ya, crew!'],
+  ben: ['Abraca-OOPS!', 'My spell backfired!']
 };
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
@@ -5386,6 +5497,7 @@ function drawLostPhoto(c, W, H, t) {
   for (let i = 0; i < 14; i++) { c.fillStyle = 'rgba(255,255,255,' + (0.4 + 0.4 * Math.sin(t * 2 + i)) + ')'; c.fillRect((i * 137) % W, (i * 41) % 90 + 8, 3, 3); }
   c.fillStyle = '#2f7a4a'; c.fillRect(0, H - 34, W, 34); c.fillStyle = INK; c.fillRect(0, H - 35, W, 3);
   const ids = G.homeIds, n = ids.length, gap = Math.min(150, (W - 40) / Math.max(1, n));
+  if (!n) G.players.forEach((p, i) => drawHero(c, p.id, W / 2 + (i - (G.players.length - 1) / 2) * 90, H - 34, { t, pose: 'idle', face: 1, scale: 1.4 }));
   ids.forEach((id, i) => {
     const x = W / 2 + (i - (n - 1) / 2) * gap, y = H - 34, col = HEROES[id].color, bob = Math.sin(t * 3 + i) * 2;
     c.save(); c.translate(x, y);
@@ -5406,12 +5518,12 @@ function drawLostPhoto(c, W, H, t) {
 
 /* ---------- When a needed friend has gone home, the crew teams up instead ---------- */
 const NEED_HINT = { barrier: 'frankie', shutters: 'naseer', wall: 'james', guard: 'jaxxs', gate: 'ollie' };
-function friendGone(id) { return !!G && G.homeIds.includes(id); }
+function friendGone(id) { return !!G && !heroById(id); } // sent home, marched home, or not picked
 function teamEffort(n) {
   if (n.type === 'shutters' || n.teamDone) return; // you can still time a run through the shutters
   if (n.teamAt == null) {
     n.teamAt = G.t;
-    toast(null, `${HEROES[n.hero].name} went home, so the crew teams up instead!`);
+    toast(null, `${awayText(n.hero)}, so the crew teams up instead!`);
     followers().forEach((f) => { f.cheer = 1.4; });
     return;
   }
@@ -5577,7 +5689,8 @@ function battleWon() {
   SAVE.grounded = grounded().filter((g) => g.id !== B.id); writeSave();
   G.homeIds = G.homeIds.filter((id) => id !== B.id);
   const h = makeHero(B.id); h.x = B.hx + 165 - h.w / 2; h.y = GROUND - h.h; h.face = -1; h.cheer = 2.5; h.inv = 0;
-  G.crew.push(h); followers().forEach((e, i) => { e.slot = i; });
+  G.crew.push(h); followers().forEach((e, i) => { e.slot = i; }); buildCrewBar();
+  if (STATE.friends && STATE.friends.length < MAX_FRIENDS && !STATE.friends.includes(B.id)) { STATE.friends = STATE.friends.concat(B.id); SAVE.friends = STATE.friends; writeSave(); }
   say(T, 'Oh, all right. But you\'d better behave!', 2.8);
   setTimeout(() => { if (G && G.battle === B) say(h, 'I\'m back! I\'ll be good, promise!', 2.2); }, 700);
   banner(`${NAME} IS BACK IN THE CREW!`, `${B.A.name} said yes. Now behave!`, { huge: true, dur: 3.2 });
@@ -5652,6 +5765,273 @@ function drawChore(c, q) {
     c.beginPath(); c.arc(-7, -2, 7, 0, 7); c.arc(7, -2, 7, 0, 7); c.arc(0, -9, 8, 0, 7); blob(c, '#3fa34d', 2.5);
   }
   c.restore();
+}
+
+/* ===================== Picking the crew ===================== */
+// Before each level you pick your hero and up to 3 friends.
+// Any friend with a job in that level (like Spencer and the computer) always comes along.
+const MAX_FRIENDS = 3;
+const HACK_JOB = { school: 'switches on the AI computer', zombie: 'reverses the Goo Machine', treat: 'fixes the porch light' };
+const JOB_TEXT = {
+  barrier: (th) => `smashes ${THEMES[th].n.barrier.toLowerCase()}`,
+  anchor: () => 'pulls the crew up the wall',
+  guard: () => 'pranks the guard',
+  gate: () => 'kicks the gate button',
+  hack: (th) => HACK_JOB[th] || 'hacks the computer',
+  bike: () => 'gets his bike back'
+};
+const jobCache = {};
+function levelJobs(id) {
+  if (jobCache[id]) return jobCache[id];
+  let L;
+  try { L = buildLevelById(id); } catch (e) { return []; }
+  const jobs = [], add = (hero, type) => { if (!jobs.some((j) => j.hero === hero)) jobs.push({ hero, type, text: JOB_TEXT[type](L.theme) }); };
+  for (const n of L.needs || []) if (n.type !== 'shutters') add(n.hero, n.type); // anyone can time a run through the shutters
+  if (L.arena && L.arena.type === 'hack') add('spencer', 'hack');
+  if (L.special === 'chase') add('ollie', 'bike');
+  return (jobCache[id] = jobs);
+}
+function neededFriends(picks, id) { return levelJobs(id).map((j) => j.hero).filter((h) => !picks.includes(h) && !isGrounded(h)); }
+function crewFriends(picks, id) {
+  const ok = (h) => HEROES[h] && !picks.includes(h) && !isGrounded(h);
+  const rest = STATE.friends ? STATE.friends.filter(ok) : HERO_IDS.filter(ok); // first time: bring a full crew
+  return [...new Set(neededFriends(picks, id).concat(rest))].slice(0, MAX_FRIENDS);
+}
+// who shows in the crew bar: the crew, plus anyone sent home during this level
+function barIds() { return G ? HERO_IDS.filter((id) => G.crew.some((e) => e.id === id) || G.homeIds.includes(id)) : HERO_IDS; }
+function awayText(id) { const n = HEROES[id].name; return G && G.homeIds.includes(id) ? `${n} went home` : `${n} isn't in your crew`; }
+
+/* ===================== Crusher the bully ===================== */
+// Crusher drops in at a random moment in about half the levels. Jumping on him and throwing things don't work.
+// Only special moves hurt him. Hit him 3 times before the countdown ends, or a grown-up comes and everyone is sent home.
+const BULLY_CHANCE = 0.5, BULLY_TIME = 25, BULLY_HP = 3;
+const BULLY_PLACE = { school: 'SCHOOL', park: 'PARK', zombie: 'SCHOOLYARD', treat: 'STREET' };
+const BULLY_ADULT = { school: 'whistle', park: 'mum', zombie: 'mop', treat: 'dad' };
+
+function planBully(L) {
+  if (!L || L.battle || L.tutorial || L.id === 'school-1' || L.special || L.chase) return null;
+  if (L.arena && L.arena.type === 'boss') return null;
+  if (Math.random() > BULLY_CHANCE) return null;
+  const spots = [];
+  for (let px = L.width * 0.22; px < L.width * 0.75; px += 40) if (bullySpotAt(L, px)) spots.push(px);
+  return spots.length ? { x: pick(spots) } : null;
+}
+function bullyActive() { const B = G.bully; return !!B && !['drop', 'flee', 'trouble'].includes(B.state); }
+
+// somewhere flat and quiet, with no grown-ups, team obstacles, gaps or finales nearby
+function bullySpotAt(L, px) {
+  const x0 = px - 240, x1 = px + 440, near = (a, b) => b > x0 - 30 && a < x1 + 30;
+  for (let x = x0; x <= x1; x += 40) if (!L.solids.some((s) => s.y === GROUND && x >= s.x && x <= s.x + s.w)) return false; // no gaps
+  if (L.solids.some((s) => s.y < GROUND - 140 && s.y + s.h >= GROUND - 10 && s.skin !== 'none' && near(s.x, s.x + s.w))) return false; // no tall walls
+  if (L.teachers.some((T) => near(T.minX - 260, T.maxX + 260))) return false;
+  if (L.barriers.some((B) => !B.broken && near(B.x, B.x + B.w)) || L.gates.some((g) => near(g.x - 200, g.x + 60)) || (L.shutters || []).some((s) => near(s.x, s.x + s.w))) return false;
+  if (L.arena && near(L.arena.x0 - 300, L.arena.x1)) return false;
+  if (L.exit && near(L.exit.x - 200, L.exit.x + 200)) return false;
+  return true;
+}
+function updateBullyPlan() {
+  const P = G.bullyPlan;
+  if (!P || G.bully || G.over || G.lose || G.scene || G.L.battle || G.freeze > 0 || G.trans) return;
+  const ld = leader(), x = cxOf(ld);
+  if (x < P.x - 200) return;
+  if (x > P.x + 400) { G.bullyPlan = null; return; } // the crew rushed past
+  if (!ld.onGround || Math.abs(ld.y + ld.h - GROUND) > 4) return; // wait until the crew is on the ground
+  G.bullyPlan = null; startBully(ld, P.x);
+}
+
+function startBully(ld, ax) {
+  const px = cxOf(ld), x0 = ax - 240, x1 = ax + 440, side = x1 - px > px - x0 ? 1 : -1; // he lands on the side with more room
+  const B = { x: clamp(px + side * 260, x0 + 10, x1 - 60), dirInit: -side, y: VIEW.top - 260, w: 50, h: 106, vx: 0, vy: 0, dir: -side, hp: BULLY_HP, state: 'drop', t: 0, actT: 1.6, roarT: 7, inv: 0, flash: 0,
+    walk: 0, onGround: false, x0, x1, timer: BULLY_TIME, dark: 0, say: '', sayT: 0 };
+  B.walls = [{ x: x0 - 30, y: -600, w: 30, h: 1500, skin: 'none' }, { x: x1, y: -600, w: 30, h: 1500, skin: 'none' }];
+  G.L.solids.push(...B.walls);
+  G.bully = B;
+  // the other baddies run off: nobody wants to be near Crusher
+  G.bots.forEach((b) => { if (live(b) && cxOf(b) > x0 - 100 && cxOf(b) < x1 + 100) { b.dead = true; puff(cxOf(b), b.y + b.h / 2, 8, '#fff', 120); } });
+  banner('UH-OH!', 'It\'s Crusher the bully!', { huge: true, dur: 2.4 });
+  SND.setTrack('boss');
+  const o = pick(followers()); if (o) say(o, pick(['Eek! Crusher!', 'He\'s so big!', 'Run!']), 1.6);
+}
+
+function bullyHit(p, how) {
+  const B = G.bully;
+  if (!bullyActive() || B.inv > 0) return false;
+  B.hp--; B.inv = 0.8; B.flash = 0.3; B.state = 'hurt'; B.t = 0; B.vx = (cxOf(B) < cxOf(p) ? -1 : 1) * 260; B.vy = -260; B.onGround = false;
+  G.shake = 0.35; SND.sfx('smash');
+  G.callouts.push({ txt: pick(['POW!', 'BAM!', 'WHAM!']), col: '#ffd23d', x: cxOf(B), y: B.y - 20, t: 0, n: 5 });
+  if (how === 'prank') floatText(cxOf(B), B.y - 10, 'KICK ME sign!', '#ffd23d', true);
+  else if (how === 'crew') floatText(cxOf(B), B.y - 10, 'The crew stands up to him!', '#9bff8a', true);
+  say(B, pick(['OW!', 'Hey, quit it!', 'No fair!']), 1.2);
+  if (B.hp <= 0) bullyBeaten(p);
+  return true;
+}
+function bullyBeaten(p) {
+  const B = G.bully;
+  B.state = 'flee'; B.t = 0; B.dir = cxOf(B) < cxOf(p) ? -1 : 1;
+  say(B, 'WAAAH! I\'m telling my mum!', 2.4);
+  banner('BULLY STOPPED!', 'Crusher ran home crying. +10 coins', { huge: true, dur: 2.6 });
+  G.coins += 10; meterAdd(20); SND.sfx('win'); confetti(cxOf(B), B.y, 30);
+  G.crew.forEach((e) => { e.cheer = 2.2; });
+  bullyWallsDown(); SND.setTrack(levelTrack());
+}
+function bullyWallsDown() { const B = G.bully; G.L.solids = G.L.solids.filter((s) => !B.walls.includes(s)); }
+function bullyTrouble() { // time's up: a grown-up storms in
+  const B = G.bully, key = BULLY_ADULT[G.L.theme] || 'whistle', A = ADULTS[key];
+  B.state = 'trouble'; B.t = 0; B.vx = 0;
+  B.adult = { x: G.cam.x - 60, y: GROUND, dir: 1, state: 'walk', walk: 0, lk: A.lk, say: '', sayT: 0, name: A.name, stopped: false };
+  SND.sfx('whistle');
+}
+
+function updateBully(dt) {
+  const B = G.bully; if (!B) return;
+  B.t += dt; B.sayT -= dt; B.inv = Math.max(0, B.inv - dt); B.flash = Math.max(0, B.flash - dt);
+  B.dark = clamp(B.dark + (['flee'].includes(B.state) ? -dt : dt) * 1.5, 0, 1);
+  const ld = leader(), target = G.players.reduce((a, q) => (Math.abs(cxOf(q) - cxOf(B)) < Math.abs(cxOf(a) - cxOf(B)) ? q : a), G.players[0]);
+  if (B.state === 'trouble') { updateTrouble(B, dt); return; }
+  if (B.state === 'flee') {
+    B.x += B.dir * 300 * dt; B.walk += dt * 14;
+    if (Math.random() < 0.3) G.parts.push({ x: cxOf(B) - B.dir * 8, y: B.y + 24, vx: -B.dir * rand(40, 120), vy: rand(-160, -60), g: 700, life: 0.6, max: 0.6, r: 3, col: '#7fd3ff', kind: 'spark' });
+    if (B.t > 2.6) G.bully = null;
+    return;
+  }
+  // gravity and the ground
+  B.vy += GRAV * dt; B.y += B.vy * dt; B.x += B.vx * dt;
+  if (B.y + B.h >= GROUND) {
+    if (!B.onGround && B.state === 'drop') { // THUD
+      G.shake = 0.7; SND.sfx('thud'); SND.sfx('roar'); puff(cxOf(B), GROUND - 6, 16, '#e8d6b0', 220);
+      B.state = 'taunt'; B.t = 0; say(B, `THIS IS MY ${BULLY_PLACE[G.L.theme] || 'PLAYGROUND'}!`, 2.2);
+      showHint({ kind: 'bully' });
+    }
+    B.y = GROUND - B.h; B.vy = 0; B.onGround = true;
+  }
+  B.x = clamp(B.x, B.x0, B.x1 - B.w);
+  if (B.state === 'drop') return;
+  B.timer -= dt;
+  if (B.timer <= 0) { bullyTrouble(); return; }
+  const dx = cxOf(target) - cxOf(B);
+  if (B.frozenT > 0) { B.frozenT -= dt; B.vx = 0; }
+  else if (B.state === 'taunt') { B.vx = 0; if (B.t > 1.4) { B.state = 'walk'; B.t = 0; } }
+  else if (B.state === 'hurt') { B.vx *= 0.9; if (B.t > 0.6 && B.onGround) { B.state = 'walk'; B.t = 0; B.actT = 0.8; } }
+  else if (B.state === 'roar') {
+    B.vx = 0;
+    for (const p of G.players) if (Math.abs(cxOf(p) - cxOf(B)) < 260 && p.onGround) p.vx += sign(cxOf(p) - cxOf(B)) * 600 * dt; // his roar blows you back
+    if (B.t > 1.1) { B.state = 'walk'; B.t = 0; B.actT = 1; }
+  } else if (B.state === 'wind') { B.vx = 0; if (B.t > 0.45) { B.state = 'shove'; B.t = 0; B.vx = B.dir * 380; SND.sfx('whack'); } }
+  else if (B.state === 'shove') {
+    for (const p of G.players) if (p.inv <= 0 && overlap(p, { x: B.x - 12, y: B.y, w: B.w + 24, h: B.h })) {
+      p.vx = B.dir * 460; p.vy = -340; p.inv = 0.8; p.bonkT = 0.35; p.onGround = false; G.shake = 0.3; SND.sfx('thud');
+      say(B, pick(['Move it, shrimp!', 'Out of my way!', 'Ha ha ha!']), 1.4);
+    }
+    if (B.t > 0.25) { B.state = 'walk'; B.t = 0; B.actT = rand(0.8, 1.4); B.vx = 0; }
+  } else { // walk towards the nearest player
+    B.dir = sign(dx) || B.dir; B.vx = Math.abs(dx) > 40 ? B.dir * 115 : 0; B.walk += dt * 7;
+    B.actT -= dt; B.roarT -= dt;
+    if (B.roarT <= 0) { B.state = 'roar'; B.t = 0; B.roarT = rand(6, 8); SND.sfx('roar'); G.shake = 0.5; say(B, 'RAAAAH!', 1.1); const o = pick(followers()); if (o) say(o, pick(['Eek!', 'Mum!', 'I\'m scared!']), 1.2); }
+    else if (B.actT <= 0 && Math.abs(dx) < 90) { B.state = 'wind'; B.t = 0; }
+  }
+  // how the crew touches him
+  for (const p of G.players) {
+    if (!overlap(p, B)) continue;
+    if (p.dashT > 0 || p.chargeT > 0) { bullyHit(p, 'dash'); p.dashT = p.chargeT = 0; p.vx = -p.face * 220; continue; }
+    if (p.invis > 0) { bullyHit(p, 'prank'); p.invis = 0; continue; }
+    const stomp = p.vy > 40 && p.y + p.h - B.y < 26;
+    if (stomp) { p.vy = -600; p.boost = true; tooTough(B); }
+    else { const side = cxOf(p) < cxOf(B) ? -1 : 1; p.x = side < 0 ? B.x - p.w : B.x + B.w; p.vx = side * 120; } // you can't walk through him
+  }
+  // only the players' special moves count. Thrown things bounce off
+  for (const q of G.proj) {
+    if (!q.owner || q.owner.ctrl < 0 || q.life <= 0 || !['drone', 'ball', 'spell', 'throw'].includes(q.kind)) continue;
+    if (q.x < B.x - 10 || q.x > B.x + B.w + 10 || q.y < B.y - 10 || q.y > B.y + B.h + 10) continue;
+    q.life = 0;
+    if (q.kind === 'throw') tooTough(B); else bullyHit(q.owner, q.kind);
+  }
+}
+function tooTough(B) {
+  if (G.t - (B.toughT || -9) < 0.8) return;
+  B.toughT = G.t; floatText(cxOf(B), B.y - 14, pick(['Ha! Too tough!', 'That tickles!', 'Nice try!']), '#fff', true);
+  toast(null, 'Only special moves work on Crusher!');
+}
+function updateTrouble(B, dt) {
+  const A = B.adult, ld = leader(), left = G.crew.reduce((m, e) => Math.min(m, cxOf(e)), cxOf(ld));
+  A.sayT -= dt; B.vx = 0;
+  if (!A.stopped) {
+    A.x += 320 * dt; A.walk += dt * 9;
+    if (A.x > left - 70 || B.t > 2.2) {
+      A.stopped = true; A.state = 'catch'; A.t = 0;
+      A.say = 'WHAT IS GOING ON HERE?! EVERYONE HOME. NOW!'; A.sayT = 3;
+      say(B, 'But they started it!', 2);
+      banner('IN BIG TROUBLE!', `${A.name} sent everyone home`, { huge: true, dur: 3 });
+      SND.sfx('whistle');
+      G.crew.forEach((e) => { e.pose = 'flail'; });
+    }
+  } else if (B.t > 4.4 && !G.lose) { // everyone goes home
+    G.homeIds = [...new Set(G.homeIds.concat(G.crew.map((e) => e.id)))];
+    G.lose = { t: 1, all: true };
+  }
+}
+
+/* ---------- drawing ---------- */
+function drawBully(c, t) {
+  const B = G.bully; if (!B) return;
+  if (B.state !== 'flee') { // storm cloud over his head
+    const cx = cxOf(B), cy = B.y - 46 + Math.sin(t * 2) * 3;
+    c.save(); c.fillStyle = '#4a4560'; c.strokeStyle = INK; c.lineWidth = 2.5;
+    c.beginPath(); c.arc(cx - 18, cy, 14, 0, 7); c.arc(cx, cy - 8, 18, 0, 7); c.arc(cx + 20, cy, 14, 0, 7); c.fill(); c.stroke();
+    if (Math.sin(t * 7) > 0.85) { c.fillStyle = '#ffe066'; c.beginPath(); c.moveTo(cx + 2, cy + 10); c.lineTo(cx - 6, cy + 26); c.lineTo(cx + 1, cy + 24); c.lineTo(cx - 4, cy + 40); c.lineTo(cx + 10, cy + 20); c.lineTo(cx + 3, cy + 22); c.lineTo(cx + 8, cy + 10); c.closePath(); c.fill(); c.stroke(); }
+    c.restore();
+  }
+  drawCrusher(c, B, t);
+  if (B.frozenT > 0) { const a = Math.min(1, B.frozenT * 2); c.save(); rrect(c, B.x - 14, B.y - 8, B.w + 28, B.h + 10, 8); c.globalAlpha = 0.45 * a; c.fillStyle = '#bff6ff'; c.fill(); c.globalAlpha = 0.9 * a; c.strokeStyle = '#fff'; c.lineWidth = 3; c.stroke(); c.restore(); }
+  if (B.state === 'wind') mark(c, cxOf(B), B.y - 74, '!', '#ff6150');
+  if (B.adult) drawAdult(c, B.adult, t);
+}
+function drawCrusher(c, B, t) {
+  const st = B.state, mad = st === 'roar' || st === 'wind' || st === 'shove', s = 1.42;
+  c.save(); c.translate(cxOf(B), B.y + B.h); c.scale(B.dir * s, s);
+  if (B.flash > 0 && Math.floor(t * 20) % 2) c.globalAlpha = 0.5;
+  const walk = st === 'walk' || st === 'flee' ? Math.sin(B.walk) * 0.5 : 0, bob = st === 'flee' ? -Math.abs(Math.sin(B.walk)) * 3 : 0;
+  // legs and big trainers
+  limb(c, [-6, -24 + bob, -6 + Math.sin(-walk) * 14, -4], 10, '#2f3e74');
+  limb(c, [6, -24 + bob, 6 + Math.sin(walk) * 14, -4], 10, '#3b4c8a');
+  for (const [fx, lw] of [[-6 + Math.sin(-walk) * 14, 0], [6 + Math.sin(walk) * 14, 1]]) { ell(c, fx + 3, -3, 9, 5); blob(c, lw ? '#ffffff' : '#e8e8f0', 2.2); c.fillStyle = '#e8432f'; c.fillRect(fx - 2, -5, 8, 2); }
+  // hoodie
+  rrect(c, -19, -60 + bob, 38, 40, 11); blob(c, '#4b5160', 2.5);
+  rrect(c, -10, -36 + bob, 20, 10, 4); blob(c, '#3c4150', 2);
+  c.fillStyle = '#e8432f'; c.beginPath(); c.moveTo(2, -56 + bob); c.lineTo(-5, -45 + bob); c.lineTo(0, -45 + bob); c.lineTo(-4, -37 + bob); c.lineTo(6, -49 + bob); c.lineTo(1, -49 + bob); c.lineTo(5, -56 + bob); c.closePath(); c.fill();
+  // arms: crossed while taunting, pushing when shoving, waving when running off
+  const skin = '#f0c6a0', fist = (x, y) => { c.beginPath(); c.arc(x, y, 6.5, 0, 7); blob(c, skin, 2.2); };
+  if (st === 'taunt') { limb(c, [-15, -54 + bob, 6, -42 + bob], 9, '#4b5160'); limb(c, [15, -54 + bob, -6, -40 + bob], 9, '#565d6e'); fist(8, -42 + bob); fist(-8, -40 + bob); }
+  else if (st === 'shove' || st === 'wind') { const k = st === 'shove' ? 1 : -0.4; limb(c, [12, -54, 22 + k * 14, -46], 9, '#565d6e'); limb(c, [-10, -54, 14 + k * 14, -40], 9, '#4b5160'); fist(24 + k * 14, -46); fist(16 + k * 14, -40); }
+  else if (st === 'flee' || st === 'hurt' || st === 'roar') { const w = Math.sin(t * 18) * 0.3; limb(c, [14, -54 + bob, 22, -78 + w * 10], 9, '#565d6e'); limb(c, [-14, -54 + bob, -22, -78 - w * 10], 9, '#4b5160'); fist(22, -80 + w * 10); fist(-22, -80 - w * 10); }
+  else { limb(c, [15, -54 + bob, 20 + walk * 10, -30 + bob], 9, '#565d6e'); limb(c, [-15, -54 + bob, -20 - walk * 10, -30 + bob], 9, '#4b5160'); fist(20 + walk * 10, -28 + bob); fist(-20 - walk * 10, -28 + bob); }
+  // head with a buzz cut
+  const hy = -76 + bob;
+  c.beginPath(); c.arc(1, hy, 16, 0, 7); blob(c, skin, 2.5);
+  c.beginPath(); c.arc(1, hy, 16.5, Math.PI * 1.02, Math.PI * 1.98); c.quadraticCurveTo(2, hy - 9, -15, hy - 2); c.closePath(); blob(c, '#3a2a20', 2);
+  // angry face
+  c.strokeStyle = INK; c.lineWidth = 3; c.lineCap = 'round';
+  if (st === 'flee') { // crying
+    c.beginPath(); c.moveTo(2, hy - 6); c.lineTo(8, hy - 8); c.moveTo(10, hy - 8); c.lineTo(16, hy - 6); c.stroke();
+    c.fillStyle = '#7fd3ff'; c.beginPath(); c.arc(6, hy + 1 + (t * 30) % 8, 2, 0, 7); c.arc(13, hy + 1 + (t * 30 + 4) % 8, 2, 0, 7); c.fill();
+    c.beginPath(); c.ellipse(9, hy + 9, 5, 4, 0, 0, 7); blob(c, '#7a2335', 2);
+  } else {
+    c.beginPath(); c.moveTo(1, hy - 9); c.lineTo(8, hy - 4); c.moveTo(17, hy - 9); c.lineTo(10, hy - 4); c.stroke(); // V brows
+    c.fillStyle = mad ? '#ff3b3b' : INK; c.beginPath(); c.arc(6, hy - 1, 2.4, 0, 7); c.arc(13, hy - 1, 2.4, 0, 7); c.fill();
+    if (mad) { c.save(); c.shadowColor = '#ff3b3b'; c.shadowBlur = 8; c.fill(); c.restore(); }
+    c.lineWidth = 2.5; c.beginPath();
+    if (st === 'roar') { c.ellipse(10, hy + 8, 6, 5, 0, 0, 7); c.fillStyle = '#7a2335'; c.fill(); c.stroke(); }
+    else { c.moveTo(3, hy + 9); c.quadraticCurveTo(10, hy + 5, 17, hy + 9); c.stroke(); c.fillStyle = '#fff'; c.fillRect(8, hy + 6.5, 3, 2.5); } // sneer with one tooth
+    c.fillStyle = 'rgba(160,80,40,0.6)'; for (const [fx, fy] of [[-1, hy + 3], [2, hy + 5], [-3, hy + 6]]) { c.beginPath(); c.arc(fx, fy, 1, 0, 7); c.fill(); } // freckles
+    rrect(c, -9, hy - 1, 7, 4, 1); blob(c, '#ffd9a8', 1.2); // band-aid
+  }
+  c.restore();
+}
+// the edges of the screen go dark while Crusher is around
+function drawBullyFx(c) {
+  const B = G.bully; if (!B || B.dark <= 0) return;
+  const W = cv.width, H = cv.height, g = c.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.2, W / 2, H * 0.55, Math.max(W, H) * 0.7);
+  g.addColorStop(0, 'rgba(25,10,40,0)'); g.addColorStop(1, `rgba(25,10,40,${0.72 * B.dark})`);
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
 }
 
 /* ===================== Backgrounds & platforms ===================== */
@@ -5936,7 +6316,7 @@ function render() {
   drawFloor(c, camX, VIEW.w, bottom);
   if (playing) drawWorld(c, t, camX); else drawMenuCrew(c, t);
   c.setTransform(1, 0, 0, 1, 0, 0);
-  if (playing) { drawWeather(c, t); surpriseDraw(c, t, 'screen'); drawDarkness(c, t); drawSentHome(c, t); drawScreenFx(c, t); drawBossPointer(c, t); }
+  if (playing) { drawWeather(c, t); surpriseDraw(c, t, 'screen'); drawDarkness(c, t); drawBullyFx(c); drawSentHome(c, t); drawScreenFx(c, t); drawBossPointer(c, t); }
   if (VIEW.portrait && touchControlsOn() && (STATE.screen === 'play' || STATE.screen === 'pause')) {
     const y = VIEW.ctlTop * d;
     const g = c.createLinearGradient(0, y, 0, cv.height); g.addColorStop(0, 'rgba(22,24,58,0.55)'); g.addColorStop(1, 'rgba(22,24,58,0.92)');
@@ -6035,6 +6415,7 @@ function drawWorld(c, t, camX) {
   for (const b of G.bots) if (vis(b.x, b.w)) { drawEnemy(c, b, t); drawEnemyExtra(c, b, t); }
   if (G.thief) drawThief(c, G.thief, t);
   if (G.boss) drawBoss(c, G.boss, t);
+  if (G.bully) drawBully(c, t);
   for (const q of G.eshots) drawEShot(c, q, t);
   // crew: followers behind, players in front
   const order = G.crew.slice().sort((a, b) => (a.ctrl >= 0) - (b.ctrl >= 0));
@@ -6053,6 +6434,12 @@ function drawWorld(c, t, camX) {
     c.globalAlpha = a;
     if (q.kind === 'ring') { c.strokeStyle = q.col; c.lineWidth = 4; c.beginPath(); c.ellipse(q.x, q.y, q.r, q.r * 0.35, 0, 0, 7); c.stroke(); }
     else if (q.kind === 'streak') { c.strokeStyle = q.col; c.lineWidth = 10 * a; c.lineCap = 'round'; c.beginPath(); c.moveTo(q.x, q.y); c.lineTo(q.x2, q.y2); c.stroke(); }
+    else if (q.kind === 'frog') {
+      c.save(); c.translate(q.x, q.y); c.scale(q.vx < 0 ? -1 : 1, 1);
+      ell(c, 0, 0, 11, 8); blob(c, q.col, 2); c.beginPath(); c.arc(-4, -7, 4, 0, 7); c.arc(5, -7, 4, 0, 7); blob(c, q.col, 2);
+      c.fillStyle = INK; c.beginPath(); c.arc(-4, -7, 1.6, 0, 7); c.arc(5, -7, 1.6, 0, 7); c.fill();
+      c.strokeStyle = INK; c.lineWidth = 1.5; c.beginPath(); c.arc(0, 0, 5, 0.3, Math.PI - 0.3); c.stroke(); c.restore();
+    }
     else if (q.kind === 'chunk' || q.kind === 'conf') { c.save(); c.translate(q.x, q.y); c.rotate(q.rot || 0); c.fillStyle = q.col; c.fillRect(-q.r / 2, -q.r / 2, q.r, q.r * (q.kind === 'conf' ? 0.5 : 1)); if (q.kind === 'chunk') { c.strokeStyle = INK; c.lineWidth = 1.5; c.strokeRect(-q.r / 2, -q.r / 2, q.r, q.r); } c.restore(); }
     else { c.fillStyle = q.col; c.beginPath(); c.arc(q.x, q.y, q.r * (q.kind === 'puff' ? 1 + (1 - a) : 1), 0, 7); c.fill(); }
   }
@@ -6061,6 +6448,7 @@ function drawWorld(c, t, camX) {
   // speech bubbles and floating text
   for (const e of G.crew) if (e.sayT > 0 && vis(e.x, e.w)) bubble(c, cxOf(e), e.y - 30, e.say, e.ctrl >= 0);
   for (const T of G.teachers) if (T.sayT > 0 && vis(T.x - 20, 40)) bubble(c, T.x, T.y - 150, T.say, true, true);
+  if (G.bully) { const Bu = G.bully; if (Bu.sayT > 0) bubble(c, cxOf(Bu), Bu.y - 76, Bu.say, true, true); if (Bu.adult && Bu.adult.sayT > 0) bubble(c, Bu.adult.x, Bu.adult.y - 150, Bu.adult.say, true, true); }
   for (const x of G.texts) {
     c.globalAlpha = clamp(x.life * 2, 0, 1); c.font = (x.big ? 26 : 19) + 'px "Lilita One", sans-serif'; c.textAlign = 'center';
     c.lineWidth = 5; c.strokeStyle = INK; c.strokeText(x.txt, x.x, x.y); c.fillStyle = x.col; c.fillText(x.txt, x.x, x.y);
@@ -6154,6 +6542,9 @@ function drawProj(c, q, t) {
     c.fillStyle = INK; c.beginPath(); c.arc(0, 0, (q.r || 9) * 0.38, 0, 7); c.fill();
     for (let k = 0; k < 5; k++) { const a = k * 1.256; c.beginPath(); c.arc(Math.cos(a) * (q.r || 9) * 0.85, Math.sin(a) * (q.r || 9) * 0.85, 2, 0, 7); c.fill(); }
     c.restore();
+  } else if (q.kind === 'spell') {
+    c.save(); c.translate(q.x, q.y); c.rotate((q.t || 0) * 10); c.shadowColor = '#e0c8ff'; c.shadowBlur = 14;
+    starPath(c, 0, 0, 10, 4.5); blob(c, '#ffe066', 2); c.restore();
   } else if (q.kind === 'drone') {
     c.save(); c.translate(q.x, q.y); rrect(c, -8, -3, 16, 6, 3); blob(c, '#c9cde6', 2);
     c.strokeStyle = '#39e1ff'; c.lineWidth = 2; c.beginPath(); c.moveTo(-12, -6); c.lineTo(12, -6); c.stroke(); c.restore();
@@ -6228,6 +6619,7 @@ function drawScreenFx(c, t) {
     g.addColorStop(0, 'rgba(80,160,255,0)'); g.addColorStop(1, `rgba(80,160,255,${a * 2.2})`); c.fillStyle = g; c.fillRect(0, 0, W, H);
   }
   if (G.chargeFlash > 0) { c.fillStyle = `rgba(255, 236, 160, ${G.chargeFlash * 0.6})`; c.fillRect(0, 0, W, H); }
+  if (G.freezeFlash > 0) { c.fillStyle = `rgba(190, 240, 255, ${G.freezeFlash * 0.8})`; c.fillRect(0, 0, W, H); }
   if (G.boltFlash > 0) { c.fillStyle = `rgba(255, 255, 240, ${G.boltFlash * 2.5})`; c.fillRect(0, 0, W, H); }
   if (G.photoFlash > 0) { c.fillStyle = `rgba(255, 255, 255, ${Math.min(1, G.photoFlash / 0.25)})`; c.fillRect(0, 0, W, H); }
   if (G.trans) { const k = G.trans.t < 0.4 ? G.trans.t / 0.4 : 1 - (G.trans.t - 0.4) / 0.4; c.fillStyle = `rgba(22,24,58,${clamp(k, 0, 1)})`; c.fillRect(0, 0, W, H); }
@@ -6319,7 +6711,7 @@ function padDisconnected() {
   resize();
   if (G && (STATE.screen === 'play' || STATE.screen === 'pause')) toast(null, 'Controller disconnected.');
 }
-function padSelect(d) { PAD.sel = (PAD.sel + d + HERO_IDS.length) % HERO_IDS.length; SND.sfx('alert'); }
+function padSelect(d) { const ids = barIds(), i = Math.max(0, ids.indexOf(HERO_IDS[PAD.sel])); PAD.sel = HERO_IDS.indexOf(ids[(i + d + ids.length) % ids.length]); SND.sfx('alert'); }
 
 function pollPads() {
   const list = padList();
@@ -6466,7 +6858,7 @@ function buildLevels() {
     </button>`;
   }).join('');
   $('levelPath').querySelectorAll('.node').forEach((el) => el.addEventListener('click', () => {
-    if (levelUnlocked(el.dataset.lv)) { STATE.level = el.dataset.lv; showScreen('crew'); } else { SND.sfx('nope'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+    if (levelUnlocked(el.dataset.lv)) { STATE.level = el.dataset.lv; STATE.crewStep = 'hero'; showScreen('crew'); } else { SND.sfx('nope'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
   }));
 }
 
@@ -6479,13 +6871,14 @@ function buildCrewSelect() {
     grid.innerHTML = HERO_IDS.map((id) => `<button class="hero" data-hero="${id}"><canvas width="180" height="210"></canvas><b>${HEROES[id].name}</b><span>${HEROES[id].role}</span></button>`).join('');
     grid.querySelectorAll('.hero').forEach((el) => {
       cardCanvases[el.dataset.hero] = el.querySelector('canvas');
-      el.addEventListener('click', () => pickHero(el.dataset.hero));
+      el.addEventListener('click', () => (STATE.crewStep === 'friends' ? toggleFriend(el.dataset.hero) : pickHero(el.dataset.hero)));
     });
   }
   refreshCrewSelect();
 }
+function crewPicks() { return STATE.picks.slice(0, STATE.players); }
 function pickHero(id) {
-  if (isGrounded(id)) { SND.sfx('nope'); $('crewHint').textContent = `${HEROES[id].name} is at home. Finish a level and win the battle to get ${HEROES[id].name} back.`; return; }
+  if (isGrounded(id)) { SND.sfx('nope'); STATE.crewMsg = `${HEROES[id].name} is at home. Finish a level and win the battle to get ${HEROES[id].name} back.`; refreshCrewSelect(); return; }
   STATE.focus = id; SND.sfx('help');
   if (STATE.players === 1) STATE.picks[0] = id;
   else {
@@ -6495,22 +6888,47 @@ function pickHero(id) {
   }
   refreshCrewSelect();
 }
+function toggleFriend(id) {
+  STATE.focus = id;
+  const picks = crewPicks(), name = HEROES[id].name, cur = STATE.friendsNow || [];
+  if (picks.includes(id)) STATE.crewMsg = STATE.players === 1 ? 'That\'s you! Tap the friends you want to bring along.' : `${name} is a player. Tap other friends to bring along.`;
+  else if (isGrounded(id)) { SND.sfx('nope'); STATE.crewMsg = `${name} is at home. Win the battle at the end of a level to get ${name} back.`; }
+  else if (neededFriends(picks, STATE.level).includes(id)) { SND.sfx('nope'); const j = levelJobs(STATE.level).find((x) => x.hero === id); STATE.crewMsg = `${name} has a job in this level: ${name} ${j.text}. ${name} has to come!`; }
+  else if (cur.includes(id)) { STATE.friends = cur.filter((x) => x !== id); SND.sfx('help'); }
+  else if (cur.length >= MAX_FRIENDS) { SND.sfx('nope'); STATE.crewMsg = `You can bring up to ${MAX_FRIENDS} friends. Tap one to leave them behind first.`; }
+  else { STATE.friends = cur.concat(id); SND.sfx('help'); }
+  SAVE.friends = STATE.friends; writeSave();
+  refreshCrewSelect();
+}
 function refreshCrewSelect() {
+  const step = STATE.crewStep === 'friends' ? 'friends' : 'hero';
   $('p1Btn').classList.toggle('on', STATE.players === 1); $('p2Btn').classList.toggle('on', STATE.players === 2);
   for (let i = 0; i < 2; i++) if (isGrounded(STATE.picks[i])) STATE.picks[i] = HERO_IDS.find((h) => !isGrounded(h) && !STATE.picks.includes(h)) || STATE.picks[i];
   if (STATE.players === 2 && STATE.picks[0] === STATE.picks[1]) STATE.picks[1] = HERO_IDS.find((h) => h !== STATE.picks[0] && !isGrounded(h)) || HERO_IDS.find((h) => h !== STATE.picks[0]);
+  const picks = crewPicks(), friends = crewFriends(picks, STATE.level), need = neededFriends(picks, STATE.level);
+  STATE.friendsNow = friends;
+  $('crewTitle').textContent = step === 'hero' ? 'Pick your hero' : 'Pick your friends';
+  $('crewScreen').classList.toggle('friends-step', step === 'friends');
   document.querySelectorAll('#crewGrid .hero').forEach((el) => {
-    const id = el.dataset.hero, p1 = STATE.picks[0] === id, p2 = STATE.players === 2 && STATE.picks[1] === id;
-    el.classList.toggle('sel1', p1); el.classList.toggle('sel2', p2);
-    const old = el.querySelector('.badge'); if (old) old.remove();
-    const oh = el.querySelector('.homebadge'); if (oh) oh.remove();
-    el.classList.toggle('home', isGrounded(id));
-    if (isGrounded(id)) el.insertAdjacentHTML('beforeend', `<span class="homebadge">${HOUSE_SVG}At home</span>`);
+    const id = el.dataset.hero, p1 = STATE.picks[0] === id, p2 = STATE.players === 2 && STATE.picks[1] === id, home = isGrounded(id);
+    const fr = step === 'friends' && friends.includes(id), nd = need.includes(id);
+    el.classList.toggle('sel1', p1); el.classList.toggle('sel2', p2); el.classList.toggle('friend', fr); el.classList.toggle('home', home);
+    el.classList.toggle('dim', step === 'friends' && !fr && !p1 && !p2 && !home);
+    el.querySelectorAll('.badge, .homebadge').forEach((b) => b.remove());
     if (p1 || p2) el.insertAdjacentHTML('afterbegin', `<span class="badge ${p1 ? 'b1' : 'b2'}">${STATE.players === 1 ? 'YOU' : p1 ? 'P1' : 'P2'}</span>`);
+    else if (fr) el.insertAdjacentHTML('afterbegin', `<span class="badge ${nd ? 'bn' : 'bf'}">${nd ? 'NEEDED' : 'FRIEND'}</span>`);
+    if (home) el.insertAdjacentHTML('beforeend', `<span class="homebadge">${HOUSE_SVG}At home</span>`);
   });
-  $('crewHint').textContent = STATE.players === 1
-    ? 'Tap a hero to play as them. The computer runs the rest of the crew.'
-    : `Player ${pickTurn + 1}, tap your hero. The computer runs the other four.`;
+  const jobs = levelJobs(STATE.level);
+  $('crewJobs').innerHTML = jobs.length
+    ? '<b>Jobs in this level:</b>' + jobs.map((j) => `<span class="job"><canvas width="48" height="48" data-por="${j.hero}"></canvas>${HEROES[j.hero].name} ${isGrounded(j.hero) && !picks.includes(j.hero) ? 'is at home, so the crew will team up' : j.text}</span>`).join('')
+    : '<b>No special jobs in this level.</b> Bring any friends you like.';
+  $('crewJobs').querySelectorAll('canvas[data-por]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.por), 0, 0, 48, 48));
+  const msg = STATE.crewMsg; STATE.crewMsg = '';
+  $('crewHint').textContent = msg || (step === 'hero'
+    ? (STATE.players === 1 ? 'Tap a hero to play as them.' : `Player ${pickTurn + 1}, tap your hero.`)
+    : `Tap to bring up to ${MAX_FRIENDS} friends (${friends.length} picked). Friends with a job in this level have to come.`);
+  $('startBtn').textContent = step === 'hero' ? 'Next' : 'Start!';
   const id = STATE.focus, H = HEROES[id], cur = heroThrow(id);
   $('crewDetail').innerHTML = `
     <div><h3>${H.name}: ${H.role}</h3>
@@ -6545,7 +6963,10 @@ function buildHUD() {
   $('statBox').innerHTML = G.players.map((p, i) => `<div class="chip" id="hp${i}"><canvas width="48" height="48"></canvas><span class="hearts"></span></div>`).join('') +
     `<div class="chip" id="coinChip"><svg viewBox="0 0 24 24" width="20" height="20"><ellipse cx="12" cy="12" rx="8" ry="9" fill="#ffd23d" stroke="#1d1b3a" stroke-width="2.4"/></svg><span>0</span></div>`;
   G.players.forEach((p, i) => { const c = $('hp' + i).querySelector('canvas'); c.getContext('2d').drawImage(portraitFor(p.id), 0, 0, 48, 48); });
-  $('portraits').innerHTML = HERO_IDS.map((id, i) => {
+  buildCrewBar();
+}
+function buildCrewBar() {
+  $('portraits').innerHTML = barIds().map((id, i) => {
     const pl = G.players.findIndex((p) => p.id === id);
     const tag = pl < 0 ? '' : `<span class="you ${pl ? 'p2' : ''}">${G.players.length === 1 ? 'YOU' : 'P' + (pl + 1)}</span>`;
     return `<button class="por" data-por="${id}" aria-label="Call ${HEROES[id].name}"><canvas width="96" height="96"></canvas><span class="cd"></span>${tag}${STATE.touch || STATE.pad ? '' : `<span class="k">${i + 1}</span>`}<span class="padk">${padNames().call}</span>${HOUSE_SVG}</button>`;
@@ -6554,6 +6975,7 @@ function buildHUD() {
     el.querySelector('canvas').getContext('2d').drawImage(portraitFor(el.dataset.por), 0, 0);
     el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); callHelp(el.dataset.por); });
   });
+  for (const k in hudCache) if (k.endsWith('cd')) delete hudCache[k];
 }
 function portraitShake(id) {
   const el = document.querySelector(`.por[data-por="${id}"]`); if (!el) return;
@@ -6582,9 +7004,12 @@ function updateHUD() {
   const m = Math.round(G.meter);
   if (hudCache.meter !== m) { hudCache.meter = m; $('meter').firstElementChild.style.width = m + '%'; $('chargeBtn').hidden = m < 100; }
   const A = G.L.arena, B = G.boss, C = G.L.chase;
-  const Bt = G.battle, showHack = !!(Bt && !Bt.end) || !!(C && !C.got) || !!(A && ((A.type !== 'boss' && A.started && !A.done) || (B && B.state !== 'ko')));
+  const Bt = G.battle, Bu = G.bully, showHack = bullyActive() || !!(Bt && !Bt.end) || !!(C && !C.got) || !!(A && ((A.type !== 'boss' && A.started && !A.done) || (B && B.state !== 'ko')));
   if (hudCache.hack !== showHack) { hudCache.hack = showHack; $('hackbar').hidden = !showHack; $('hud').classList.toggle('hacking', showHack); $('hackbar').classList.toggle('boss', !!B); placeOverlays(); }
-  if (showHack && Bt) {
+  if (showHack && bullyActive()) {
+    const left = Math.max(0, Math.ceil(Bu.timer)), lab = `Hit Crusher ${Bu.hp === BULLY_HP ? Bu.hp + ' times' : Bu.hp === 1 ? 'once more' : Bu.hp + ' more times'}! 0:${String(left).padStart(2, '0')}`;
+    if (hudCache.prog !== lab) { hudCache.prog = lab; $('hackFill').style.width = Math.round(clamp(Bu.timer / BULLY_TIME, 0, 1) * 100) + '%'; $('hackLabel').textContent = lab; }
+  } else if (showHack && Bt) {
     const pr = Math.round(Bt.prog), left = Math.max(0, Math.ceil(BATTLE_TIME - Bt.t)), lab = `Win ${Bt.name} back! 0:${String(left).padStart(2, '0')}`;
     if (hudCache.prog !== lab + pr) { hudCache.prog = lab + pr; $('hackFill').style.width = pr + '%'; $('hackLabel').textContent = lab; }
   } else if (showHack && C) {
@@ -6645,7 +7070,7 @@ function banner(big, small, o) {
   bannerT = (o && o.dur) || 2.1;
 }
 function callTip(id) {
-  const n = HERO_IDS.indexOf(id) + 1;
+  const n = barIds().indexOf(id) + 1;
   const N = padNames();
   if (isPlayer(id)) return touchOrKey('tap your own face up top', `press ${n}`, `press ${N.call}`);
   return touchOrKey(`tap ${HEROES[id].name}'s face up top`, `press ${n} to call ${HEROES[id].name}`, `press ${N.call} to call ${HEROES[id].name}`);
@@ -6656,13 +7081,14 @@ function showHint(h) {
   const T = h.t != null ? (G.teachers[h.t] || L.teachers[h.t]) : null, low = (x) => x.charAt(0).toLowerCase() + x.slice(1);
   let id = null, text = '';
   const gone = NEED_HINT[h.kind];
-  if (gone && friendGone(gone)) { toast(null, `${HEROES[gone].name} went home. ${h.kind === 'shutters' ? 'Time your run through the gaps!' : 'Keep going and the crew will team up!'}`); return; }
+  if (gone && friendGone(gone)) { toast(null, `${awayText(gone)}. ${h.kind === 'shutters' ? 'Time your run through the gaps!' : 'Keep going and the crew will team up!'}`); return; }
   switch (h.kind) {
     case 'goal': text = L.goal; break;
     case 'move': text = touchOrKey('Slide your thumb on the left side of the screen to run. Tap the up arrow to jump.', one ? 'Run with ← → or A D. Jump with ↑, W or Space.' : 'Player 1: A D to run, W to jump. Player 2: arrow keys.', `Run with the left stick and press ${N.jump} to jump.`); break;
     case 'special': id = me.id; text = one ? `${H.name}'s special move is ${H.move}. ${moveKey} to use it.` : `Every hero has a special move. ${moveKey} to use yours.`; break;
     case 'enemy': text = `${n.enemies}! ${n.enemyTip} If one gets you, a friend is sent home.`; break;
     case 'throw': { const tk = heroThrow(me.id), ob = THROWS[tk].name, vb = tk === 'soccer' ? 'kick' : 'throw'; id = me.id; text = touchOrKey(`Tap the ${ob} button to ${vb} your ${ob} at baddies.`, one ? `Press Q to ${vb} your ${ob} at baddies.` : 'Player 1 throws with Q. Player 2 throws with Enter.', `Press ${N.throw} to ${vb} your ${ob} at baddies.`); break; }
+    case 'bully': id = me.id; text = `${moveKey} to use your special move on Crusher. Hit him ${BULLY_HP} times before a grown-up comes!`; break;
     case 'chase': id = 'ollie'; text = 'Keep up with the screen! Jump over the tyres and catch the bike thief.'; break;
     case 'survive': text = 'Zombies pop up from the ground! Keep moving and bop them until the sun comes up.'; break;
     case 'dark': text = 'It\'s dark in here! Stay close to your crew. Grown-ups carry lanterns, so you can see them coming.'; break;
@@ -6689,10 +7115,12 @@ function showDone(stars) {
   if (G && G.over) showScreen('done');
 }
 function showLost() {
-  $('doneTitle').textContent = 'Sent home!';
+  const all = G.lose && G.lose.all;
+  $('doneTitle').textContent = all ? 'Everyone sent home!' : 'Sent home!';
   $('nextBtn').hidden = true; $('againBtn').textContent = 'Try again';
   $('photo').setAttribute('aria-label', 'The friends who were sent home, waving from their houses');
-  $('doneStars').innerHTML = `<p class="lostmsg">Too many friends were sent home.<small>Jump on baddies, throw at them, or dodge them to keep your crew together.</small></p>`;
+  $('doneStars').innerHTML = all ? `<p class="lostmsg">Crusher got the whole crew in trouble.<small>Next time, hit him ${BULLY_HP} times with your special move before a grown-up comes.</small></p>`
+    : `<p class="lostmsg">Too many friends were sent home.<small>Jump on baddies, throw at them, or dodge them to keep your crew together.</small></p>`;
   const sec = Math.floor(G.time), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0');
   $('doneStats').innerHTML = `<div><b>${G.coins}</b><span>coins</span></div><div><b>${G.bopped}</b><span>baddies bopped</span></div><div><b>${mm}:${ss}</b><span>time</span></div>`;
   showScreen('done');
@@ -6772,7 +7200,7 @@ window.addEventListener('keydown', (e) => {
     if (GAME_KEYS.includes(e.code)) e.preventDefault();
     if (!e.repeat) {
       const n = parseInt(e.key, 10);
-      if (n >= 1 && n <= 6) callHelp(HERO_IDS[n - 1]);
+      if (n >= 1 && n <= 6 && barIds()[n - 1]) callHelp(barIds()[n - 1]);
       if (e.code === 'KeyE') crewCharge();
       if (e.code === 'KeyP' || e.code === 'Escape') { showScreen('pause'); return; }
     }
@@ -6803,12 +7231,13 @@ function beginPlay() {
   $('storyTitle').textContent = L.name;
   $('storySub').textContent = `${adv.name}: level ${L.levelIdx + 1}`;
   let html;
-  if (L.tutorial && !storySeen) html = TUTORIAL_HTML;
+  const crewLine = `<p><b>Your crew:</b> ${G.crew.map((e) => HEROES[e.id].name + (e.ctrl >= 0 ? (G.players.length > 1 ? ` (P${e.ctrl + 1})` : ' (you)') : '')).join(', ')}.</p>`;
+  if (L.tutorial && !storySeen) html = TUTORIAL_HTML + crewLine;
   else {
     const n = THEMES[L.theme].n, names = [...new Set(L.teachers.map((t) => t.name))];
-    html = `<p>${L.intro}</p><p><b>Goal:</b> ${L.goal}</p><p><b>Baddies:</b> ${n.enemies}. ${n.enemyTip}</p>`;
+    html = `<p>${L.intro}</p><p><b>Goal:</b> ${L.goal}</p>${crewLine}<p><b>Baddies:</b> ${n.enemies}. ${n.enemyTip}</p>`;
     if (names.length) html += `<p><b>Watch out for:</b> ${names.join(' and ')}. You can't fight grown-ups, so hide, sneak past or get a friend to distract them. If they catch you, they march a friend home!</p>`;
-    const home = grounded().filter((g) => !STATE.picks.slice(0, STATE.players).includes(g.id)).map((g) => HEROES[g.id].name);
+    const home = grounded().filter((g) => !crewPicks().includes(g.id)).map((g) => HEROES[g.id].name);
     if (home.length) html += `<p><b>At home:</b> ${home.join(', ')}. Finish this level to battle for ${home.length > 1 ? 'one of them' : home[0]} back!</p>`;
     if (L.arena && L.arena.type === 'boss') html += '<p><b>Boss tip:</b> Jump on its head or hit it with special moves. Dodge what it throws. At half health it gets angry and tries a new trick!</p>';
     if (L.special === 'chase') html += '<p><b>Tip:</b> The screen keeps moving. Don\'t get stuck behind the tyres!</p>';
@@ -6825,16 +7254,20 @@ function wireButtons() {
   $('howBtn2').onclick = () => { helpReturn = 'pause'; showScreen('help'); };
   $('helpClose').onclick = () => showScreen(helpReturn);
   document.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => showScreen(b.dataset.go)));
-  $('p1Btn').onclick = () => { STATE.players = 1; pickTurn = 0; refreshCrewSelect(); };
-  $('p2Btn').onclick = () => { STATE.players = 2; pickTurn = 1; refreshCrewSelect(); };
-  $('startBtn').onclick = () => beginPlay();
+  $('p1Btn').onclick = () => { STATE.players = 1; pickTurn = 0; STATE.crewStep = 'hero'; refreshCrewSelect(); };
+  $('p2Btn').onclick = () => { STATE.players = 2; pickTurn = 1; STATE.crewStep = 'hero'; refreshCrewSelect(); };
+  $('startBtn').onclick = () => {
+    if (STATE.crewStep !== 'friends') { STATE.crewStep = 'friends'; SND.sfx('help'); refreshCrewSelect(); $('s-crew').scrollTop = 0; return; }
+    STATE.friends = STATE.friendsNow; SAVE.friends = STATE.friends; writeSave(); beginPlay();
+  };
+  $('crewBack').onclick = () => { if (STATE.crewStep === 'friends') { STATE.crewStep = 'hero'; refreshCrewSelect(); } else showScreen('levels'); };
   $('storyGo').onclick = () => enterPlay();
   $('pauseBtn').onclick = () => showScreen('pause');
   $('resumeBtn').onclick = () => showScreen('play');
   $('restartBtn').onclick = () => { startLevel(); enterPlay(); };
   $('quitBtn').onclick = () => { G = null; showScreen('levels'); };
   $('againBtn').onclick = () => { startLevel(); enterPlay(); };
-  $('nextBtn').onclick = () => { const nx = nextLevelId(STATE.level); if (nx) { STATE.level = nx; beginPlay(); } };
+  $('nextBtn').onclick = () => { const nx = nextLevelId(STATE.level); if (nx) { STATE.level = nx; STATE.crewStep = 'friends'; G = null; showScreen('crew'); } };
   $('unlockBtn').onclick = () => { SAVE.unlockAll = !SAVE.unlockAll; writeSave(); buildAdventures(); };
   $('mapBtn').onclick = () => { G = null; showScreen('levels'); };
   $('chargeBtn').addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); crewCharge(); });
@@ -6862,6 +7295,7 @@ function frame(now) {
 }
 function boot(data) {
   loadSave(); readSafe(); TUTORIAL_HTML = $('storyBody').innerHTML;
+  if (Array.isArray(SAVE.friends)) STATE.friends = SAVE.friends.slice(0, MAX_FRIENDS);
   if (data && data.picks) { STATE.players = data.players || 1; STATE.picks = data.picks; STATE.focus = data.picks[0]; }
   if (data && data.adv && ADV.some((a) => a.id === data.adv)) STATE.adv = data.adv;
   if (data && data.level) { try { levelDef(data.level); STATE.level = data.level; } catch (e) { /* ignore */ } }
