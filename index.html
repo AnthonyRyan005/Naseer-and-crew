@@ -163,9 +163,11 @@ h2.title {
 .hero .badge.bn { background: #ff8a1f; }
 .jobs { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; font-size: 14px; font-weight: 600; text-align: center; }
 .jobs .job { display: inline-flex; align-items: center; gap: 5px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 2px 10px 2px 2px; }
+.jobs .job.have { border-color: #22c993; box-shadow: 0 0 0 2px #22c993; }
+.jobs .job i { font-style: normal; color: var(--muted); font-weight: 600; }
 .jobs .job canvas { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink); }
 .jobs > b { color: #fff; text-shadow: 0 1px 0 var(--ink); }
-@media (max-width: 400px) { #crewTitle { font-size: 27px; padding: 0 44px; } }
+@media (max-width: 400px) { #crewTitle { font-size: 27px; padding: 0 44px; } .jobs { font-size: 12.5px; gap: 5px 6px; } .jobs .job { padding-right: 8px; } }
 .hero .homebadge { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 3px; background: #fff; border: 2px solid var(--ink);
   border-radius: 8px; padding: 1px 6px 1px 2px; font-size: 12px; font-weight: 700; color: var(--ink); }
 .hero .homebadge svg { width: 18px; height: 18px; }
@@ -314,6 +316,34 @@ h2.title {
 .joy.p1 { border-color: var(--p1); }
 .joy.p2 { border-color: var(--p2); }
 .padfocus { outline: 4px solid var(--sun) !important; outline-offset: 3px; }
+
+/* ---------- Crusher: special moves or an Annoy-Off? ---------- */
+.bullypanel { align-items: center; max-width: 520px; }
+#bullyFace { width: 92px; height: 92px; margin: -4px 0 -6px; }
+.choices { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.choice { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 14px; border-radius: 16px; border: 3px solid var(--ink);
+  box-shadow: 0 4px 0 var(--ink); background: #fff; color: var(--ink); font-family: var(--font-body); cursor: pointer; touch-action: manipulation; }
+.choice.go { background: var(--sun); }
+.choice:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+.choice:disabled { opacity: 0.75; }
+.choice canvas, .choice .ico { width: 52px; height: 52px; flex: none; border-radius: 50%; border: 2.5px solid var(--ink); background: #fff; }
+.choice .ico { display: grid; place-items: center; background: #ffe9a8; }
+.choice .ico svg { width: 30px; height: 30px; }
+.choice > span:not(.ico) { flex: 1; min-width: 0; }
+.choice b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1.1; }
+.choice small { display: block; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--muted); line-height: 1.3; }
+.choice kbd { flex: none; font-family: var(--font-body); font-weight: 700; font-size: 15px; background: #fff; border: 2px solid var(--ink); border-radius: 8px; padding: 1px 8px; }
+.choices:not(.keys) kbd { display: none; }
+@media (max-height: 460px) { #bullyFace { display: none; } .choice { padding: 6px 12px; } .choice canvas, .choice .ico { width: 40px; height: 40px; } .choice b { font-size: 19px; } .choice small { font-size: 13px; } }
+
+/* ---------- the Annoy-Off: the cool bars are drawn on the game itself ---------- */
+#hud.duel .stat, #hud.duel #crewbar, #hud.duel #hackbar { visibility: hidden; }
+.tb.duelsup { background: conic-gradient(rgba(255, 200, 61, 0.95) var(--chg, 0%), rgba(255, 255, 255, 0.45) 0); }
+.tb.duelsup.ready { animation: supGlow 0.6s ease-in-out infinite alternate; }
+@keyframes supGlow { from { box-shadow: 0 4px 0 rgba(29, 27, 58, 0.5), 0 0 0 0 rgba(255, 210, 61, 0.9); } to { box-shadow: 0 4px 0 rgba(29, 27, 58, 0.5), 0 0 0 12px rgba(255, 210, 61, 0); } }
+.tb.duelann { background: rgba(255, 255, 255, 0.7); }
+.tb .big { display: flex; flex-direction: column; align-items: center; font-family: var(--font-display); font-size: 17px; letter-spacing: 0.5px; color: var(--ink); line-height: 1; text-align: center; }
+.tb .big small { font-family: var(--font-body); font-weight: 700; font-size: 10px; letter-spacing: 0; margin-top: 3px; max-width: 86%; }
 .por .padk { display: none; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: var(--sun); border: 2px solid var(--ink);
   border-radius: 8px; font-size: 10px; font-weight: 700; padding: 0 4px; line-height: 14px; white-space: nowrap; }
 .pad-on .por.sel { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--sun); }
@@ -459,6 +489,17 @@ h2.title {
     </div>
   </section>
 
+  <section class="screen dim" id="s-bully" hidden>
+    <div class="inner">
+      <div class="panel bullypanel">
+        <canvas id="bullyFace" width="192" height="192" aria-hidden="true"></canvas>
+        <h2>Crusher wants trouble!</h2>
+        <p class="sub">How will you stop him?</p>
+        <div class="choices" id="bullyChoices"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="screen dim" id="s-pause" hidden>
     <div class="inner">
       <div class="panel">
@@ -502,9 +543,9 @@ h2.title {
           <li>You play one hero. The rest of the crew follows you and helps out.</li>
           <li>Tap a friend's face at the top to call for help. Frankie smashes, Spencer hacks, Jaxxs pranks, James pulls you up, Ollie kicks, Ben freezes baddies with a spell, and Naseer slows time.</li>
           <li>Jump on Glitch Bots to bop them, throw your object at them, or use your special move. Pick what each hero throws on the "Pick your hero" screen.</li>
-          <li>Before each level, pick your hero and up to 3 friends. Friends with a job in that level always come along.</li>
+          <li>Before each level, pick your hero and up to 3 friends. Any mix works: if a job needs a friend who isn't in your crew, they pop in to help.</li>
           <li>If a baddie gets you, a friend is sent home and you lose a heart. Lose all 4 hearts and you start the level again.</li>
-          <li>Watch out for Crusher the bully! Only special moves can stop him. If you take too long, a grown-up comes and everyone gets sent home.</li>
+          <li>Watch out for Crusher the bully! Stop him with special moves before a grown-up comes, or take him on one on one in an Annoy-Off. Annoy him until his keeping cool bar hits 100%. If yours gets there first, everyone gets sent home.</li>
           <li>If a grown-up catches you, they march a friend home. Win them back in a promise battle at the end of a level.</li>
           <li>Teachers can't be fought. Stand still in an open locker to hide, sneak behind them, or get Jaxxs to distract them.</li>
           <li>Bopping bots and teaming up fills the crew meter. When it's full, use Crew Charge!</li>
@@ -678,6 +719,19 @@ const SND = {
       case 'bounce': this.tone(210, 0.07, 'triangle', 0.16, -80); this.noise(0.03, 0.06, 1400); break;
       case 'meow': this.tone(700, 0.3, 'sine', 0.1, 200); this.tone(900, 0.2, 'sine', 0.06, -300, 0.18); break;
       case 'chain': { const k = Math.min(n || 2, 6); for (let i = 0; i < k; i++) this.tone(523 * Math.pow(1.1225, i + k), 0.09, 'square', 0.08, 0, i * 0.045); break; }
+      // the Annoy-Off
+      case 'burp': if (n === 2) { this.tone(80, 0.85, 'sawtooth', 0.2, -35); this.tone(60, 0.9, 'square', 0.1, 15, 0.1); this.noise(0.8, 0.08, 280); }
+        else { this.tone(96, 0.35, 'sawtooth', 0.16, -30); this.tone(72, 0.4, 'square', 0.08, 20, 0.05); this.noise(0.3, 0.06, 300); } break;
+      case 'fart': this.noise(0.75, 0.3, 380); this.tone(70, 0.75, 'sawtooth', 0.15, 30); this.tone(110, 0.5, 'square', 0.06, -60, 0.1); break;
+      case 'beep': this.tone(1320, 0.07, 'square', 0.07); this.tone(990, 0.08, 'square', 0.07, 0, 0.09); break;
+      case 'ding': this.tone(1760, 0.25, 'sine', 0.12); this.tone(2637, 0.18, 'sine', 0.06); this.tone(1760, 0.22, 'sine', 0.1, 0, 0.12); break;
+      case 'airhorn': this.tone(415, 0.42, 'sawtooth', 0.11); this.tone(311, 0.42, 'sawtooth', 0.09); this.tone(523, 0.42, 'square', 0.04); break;
+      case 'nyah': [660, 550, 660, 550].forEach((f, i) => this.tone(f, 0.12, 'triangle', 0.1, 0, i * 0.13)); break;
+      case 'meltdown': this.tone(300, 1.2, 'sawtooth', 0.12, -220); this.noise(1.0, 0.12, 2400, 0.2, null, null, true); break;
+      case 'cool': [1568, 2093, 2637].forEach((f, i) => this.tone(f, 0.15, 'sine', 0.08, 0, i * 0.06)); this.noise(0.3, 0.05, 5000, 0, null, null, true); break;
+      case 'tick': this.tone(880, 0.12, 'square', 0.08); break;
+      case 'go': [659, 988, 1319].forEach((f, i) => this.tone(f, 0.16, 'square', 0.09, 0, i * 0.05)); break;
+      case 'vs': this.noise(0.5, 0.2, 1500); this.tone(140, 0.6, 'sawtooth', 0.15, 260); break;
     }
   },
   /* Looping tunes: bass, melody and sometimes drums. Each adventure and the bosses have their own. */
@@ -2097,7 +2151,7 @@ function startLevel() {
     needHero: null, need: null, chargeFlash: 0, winT: 0, pulse: null, hackTalk: 0, eshots: [], boss: null, hits: 0, ropeFrom: null, puddles: [],
     goop: [], darkK: L.dark ? 1 : 0, darkTo: L.dark ? 1 : 0, flashT: 0, boltT: rand(5, 9), chain: 0, chainT: -9, callouts: [], scene: null, party: null, chaseX: 0, thief: null,
     sp: null, movers: [], gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, boltFlash: 0,
-    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null
+    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null, cameo: null, duel: null
   };
   G.bullyPlan = planBully(L); // Crusher the bully may turn up somewhere in this level
   // your hero (or two players' heroes) and up to 3 friends, always including friends with a job here
@@ -2688,6 +2742,7 @@ function update(dt) {
     if (G.trans.t >= 0.8) G.trans = null;
     return;
   }
+  if (G.duel) { updateDuel(dt); return; } // the Annoy-Off with Crusher takes over until it's done
   if (G.freeze > 0) {
     G.freeze -= dt;
     G.teachers.forEach((T) => (T.sayT -= dt));
@@ -2698,7 +2753,7 @@ function update(dt) {
   if (G.lose) { updateLose(dt); return; }
   if (G.bully && G.bully.state === 'trouble') { updateBully(dt); updateCamera(dt); return; }
   updateDark(dt);
-  if (G.over) { if (G.party) updateParty(dt); else if (G.battleNext) updateBattleQueue(dt); return; }
+  if (G.over) { if (G.cameo) updateCameo(dt); if (G.party) updateParty(dt); else if (G.battleNext) updateBattleQueue(dt); return; }
   const wdt = dt * (G.slow > 0 ? 0.35 : 1);
   G.wt += wdt; G.time += dt;
   G.slow = Math.max(0, G.slow - dt); G.shield = Math.max(0, G.shield - dt);
@@ -2720,6 +2775,7 @@ function update(dt) {
   if (G.L.surprise) { if (G.L.surprise.kind === 'ramp') updateRamp(dt); updateSurprise(dt); }
   updateProj(dt, wdt);
   if (G.bully) updateBully(dt);
+  if (G.cameo) updateCameo(dt);
   if (G.puddles.length) updatePuddles(dt);
   updateObstacles(dt);
   updateArena(dt);
@@ -2892,11 +2948,11 @@ function smashBarrier(B, by, sub) {
   [60, 130].forEach((dx) => G.bots.push(makeBot({ sx: B.x + B.w + dx, sy: GROUND, minX: B.x + B.w + 20, maxX: B.x + B.w + 260 })));
 }
 function nearestBarrier(x, range) { return G.L.barriers.find((B) => !B.broken && Math.abs(x - B.x) < range); }
-function pressButton(gt, sub) {
+function pressButton(gt, sub, title) {
   const Bt = gt.button;
   Bt.hit = true; gt.opening = true; SND.sfx('gate'); meterAdd(10);
   sparks(Bt.x + 17, Bt.y + 17, 14, '#ff6150');
-  banner(sub ? 'TEAMWORK!' : 'GOAL!', sub || 'Ollie hit the button. The gate is open');
+  banner(title || (sub ? 'TEAMWORK!' : 'GOAL!'), sub || 'Ollie hit the button. The gate is open');
   const o = heroById('ollie'); if (o) { say(o, 'Back of the net!', 1.8); o.cheer = 0.8; }
   if (G.t - (G.lastHelp.james ?? -99) < 8) combo('Kick and Swing');
 }
@@ -2937,7 +2993,7 @@ function botsOnScreen() { return G.bots.filter((b) => live(b) && onScreen(b)); }
 const bossActive = () => G.boss && G.boss.state !== 'ko' && G.boss.state !== 'intro';
 
 function callHelp(id) {
-  if (!G || STATE.screen !== 'play' || G.trans || G.freeze > 0 || G.over) return;
+  if (!G || STATE.screen !== 'play' || G.trans || G.freeze > 0 || G.over || G.duel) return;
   if (G.cd[id] > 0) { portraitShake(id); SND.sfx('nope'); return; }
   const h = heroById(id), ld = leader();
   if (!h) { portraitShake(id); SND.sfx('nope'); toast(id, `${HEROES[id].name} was sent home and can't help this time.`); return; }
@@ -3042,9 +3098,9 @@ function frogPop(x, y) { // a baddie zapped by Ben hops away as a frog
   G.parts.push({ kind: 'frog', x, y, vx: rand(-70, 70), vy: -280, g: 900, life: 1.1, max: 1.1, r: 9, col: '#5fd35f' });
 }
 
-function ropePull(j, An, sub) {
+function ropePull(j, An, sub, title) {
   An.used = true; SND.sfx('rope'); meterAdd(10);
-  banner(sub ? 'TEAMWORK!' : 'Grab on!', sub || 'James pulls the crew up');
+  banner(title || (sub ? 'TEAMWORK!' : 'Grab on!'), sub || 'James pulls the crew up');
   G.ropeFrom = An;
   const order = G.crew.slice().sort((a, b) => (a === j ? -1 : b === j ? 1 : 0));
   order.forEach((e, i) => {
@@ -3064,7 +3120,7 @@ function combo(name) {
   banner('COMBO!', name + ' (+5 coins)');
 }
 function crewCharge() {
-  if (!G || G.meter < 100 || G.trans || G.freeze > 0 || G.over || STATE.screen !== 'play') return;
+  if (!G || G.meter < 100 || G.trans || G.freeze > 0 || G.over || G.duel || STATE.screen !== 'play') return;
   G.meter = 0; G.chargeFlash = 0.7; G.shake = 0.5; SND.sfx('charge');
   banner('CREW CHARGE!', 'Everyone, all at once');
   G.shield = Math.max(G.shield, 5);
@@ -3088,7 +3144,7 @@ function updateArena(dt) {
   if (!A) return;
   const n = THEMES[L.theme].n;
   if (!A.active && !A.done && G.players.some((p) => cxOf(p) > A.trigger)) {
-    A.active = true;
+    A.active = true; A.activeAt = G.t;
     G.cp = L.checkpoints.length - 1; L.checkpoints[G.cp].on = true;
     G.players.forEach((p) => { if (cxOf(p) < A.x0 + 30) p.x = A.x0 + 40; });
     followers().forEach((f) => { if (cxOf(f) < A.x0 + 20) { f.x = A.x0 + 40 + f.slot * 30; f.y = GROUND - f.h; } });
@@ -3097,9 +3153,13 @@ function updateArena(dt) {
     else if (A.type === 'survive') { banner('SURVIVE!', 'Hold out until the sun comes up'); A.started = true; showHint({ kind: 'survive' }); }
     else if (A.type === 'defend') { banner(n.start, n.startSub); startHack(); }
     else if (isPlayer('spencer')) { banner('Spencer, you\'re up!', 'Get to it and start the hack'); toast('spencer', touchOrKey('Stand right next to it and tap the star to start the hack.', 'Stand right next to it and press your special move key to start the hack.', `Stand right next to it and press ${padNames().move} to start the hack.`)); }
-    else if (friendGone('spencer')) { banner('Hold them off!', `${awayText('spencer')}, so it works by itself. Keep the baddies away!`); startHack(); }
+    else if (friendGone('spencer')) hackCameo(A); // Spencer pops in to start it
     else { banner(n.start, n.startSub); startHack(); }
   }
+  if (A.type === 'hack' && A.active && !A.started && isPlayer('spencer') && G.t - A.activeAt > 10) { // Spencer forgot to start it
+    startHack(); toast('spencer', 'The hack has started! Stay right next to it to keep it going.');
+  }
+  if (A.type === 'hack' && A.active && !A.started && friendGone('spencer') && !G.cameo && G.t - A.activeAt > 4) startHack(); // just in case the pop-in got cut short
   if (G.pulse) {
     G.pulse.r += dt * 1400;
     G.bots.forEach((b) => { if (Math.abs(cxOf(b) - G.pulse.x) < G.pulse.r) { if (live(b)) bop(b, heroById('spencer') || leader(), true); else if (b.state !== 'ko') { b.dead = true; puff(cxOf(b), b.y + b.h - 6, 8, '#7a5a3a'); } } });
@@ -3181,7 +3241,8 @@ function updateHints() {
     if (n.type === 'guard') { const T = G.teachers[n.t]; if (!T || T.distract > 0 || x > T.x + 20) continue; }
     need = n; break;
   }
-  if (need && friendGone(need.hero)) { teamEffort(need); need = null; }
+  if (need) jobHelp(need); // the right friend helps, pops in, or the crew teams up
+  if (need && !heroById(need.hero)) need = null; // only point at friends who are here to tap
   const A = L.arena;
   if (!need && A && A.active && !A.done && A.type === 'hack' && !friendGone('spencer')) need = { hero: 'spencer', type: 'hack' };
   G.need = need; G.needHero = need ? need.hero : null;
@@ -4010,7 +4071,7 @@ function updateChase(dt, wdt) {
   if (!C.got && T.bikeX && G.players.some((p) => cxOf(p) > T.bikeX - 40)) {
     C.got = true; G.winT = 1.8; SND.sfx('win'); confetti(T.bikeX, GROUND - 120, 40);
     banner('GOT IT BACK!', 'Ollie\'s bike is safe');
-    const o = heroById('ollie'); if (o) say(o, 'My bike!', 2); G.crew.forEach((e) => (e.cheer = 2.5));
+    const o = heroById('ollie'); if (o) say(o, 'My bike!', 2); else bikeCameo(T); G.crew.forEach((e) => (e.cheer = 2.5));
     T.state = 'run'; T.say = 'Sorry!'; T.sayT = 1.5;
   }
 }
@@ -4040,7 +4101,7 @@ function drawThief(c, T, t) {
     drawBikeAt(c, T.x, T.y, t, false);
     c.save(); c.translate(T.x + 2, T.y - 20); drawKidBaddie(c, { kind: 'bully', t: t * 1.4, seed: 2, dir: 1 }, t, false); c.restore();
   } else {
-    drawBikeAt(c, T.bikeX, GROUND, t, true);
+    if (!T.bikeTaken) drawBikeAt(c, T.bikeX, GROUND, t, true);
     c.save(); c.translate(T.x, T.y); if (T.state === 'crash') c.rotate(T.t * 10); drawKidBaddie(c, { kind: 'bully', t: T.state === 'run' ? t * 2 : 0, seed: 2, dir: 1 }, t, T.state === 'sit'); c.restore();
   }
   if (T.sayT > 0) bubble(c, T.x, T.y - 96, T.say, true, true);
@@ -5519,11 +5580,11 @@ function drawLostPhoto(c, W, H, t) {
 /* ---------- When a needed friend has gone home, the crew teams up instead ---------- */
 const NEED_HINT = { barrier: 'frankie', shutters: 'naseer', wall: 'james', guard: 'jaxxs', gate: 'ollie' };
 function friendGone(id) { return !!G && !heroById(id); } // sent home, marched home, or not picked
-function teamEffort(n) {
+function teamEffort(n, msg) {
   if (n.type === 'shutters' || n.teamDone) return; // you can still time a run through the shutters
   if (n.teamAt == null) {
     n.teamAt = G.t;
-    toast(null, `${awayText(n.hero)}, so the crew teams up instead!`);
+    toast(null, msg || `${awayText(n.hero)}, so the crew teams up instead!`);
     followers().forEach((f) => { f.cheer = 1.4; });
     return;
   }
@@ -5598,7 +5659,7 @@ function enterBattle() {
   };
   Object.assign(G, { bots: [], teachers: [], proj: [], eshots: [], puddles: [], goop: [], boss: null, movers: [], parts: [], texts: [], callouts: [], sent: [],
     gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, darkK: 0, darkTo: 0, slow: 0, shield: 0, thief: null,
-    scene: null, pulse: null, over: false, winT: 0, need: null, needHero: null });
+    scene: null, pulse: null, over: false, winT: 0, need: null, needHero: null, cameo: null });
   placeCrewAt({ x: 150, y: GROUND });
   const A = ADULTS[g.by] || ADULTS.whistle, name = HEROES[g.id].name;
   G.battle = {
@@ -5777,6 +5838,7 @@ const JOB_TEXT = {
   anchor: () => 'pulls the crew up the wall',
   guard: () => 'pranks the guard',
   gate: () => 'kicks the gate button',
+  shutters: () => 'slows down the shutters',
   hack: (th) => HACK_JOB[th] || 'hacks the computer',
   bike: () => 'gets his bike back'
 };
@@ -5786,16 +5848,17 @@ function levelJobs(id) {
   let L;
   try { L = buildLevelById(id); } catch (e) { return []; }
   const jobs = [], add = (hero, type) => { if (!jobs.some((j) => j.hero === hero)) jobs.push({ hero, type, text: JOB_TEXT[type](L.theme) }); };
-  for (const n of L.needs || []) if (n.type !== 'shutters') add(n.hero, n.type); // anyone can time a run through the shutters
+  for (const n of L.needs || []) add(n.hero, n.type);
   if (L.arena && L.arena.type === 'hack') add('spencer', 'hack');
   if (L.special === 'chase') add('ollie', 'bike');
   return (jobCache[id] = jobs);
 }
 function neededFriends(picks, id) { return levelJobs(id).map((j) => j.hero).filter((h) => !picks.includes(h) && !isGrounded(h)); }
+// any mix works: friends with a job here are handy, but if they're missing they pop in to help
 function crewFriends(picks, id) {
   const ok = (h) => HEROES[h] && !picks.includes(h) && !isGrounded(h);
-  const rest = STATE.friends ? STATE.friends.filter(ok) : HERO_IDS.filter(ok); // first time: bring a full crew
-  return [...new Set(neededFriends(picks, id).concat(rest))].slice(0, MAX_FRIENDS);
+  if (STATE.friends) return STATE.friends.filter(ok).slice(0, MAX_FRIENDS);
+  return [...new Set(neededFriends(picks, id).concat(HERO_IDS.filter(ok)))].slice(0, MAX_FRIENDS); // first time: a full crew, handy friends first
 }
 // who shows in the crew bar: the crew, plus anyone sent home during this level
 function barIds() { return G ? HERO_IDS.filter((id) => G.crew.some((e) => e.id === id) || G.homeIds.includes(id)) : HERO_IDS; }
@@ -5804,6 +5867,7 @@ function awayText(id) { const n = HEROES[id].name; return G && G.homeIds.include
 /* ===================== Crusher the bully ===================== */
 // Crusher drops in at a random moment in about half the levels. Jumping on him and throwing things don't work.
 // Only special moves hurt him. Hit him 3 times before the countdown ends, or a grown-up comes and everyone is sent home.
+// Or take him on one on one in an Annoy-Off (z_duel.js).
 const BULLY_CHANCE = 0.5, BULLY_TIME = 25, BULLY_HP = 3;
 const BULLY_PLACE = { school: 'SCHOOL', park: 'PARK', zombie: 'SCHOOLYARD', treat: 'STREET' };
 const BULLY_ADULT = { school: 'whistle', park: 'mum', zombie: 'mop', treat: 'dad' };
@@ -5865,12 +5929,12 @@ function bullyHit(p, how) {
   if (B.hp <= 0) bullyBeaten(p);
   return true;
 }
-function bullyBeaten(p) {
-  const B = G.bully;
+function bullyBeaten(p, how) {
+  const B = G.bully, duel = how === 'duel';
   B.state = 'flee'; B.t = 0; B.dir = cxOf(B) < cxOf(p) ? -1 : 1;
-  say(B, 'WAAAH! I\'m telling my mum!', 2.4);
-  banner('BULLY STOPPED!', 'Crusher ran home crying. +10 coins', { huge: true, dur: 2.6 });
-  G.coins += 10; meterAdd(20); SND.sfx('win'); confetti(cxOf(B), B.y, 30);
+  say(B, duel ? 'WAAAH! You\'re too annoying!' : 'WAAAH! I\'m telling my mum!', 2.4);
+  banner(duel ? 'YOU STAYED COOL!' : 'BULLY STOPPED!', duel ? 'Crusher lost the Annoy-Off and ran home. +15 coins' : 'Crusher ran home crying. +10 coins', { huge: true, dur: 2.6 });
+  G.coins += duel ? 15 : 10; meterAdd(20); SND.sfx('win'); confetti(cxOf(B), B.y, 30);
   G.crew.forEach((e) => { e.cheer = 2.2; });
   bullyWallsDown(); SND.setTrack(levelTrack());
 }
@@ -5900,7 +5964,6 @@ function updateBully(dt) {
     if (!B.onGround && B.state === 'drop') { // THUD
       G.shake = 0.7; SND.sfx('thud'); SND.sfx('roar'); puff(cxOf(B), GROUND - 6, 16, '#e8d6b0', 220);
       B.state = 'taunt'; B.t = 0; say(B, `THIS IS MY ${BULLY_PLACE[G.L.theme] || 'PLAYGROUND'}!`, 2.2);
-      showHint({ kind: 'bully' });
     }
     B.y = GROUND - B.h; B.vy = 0; B.onGround = true;
   }
@@ -5910,7 +5973,11 @@ function updateBully(dt) {
   if (B.timer <= 0) { bullyTrouble(); return; }
   const dx = cxOf(target) - cxOf(B);
   if (B.frozenT > 0) { B.frozenT -= dt; B.vx = 0; }
-  else if (B.state === 'taunt') { B.vx = 0; if (B.t > 1.4) { B.state = 'walk'; B.t = 0; } }
+  else if (B.state === 'taunt') {
+    B.vx = 0;
+    if (!B.asked && B.t > 1.1) { B.asked = true; openBullyChoice(); return; } // special moves or an Annoy-Off?
+    if (B.t > 1.4) { B.state = 'walk'; B.t = 0; }
+  }
   else if (B.state === 'hurt') { B.vx *= 0.9; if (B.t > 0.6 && B.onGround) { B.state = 'walk'; B.t = 0; B.actT = 0.8; } }
   else if (B.state === 'roar') {
     B.vx = 0;
@@ -5966,7 +6033,7 @@ function updateTrouble(B, dt) {
     }
   } else if (B.t > 4.4 && !G.lose) { // everyone goes home
     G.homeIds = [...new Set(G.homeIds.concat(G.crew.map((e) => e.id)))];
-    G.lose = { t: 1, all: true };
+    G.lose = { t: 1, all: true, duel: !!B.duelLost };
   }
 }
 
@@ -6032,6 +6099,996 @@ function drawBullyFx(c) {
   const W = cv.width, H = cv.height, g = c.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.2, W / 2, H * 0.55, Math.max(W, H) * 0.7);
   g.addColorStop(0, 'rgba(25,10,40,0)'); g.addColorStop(1, `rgba(25,10,40,${0.72 * B.dark})`);
   c.fillStyle = g; c.fillRect(0, 0, W, H);
+}
+
+/* ===================== Every job gets done, whoever is in the crew ===================== */
+// Bring any mix of friends. At a team job (a barrier, a high wall, a guard, a gate button, fast shutters):
+// - the right friend in your crew does it when you tap their face, or by themselves after a few seconds
+// - if they're not in your crew, they pop in from the side of the screen, do the job and run off again
+// - if it's your own hero's job and you're stuck, the crew helps out after a while
+const AUTO_HELP_AFTER = 4, PLAYER_JOB_HELP_AFTER = 10, CAMEO_AFTER = 1.2;
+const CAMEO_LINES = {
+  picked: ['Need a hand? I\'ll be quick!', 'Coming through!', 'Did someone call me?'],
+  sent: ['I\'m back for a sec!', 'Quick, before Mum notices!'],
+  grounded: ['Mum let me out for one minute!']
+};
+
+// called every frame with the job the leader is standing at
+function jobHelp(n) {
+  n.at = n.at ?? G.t;
+  const id = n.hero, wait = G.t - n.at, h = heroById(id);
+  if (G.cameo) return;
+  if (n.type === 'shutters') { // Naseer slows the shutters down
+    if (G.slow > 0) return;
+    if (h) { if (wait - (n.autoT || 0) > (isPlayer(id) ? 6 : AUTO_HELP_AFTER) && G.cd.naseer <= 0) { n.autoT = wait; if (!isPlayer(id)) say(h, 'I\'ve got this!', 1.4); callHelp('naseer'); } }
+    else if (wait > CAMEO_AFTER && G.t - (n.cameoAt ?? -99) > 8) startCameo(n);
+    return;
+  }
+  if (isPlayer(id)) { if (wait > PLAYER_JOB_HELP_AFTER) teamEffort(n, 'Need a hand? The crew teams up!'); return; }
+  if (h) { // in the crew: does the job by themselves if nobody taps their face
+    if (wait - (n.autoT || 0) > AUTO_HELP_AFTER && G.cd[id] <= 0 && !h.task && !h.pull) { n.autoT = wait; say(h, 'I\'ve got this!', 1.4); callHelp(id); }
+    return;
+  }
+  if (wait > CAMEO_AFTER && !n.cameoDone) startCameo(n);
+}
+
+function startCameo(n) {
+  const id = n.hero, ld = leader(), feet = ld.y + ld.h;
+  const why = isGrounded(id) ? 'grounded' : G.homeIds.includes(id) ? 'sent' : 'picked';
+  let tx = cxOf(ld) - 40, fy = feet, line = pick(CAMEO_LINES[why]);
+  if (n.type === 'barrier') { tx = n.ref.x - 26; fy = GROUND; }
+  else if (n.type === 'anchor') { tx = Math.min(cxOf(ld) + 30, n.ref.x - 30); fy = GROUND; }
+  else if (n.type === 'hack') { tx = n.ref.cx - 46; fy = GROUND; }
+  else if (n.type === 'bike') { tx = n.ref.bikeX - 34; fy = GROUND; line = 'Hey! That\'s my bike!'; }
+  G.cameo = { id, n, cx: G.cam.x - 40, feet: fy, tx, face: 1, phase: 'in', t: 0, walk: 0, pose: 'run', say: line, sayT: 2, cheer: 0 };
+  n.cameoDone = true; n.cameoAt = G.t;
+  SND.sfx('help');
+}
+// Spencer isn't here for the hack: he pops in, starts it and runs off. It then works by itself.
+function hackCameo(A) {
+  if (G.cameo) { banner('Hold them off!', `${awayText('spencer')}, so it works by itself. Keep the baddies away!`); startHack(); return; }
+  startCameo({ hero: 'spencer', type: 'hack', ref: A.obj });
+}
+// Ollie isn't here when his bike is saved: he pops in, grabs it and rides off
+function bikeCameo(T) {
+  if (G.cameo) return;
+  startCameo({ hero: 'ollie', type: 'bike', ref: T });
+  G.winT = Math.max(G.winT, 3.6);
+}
+function updateCameo(dt) {
+  const C = G.cameo; C.t += dt; C.sayT -= dt;
+  if (C.phase === 'in') {
+    const d = C.tx - C.cx; C.face = sign(d) || 1;
+    C.cx += C.face * Math.min(Math.abs(d), 560 * dt); C.walk += dt * 22; C.pose = 'run';
+    if (Math.abs(C.tx - C.cx) < 2 || C.t > 2.5) { C.cx = C.tx; C.phase = 'act'; C.t = 0; C.face = 1; cameoAct(C); }
+  } else if (C.phase === 'act') {
+    if (C.n.type === 'gate' && !C.n.ref.button.hit && C.t > 1.4) pressButton(C.n.ref, `${HEROES[C.id].name} popped in and kicked the ball`, 'GOAL!'); // in case the ball missed
+    if (C.t > 0.9) { C.phase = 'out'; C.t = 0; }
+  } else {
+    C.face = C.n.type === 'bike' ? 1 : -1; C.cx += C.face * 560 * dt; C.walk += dt * 22; C.pose = 'run'; // Ollie rides off after the thief
+    if (C.cx < G.cam.x - 80 || C.cx > G.cam.x + VIEW.w + 80 || C.t > 3) G.cameo = null;
+  }
+}
+function cameoAct(C) {
+  const n = C.n, ld = leader(), name = HEROES[C.id].name;
+  if (n.type === 'barrier') { C.pose = 'punch'; smashBarrier(n.ref, C, `${name} popped in to help`); }
+  else if (n.type === 'anchor') { C.pose = 'cheer'; ropePull(ld, n.ref, `${name} popped in and pulled the crew up`, 'Grab on!'); }
+  else if (n.type === 'gate') { C.pose = 'kick'; kickBall({ x: C.cx - 16, y: C.feet - 62, w: 32, h: 62, face: 1, kickT: 0, ctrl: -1 }, true); }
+  else if (n.type === 'guard') {
+    C.pose = 'cheer'; const T = G.teachers[n.t];
+    if (T) { T.distract = 7; T.alert = 0; say(T, 'EEK! A SPIDER!', 2); SND.sfx('eek'); }
+    banner('PRANKED!', `${name} popped in with a fake spider`);
+  } else if (n.type === 'shutters') { C.pose = 'cheer'; G.slow = 5; SND.sfx('turbo'); banner('TURBO TIME!', `${name} popped in and slowed everything down`); }
+  else if (n.type === 'hack') { C.pose = 'hack'; startHack(); banner('Hold them off!', `${name} popped in and started it. It works by itself now!`); }
+  else if (n.type === 'bike') { C.pose = 'cheer'; n.ref.bikeTaken = true; SND.sfx('coin'); }
+  const done = { shutters: 'Turbo time!', hack: 'Keep the baddies off it!', bike: 'My bike! Thanks, crew!' };
+  say(C, done[n.type] || pick(['Done! See ya!', 'Easy!', 'Gotta go!']), 1.4);
+  meterAdd(6);
+}
+function drawCameo(c, t) {
+  const C = G.cameo; if (!C) return;
+  const bike = C.id === 'ollie' && (C.n.type === 'bike' ? C.phase === 'out' : C.phase !== 'act'); // no bike until he gets it back
+  drawHero(c, C.id, C.cx, C.feet, { t, pose: C.pose, face: C.face, phase: C.walk, bike, drone: C.id === 'spencer' });
+  if (C.sayT > 0) bubble(c, C.cx, C.feet - 92, C.say, false);
+}
+
+/* ===================== The Annoy-Off: one on one with Crusher ===================== */
+// When Crusher shows up, you can take him on one on one instead of using special moves.
+// Nobody fights. You annoy each other! Every annoying move that lands fills the other one's
+// "keeping cool" bar. Whoever reaches 100% loses their cool and gives up.
+// Win, and the level carries on. Lose, and a grown-up sends the whole crew home.
+const DUEL_AMMO = 3, DUEL_GAP = 0.26, DUEL_DY = 1.8; // DUEL_DY: the floor is seen at an angle, so depth counts for more
+const DUEL_MOVES = {
+  naseer: { annoy: 'Paper Planes', kind: 'shot', look: 'plane', speed: 680, range: 540, dmg: 7, r: 16, reload: 1.0, spd: 280, hit: ['BONK!', 'WHOOSH!'], sup: 'Turbo Taunt', supLine: 'Too slow!', tip: 'Paper planes fly a long way.' },
+  frankie: { annoy: 'Big Burp', kind: 'cone', look: 'burp', speed: 600, range: 200, arc: 0.6, dmg: 7, reload: 1.15, spd: 250, charge: 2.4, hit: ['BURRP!', 'EWWW!'], sup: 'Mega Burp', supLine: 'Excuse ME!', tip: 'Get close to Crusher, then burp!' },
+  spencer: { annoy: 'Beep Drone', kind: 'homing', look: 'drone', speed: 400, range: 640, dmg: 5.5, r: 16, reload: 1.0, spd: 245, charge: 2.8, hit: ['BEEP!', 'BOOP!'], sup: 'Air Horn', supLine: 'Turn it up!', tip: 'Your drones chase him around.' },
+  jaxxs: { annoy: 'Kick Me Stickers', kind: 'spread', look: 'sticker', speed: 600, range: 450, dmg: 4.5, r: 14, n: 3, spread: 0.16, reload: 1.05, spd: 250, hit: ['KICK ME!', 'STUCK!'], sup: 'Whoopee Cushion', supLine: 'Take a seat!', tip: 'Get close and all three stickers stick.' },
+  james: { annoy: 'Yo-yo', kind: 'yoyo', look: 'yoyo', speed: 650, range: 360, dmg: 5, r: 15, reload: 1.0, spd: 255, hit: ['BOING!', 'YOINK!'], sup: 'Copycat', supLine: 'Stop copying me!', tip: 'Your yo-yo can annoy him twice.' },
+  ollie: { annoy: 'Bike Bell', kind: 'wave', look: 'bell', speed: 480, range: 410, dmg: 6, r: 24, reload: 1.0, spd: 250, hit: ['DING!', 'RING RING!'], sup: 'Wheelie Dash', supLine: 'Coming through!', tip: 'Ring your bell when he is close.' },
+  ben: { annoy: 'Tickle Spell', kind: 'shot', look: 'tickle', speed: 620, range: 580, dmg: 7, r: 16, bounce: 1, reload: 1.0, spd: 245, hit: ['TEE-HEE!', 'TICKLE!'], sup: 'Frog Voice', supLine: 'Abraca-ribbit!', tip: 'Tickle spells bounce off things.' }
+};
+const DUEL_SFX = { naseer: 'throw', frankie: 'burp', spencer: 'beep', jaxxs: 'squeak', james: 'boing', ollie: 'ding', ben: 'spell' };
+const CRUSHER_SOCK = { flight: 0.8, range: 480, dmg: 8, splash: 58 };
+const DUEL_LINES = {
+  crAnnoyed: ['Quit it!', 'Stop that!', 'So annoying!', 'Grrr!', 'Hey!'],
+  crHot: ['I\'m... staying... cool...', 'Not... cool...', 'ARGH!', 'You\'re SO annoying!'],
+  crTaunt: ['Catch!', 'Smell THIS!', 'Stinky sock!'],
+  heroHit: ['Ew, stinky!', 'Gross!', 'Not cool!', 'Yuck!'],
+  fans: ['Stay cool, {n}!', 'You\'ve got this!', 'Don\'t let him get to you!', 'Dodge the socks!', 'Keep annoying him!']
+};
+const angDiff = (a, b) => { let d = a - b; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; };
+const duelDist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const floorDist = (a, x, y) => Math.hypot(a.x - x, (a.y - y) * DUEL_DY);
+
+// The court has its own zoom, so it fills the space between the cool bars and the buttons on any screen.
+// Court units: the floor runs from (0, 0) at the back left to (w, d) at the front right.
+let DUEL_LAY = null, DUEL_LAY_KEY = '';
+const duelStacked = () => VIEW.W < 600; // narrow screens put Crusher's bar under yours
+function duelPanelH() { return VIEW.H < 450 ? 46 : 62; }
+function duelHudH() { return duelStacked() ? duelPanelH() * 2 + 8 : duelPanelH() + 4; } // the cool bars along the top
+function duelLayout() {
+  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), on = !!(G && G.duel);
+  const key = [W, H, VIEW.portrait, touch, SAFE.top, SAFE.bottom, SAFE.left, SAFE.right, on].join();
+  if (DUEL_LAY && key === DUEL_LAY_KEY) return DUEL_LAY;
+  const top = SAFE.top + 8 + duelHudH() + 8;
+  let bottom = H - SAFE.bottom - 6;
+  if (touch && VIEW.portrait) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers()).top - 14);
+  else if (touch) bottom -= 22;
+  const left = SAFE.left + 6, aw = W - SAFE.right - 6 - left, ah = Math.max(160, bottom - top);
+  const ABOVE = 118, BELOW = 14; // room behind the court for the fence and the crew, and a little in front
+  const s = clamp(Math.min(aw / (VIEW.portrait ? 540 : 760), ah / (236 + ABOVE + BELOW)), 0.45, 1.4);
+  const w = clamp(aw / s - 40, 420, 1100), d = clamp(ah / s - ABOVE - BELOW, 200, VIEW.portrait ? 440 : 380);
+  const ox = left + (aw - w * s) / 2, oy = top + (ah - (d + ABOVE + BELOW) * s) / 2 + ABOVE * s;
+  DUEL_LAY_KEY = key; DUEL_LAY = { s, w, d, ox, oy, vx0: -ox / s, vx1: (W - ox) / s, vy0: -oy / s, vy1: (H - oy) / s };
+  if (on) for (const f of [G.duel.me, G.duel.cr]) { f.x = clamp(f.x, f.r, w - f.r); f.y = clamp(f.y, 10, d - 4); } // the phone turned: keep everyone on the court
+  return DUEL_LAY;
+}
+function duelBounds() { const L = duelLayout(); return { x0: 0, x1: L.w, y0: 0, y1: L.d, w: L.w, d: L.d }; }
+function duelK(y) { const A = duelBounds(); return 0.84 + 0.16 * clamp((y - A.y0) / A.d, 0, 1); } // further back looks smaller
+const DUEL_PROPS = { // near the edges, so the middle of the court stays clear
+  school: [['bench', 0.36, 0.9], ['bin', 0.64, 0.12]],
+  park: [['bush', 0.36, 0.88], ['bench', 0.64, 0.12]],
+  zombie: [['crate', 0.36, 0.88], ['bin', 0.64, 0.12]],
+  treat: [['pumpkin', 0.36, 0.88], ['crate', 0.64, 0.12]]
+};
+function duelProps() {
+  const A = duelBounds();
+  return (DUEL_PROPS[G.L.theme] || DUEL_PROPS.school).map(([k, fx, fy]) => {
+    const round = k !== 'bench' && k !== 'crate';
+    return { k, x: A.x0 + fx * A.w, y: A.y0 + fy * A.d, rx: round ? 26 : k === 'bench' ? 58 : 30, ry: round ? 18 : 14 };
+  });
+}
+// later levels have a sneakier Crusher
+function duelDiff() {
+  const L = G.L, ai = Math.max(0, ADV.findIndex((a) => a.id === L.adv)), li = L.levelIdx || 0;
+  return clamp(0.12 + ai * 0.15 + li * 0.04, 0.1, 0.65);
+}
+function duelFighter(id, x, y) {
+  const cr = id === 'crusher';
+  return { id, cr, x, y, vx: 0, vy: 0, face: cr ? -1 : 1, heat: 0, ammo: cr ? 2 : DUEL_AMMO, reload: 0, gap: 0, sup: 0, atkT: 0, hitT: 0, walk: 0,
+    say: '', sayT: 0, stun: 0, croak: 0, boost: 0, aura: 0, auraT: 0, dash: null, burst: null, wind: 0, windSup: false, kb: null,
+    dodge: 0, dx: 0, dy: 0, strafe: rand(0, 6), r: cr ? 30 : 22, steamT: 0 };
+}
+
+/* ---------- when Crusher lands: special moves or an Annoy-Off? ---------- */
+function openBullyChoice() {
+  const box = $('bullyChoices'); if (!box) return;
+  const two = G.players.length === 2;
+  box.innerHTML = G.players.map((p, i) => {
+    const n = HEROES[p.id].name;
+    return `<button class="choice go" data-duel="${i}"><canvas width="96" height="96" data-por="${p.id}"></canvas><span><b>${two ? `Annoy-Off: ${n}` : 'Annoy-Off!'}</b>` +
+      `<small>${n} vs Crusher, one on one. Annoy him until he loses his cool!</small></span><kbd>${i + 1}</kbd></button>`;
+  }).join('') +
+    `<button class="choice" data-duel="moves"><span class="ico">${ICON.action}</span><span><b>Special moves</b><small>Hit him ${BULLY_HP} times before a grown-up comes.</small></span><kbd>${G.players.length + 1}</kbd></button>`;
+  box.classList.toggle('keys', !STATE.touch && !STATE.pad);
+  box.querySelectorAll('canvas[data-por]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.por), 0, 0, 96, 96));
+  const face = $('bullyFace'); if (face) { const c = face.getContext('2d'); c.clearRect(0, 0, face.width, face.height); c.drawImage(bigPortrait('crusher'), 0, 0, face.width, face.height); }
+  box.querySelectorAll('button').forEach((b) => { b.disabled = true; b.onclick = () => chooseBully(b.dataset.duel); });
+  showScreen('bully'); SND.sfx('alert');
+  setTimeout(() => { // a moment to read it, so a button you were already mashing doesn't choose for you
+    box.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+    if (STATE.screen !== 'bully') return;
+    if (STATE.pad) focusPrimary(); else if (!STATE.touch) { try { box.querySelector('button').focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+  }, 700);
+}
+function chooseBully(k) {
+  const B = G && G.bully;
+  if (STATE.screen !== 'bully' || !B) return;
+  showScreen('play');
+  if (k === 'moves') { B.timer = BULLY_TIME; showHint({ kind: 'bully' }); return; }
+  const pl = clamp(parseInt(k, 10) || 0, 0, G.players.length - 1);
+  startTrans(() => startDuel(pl));
+}
+function bullyKey(e) { // 1, 2 (and 3 for two players) pick, the arrows move between the choices
+  const btns = [...document.querySelectorAll('#bullyChoices button')];
+  if (!btns.length || btns[0].disabled) return;
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= btns.length) { e.preventDefault(); btns[n - 1].click(); return; }
+  const i = btns.indexOf(document.activeElement), d = ['ArrowDown', 'ArrowRight'].includes(e.code) ? 1 : ['ArrowUp', 'ArrowLeft'].includes(e.code) ? -1 : 0;
+  if (d) { e.preventDefault(); btns[(Math.max(0, i) + (i < 0 ? 0 : d) + btns.length) % btns.length].focus(); }
+}
+
+/* ---------- starting and finishing ---------- */
+function startDuel(pl) {
+  const B = G.bully, p = G.players[pl] || G.players[0];
+  if (!B || !p) return;
+  const D = G.duel = {
+    phase: 'vs', t: 0, pl: G.players.indexOf(p), diff: duelDiff(), shots: [], fx: [], lolly: null, lollyT: 6, chat: 3, supWas: false, count: -1, flash: 0,
+    me: duelFighter(p.id, 0, 0), cr: duelFighter('crusher', 0, 0),
+    fans: G.crew.filter((e) => e !== p).map((e) => ({ id: e.id, x: 0, y: 0, say: '', sayT: 0, cheer: 0 })), won: false, loser: null, copy: 0
+  };
+  const A = duelBounds(); D.me.x = A.w * 0.2; D.me.y = A.d * 0.55; D.cr.x = A.w * 0.8; D.cr.y = A.d * 0.45;
+  B.duel = true; G.parts = []; G.texts = []; G.callouts = [];
+  try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) { /* ignore */ }
+  joyEnd(); Input.held.clear(); Input.tapped.clear();
+  $('hud').classList.add('duel'); $('banner').hidden = true; $('toast').hidden = true;
+  layoutControls(); placeOverlays();
+  SND.setTrack('chase'); SND.sfx('vs');
+}
+function duelHelpToast() {
+  const D = G.duel, N = padNames();
+  const keys = STATE.players === 2
+    ? (D.pl === 0 ? 'Move with W A S D. Space annoys Crusher. F uses your Super when it glows.' : 'Move with the arrow keys. Enter annoys Crusher. / uses your Super when it glows.')
+    : 'Move with the arrow keys or W A S D. Space annoys Crusher. X uses your Super when it glows.';
+  const tip = ' ' + DUEL_MOVES[D.me.id].tip;
+  toast(D.me.id, touchOrKey('Move with your left thumb. Tap ANNOY to annoy Crusher. Tap SUPER when it glows.', keys,
+    `Move with the left stick. ${N.jump} annoys Crusher. ${N.move} uses your Super when it glows.`) + tip, 6);
+}
+function duelEnd(loser) {
+  const D = G.duel;
+  D.phase = 'end'; D.t = 0; D.loser = loser; D.won = loser === D.cr;
+  D.shots = []; D.fx = []; D.lolly = null;
+  for (const f of [D.me, D.cr]) { f.vx = f.vy = 0; f.dash = null; f.burst = null; f.aura = 0; f.wind = 0; f.kb = null; f.croak = 0; }
+  say(loser, loser.cr ? 'AAARGH! FINE! I GIVE UP!' : 'I can\'t take it! I give up!', 2.6);
+  G.shake = 0.6; SND.sfx('meltdown'); SND.sfx(D.won ? 'win' : 'sad');
+  banner(D.won ? 'YOU WIN!' : 'YOU LOST YOUR COOL!', D.won ? 'Crusher lost his cool and gave up' : 'Crusher wins the Annoy-Off', { huge: true, dur: 2.8 });
+  if (D.won) { confetti(D.cr.x, D.cr.y - 160, 40); D.fans.forEach((F) => { F.cheer = 3; }); const F = pick(D.fans); if (F) { F.say = 'WOOHOO!'; F.sayT = 2; } }
+  else { const F = pick(D.fans); if (F) { F.say = 'Oh no...'; F.sayT = 2; } }
+}
+function duelFinish() {
+  const D = G.duel, B = G.bully, p = G.players[D.pl] || G.players[0];
+  G.duel = null; G.parts = []; G.texts = []; G.callouts = [];
+  $('hud').classList.remove('duel'); $('toast').hidden = true;
+  joyEnd(); layoutControls(); placeOverlays();
+  if (!B) { SND.setTrack(levelTrack()); return; }
+  B.duel = false;
+  if (D.won) bullyBeaten(p, 'duel');
+  else { B.duelLost = true; SND.setTrack('boss'); say(p, 'I lost my cool...', 2.2); bullyTrouble(); }
+}
+
+/* ---------- every frame ---------- */
+function updateDuel(dt) {
+  const D = G.duel, A = duelBounds();
+  D.t += dt; D.flash = Math.max(0, D.flash - dt);
+  if (D.phase === 'vs' && D.t > 2.3) { D.phase = 'count'; D.t = 0; duelHelpToast(); }
+  else if (D.phase === 'count') {
+    const n = Math.floor(D.t / 0.6);
+    if (n !== D.count && n <= 3) { D.count = n; SND.sfx(n < 3 ? 'tick' : 'go'); }
+    if (D.t > 2.4) { D.phase = 'fight'; D.t = 0; }
+  } else if (D.phase === 'end' && D.t > 3.1) { duelFinish(); return; }
+  for (const f of [D.me, D.cr]) duelTick(f, dt);
+  if (D.phase === 'fight') {
+    duelHero(D.me, D.cr, dt);
+    duelCrusher(D.cr, D.me, dt);
+    duelLolly(dt, A);
+  } else {
+    D.supWas = duelInput(D.pl).sup;
+    for (const f of [D.me, D.cr]) f.vx = f.vy = 0;
+  }
+  for (const f of [D.me, D.cr]) duelMove(f, dt, A);
+  duelSeparate(D.me, D.cr);
+  duelShots(dt, A);
+  for (const e of D.fx) e.t += dt;
+  D.fx = D.fx.filter((e) => e.t < e.T);
+  duelFans(dt);
+  if (D.phase === 'end') duelMeltdown(D.loser, dt);
+  Input.tapped.clear();
+}
+function duelTick(f, dt) {
+  const D = G.duel;
+  f.sayT -= dt; f.atkT = Math.max(0, f.atkT - dt); f.hitT = Math.max(0, f.hitT - dt); f.gap = Math.max(0, f.gap - dt);
+  f.stun = Math.max(0, f.stun - dt); f.croak = Math.max(0, f.croak - dt); f.boost = Math.max(0, f.boost - dt);
+  if (D.phase !== 'fight') return;
+  const most = f.cr ? 2 : DUEL_AMMO, R = f.cr ? 2.1 - 0.7 * D.diff : DUEL_MOVES[f.id].reload;
+  if (f.ammo < most) { f.reload += dt; if (f.reload >= R) { f.reload = 0; f.ammo++; } } else f.reload = 0;
+  const o = f === D.me ? D.cr : D.me;
+  if (f.burst) { // Naseer's Turbo Taunt: a stream of paper planes
+    f.burst.t -= dt;
+    if (f.burst.t <= 0) {
+      duelShot(f, duelAim(f, o, 760) + rand(-0.12, 0.12), { look: 'plane', speed: 760, range: 580, dmg: 5, r: 16 }, { sup: true }); SND.sfx('throw');
+      f.burst.t = 0.08; if (--f.burst.n <= 0) f.burst = null;
+    }
+  }
+  if (f.aura > 0) { // James's Copycat: copying everything Crusher does is SO annoying
+    f.aura -= dt; f.auraT -= dt;
+    if (f.auraT <= 0) {
+      f.auraT = 0.45;
+      if (duelDist(f, o) < 300) { duelHurt(o, 3, f, 'COPYCAT!', { quiet: true, sup: true }); D.copy ^= 1; say(D.copy ? o : f, 'Stop copying me!', 0.6); }
+    }
+  }
+  if (f.heat > 75 && Math.random() < dt * 6) duelSteam(f);
+}
+function duelSteam(f) {
+  const k = duelK(f.y), hy = f.y - (f.cr ? 126 : 94) * k;
+  G.parts.push({ x: f.x + rand(-12, 12), y: hy, vx: rand(-25, 25), vy: -rand(70, 120), life: 0.6, max: 0.6, r: rand(4, 7), col: 'rgba(255,255,255,0.85)', kind: 'puff' });
+}
+function duelMeltdown(f, dt) {
+  f.steamT -= dt;
+  if (f.steamT <= 0) { f.steamT = 0.06; duelSteam(f); }
+}
+
+/* ---------- controls ---------- */
+const DUEL_KEYS1 = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'],
+  annoy: ['Space', 'KeyQ', 'KeyJ', 'KeyZ', 'KeyC', 'KeyK', 'Enter'], sup: ['KeyX', 'KeyF', 'KeyE', 'KeyL', 'ShiftLeft', 'ShiftRight'] };
+const DUEL_KEYS2 = [
+  { up: ['KeyW'], down: ['KeyS'], left: ['KeyA'], right: ['KeyD'], annoy: ['Space', 'KeyQ'], sup: ['KeyF', 'KeyE'] },
+  { up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'], annoy: ['Enter', 'ShiftRight'], sup: ['Slash', 'Period'] }
+];
+function duelInput(pl) {
+  const map = STATE.players === 2 ? DUEL_KEYS2[pl] || DUEL_KEYS1 : DUEL_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
+  let mx = (has('right') ? 1 : 0) - (has('left') ? 1 : 0), my = (has('down') ? 1 : 0) - (has('up') ? 1 : 0);
+  const J = JOY[pl];
+  if (J) { const dx = J.x - J.ox, dy = J.y - J.oy; if (Math.hypot(dx, dy) > 8) { mx = dx / JOY_R; my = dy / JOY_R; } }
+  const P = Input.pad[pl];
+  if (P) {
+    if (Math.abs(P.ax || 0) > 0.2 || Math.abs(P.ay || 0) > 0.2) { mx = P.ax; my = P.ay; }
+    if (P.dl) mx = -1; if (P.dr) mx = 1; if (P.du) my = -1; if (P.dd) my = 1;
+  }
+  const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
+  const tb = (k) => Input.held.has(pl + ':' + k) || Input.tapped.has(pl + ':' + k);
+  return { mx, my, annoy: has('annoy') || tb('throw') || !!(P && P.annoy), sup: has('sup') || tb('action') || !!(P && P.sup) };
+}
+
+/* ---------- moving ---------- */
+function duelMove(f, dt, A) {
+  if (f.kb) { f.x += f.kb.vx * dt; f.y += f.kb.vy * dt; f.kb.t -= dt; if (f.kb.t <= 0) f.kb = null; }
+  else { f.x += f.vx * dt; f.y += f.vy * dt; }
+  if (Math.hypot(f.vx, f.vy) > 20 || f.kb) f.walk += dt * (f.cr ? 9 : 14);
+  for (const o of duelProps()) duelPushOut(f, o);
+  f.x = clamp(f.x, A.x0 + f.r, A.x1 - f.r); f.y = clamp(f.y, A.y0 + 10, A.y1 - 4);
+}
+function duelPushOut(f, o) {
+  const rx = o.rx + f.r * 0.8, ry = o.ry + f.r * 0.45, dx = (f.x - o.x) / rx, dy = (f.y - o.y) / ry, q = dx * dx + dy * dy;
+  if (q >= 1 || q === 0) return;
+  const s = 1 / Math.sqrt(q); f.x = o.x + dx * s * rx; f.y = o.y + dy * s * ry;
+}
+function duelSeparate(a, b) {
+  const dx = b.x - a.x, dy = (b.y - a.y) * 1.6, d = Math.hypot(dx, dy), m = (a.r + b.r) * 0.85;
+  if (d >= m || d === 0) return;
+  const push = (m - d) / 2, ux = dx / d, uy = dy / d / 1.6;
+  a.x -= ux * push; a.y -= uy * push; b.x += ux * push; b.y += uy * push;
+}
+function duelKnock(f, a, d) { f.kb = { vx: Math.cos(a) * d / 0.25, vy: Math.sin(a) * d / 0.25 * 0.7, t: 0.25 }; }
+
+/* ---------- the hero ---------- */
+function duelHero(f, o, dt) {
+  const D = G.duel, M = DUEL_MOVES[f.id], inp = duelInput(D.pl);
+  const supP = inp.sup && !D.supWas; D.supWas = inp.sup;
+  if (f.stun > 0) { f.vx = f.vy = 0; return; }
+  if (f.dash) { duelDash(f, o, dt); return; }
+  const sp = M.spd * (f.boost > 0 ? 1.4 : 1) * (f.aura > 0 ? 1.2 : 1);
+  f.vx = inp.mx * sp; f.vy = inp.my * sp * 0.8;
+  f.face = Math.abs(inp.mx) > 0.2 ? sign(inp.mx) : sign(o.x - f.x) || f.face;
+  if (inp.annoy && f.gap <= 0 && f.ammo >= 1) duelAnnoy(f, o);
+  if (supP) {
+    if (f.sup >= 100) duelSuper(f, o);
+    else if (G.t - (D.supNope || -9) > 1.2) { D.supNope = G.t; floatText(f.x, f.y - 140 * duelK(f.y), 'Super not ready yet!', '#fff'); SND.sfx('nope'); }
+  }
+}
+function duelAim(f, o, sp) { // aim at where they're going, not just where they are
+  const tt = duelDist(f, o) / sp;
+  return Math.atan2(o.y + o.vy * tt * 0.5 - f.y, o.x + o.vx * tt * 0.5 - f.x);
+}
+function duelShot(f, a, M, extra) {
+  const sp = M.speed;
+  G.duel.shots.push(Object.assign({ k: 'fly', look: M.look, own: f, x: f.x + Math.cos(a) * 26, y: f.y + Math.sin(a) * 12, z: f.cr ? 60 : 46,
+    vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, a, life: M.range / sp, dmg: M.dmg, r: M.r || 15, bounce: M.bounce || 0, t: 0, hits: 0, cool: 0 }, extra || {}));
+}
+function duelAnnoy(f, o) {
+  const M = DUEL_MOVES[f.id], D = G.duel;
+  if (M.range < 420 && duelDist(f, o) > M.range + 40 && G.t - (D.closer || -9) > 1.5) { D.closer = G.t; floatText(f.x, f.y - 150 * duelK(f.y), 'Get closer!', '#fff', true); }
+  f.ammo--; f.gap = DUEL_GAP; f.atkT = 0.22; f.face = sign(o.x - f.x) || f.face;
+  const a = duelAim(f, o, M.speed);
+  if (M.kind === 'cone') duelCone(f, o, a, M.range, M.arc, M.dmg, false);
+  else if (M.kind === 'spread') for (let i = 0; i < M.n; i++) duelShot(f, a + (i - (M.n - 1) / 2) * M.spread, M);
+  else duelShot(f, a, M, M.kind === 'homing' ? { homing: 1.8 } : M.kind === 'wave' ? { wave: 1 } : M.kind === 'yoyo' ? { yoyo: 'out' } : null);
+  SND.sfx(DUEL_SFX[f.id] || 'throw');
+}
+function duelCone(f, o, a, range, arc, dmg, big) {
+  G.duel.fx.push({ k: 'cone', x: f.x + Math.cos(a) * 20, y: f.y, a, range, arc, t: 0, T: big ? 0.65 : 0.42, big });
+  const dx = o.x - f.x, dy = o.y - f.y;
+  if (Math.hypot(dx, dy) < range + o.r && Math.abs(angDiff(Math.atan2(dy, dx), a)) < arc + 0.2) {
+    duelHurt(o, dmg, f, big ? 'MEGA BURP!' : pick(DUEL_MOVES[f.id].hit), { sup: big });
+    if (big) duelKnock(o, Math.atan2(dy, dx), 150);
+  }
+}
+function duelSuper(f, o) {
+  const D = G.duel, M = DUEL_MOVES[f.id], A = duelBounds(), a = duelAim(f, o, 600);
+  f.sup = 0; f.atkT = 0.4; f.face = sign(o.x - f.x) || f.face; D.flash = 0.25;
+  say(f, M.supLine, 1.5);
+  G.callouts.push({ txt: M.sup.toUpperCase() + '!', col: '#ffd23d', x: f.x, y: f.y - 150 * duelK(f.y), t: 0, n: 4 });
+  if (G.callouts.length > 3) G.callouts.shift();
+  const tx = clamp(o.x + o.vx * 0.35, A.x0 + 20, A.x1 - 20), ty = clamp(o.y + o.vy * 0.35, A.y0 + 10, A.y1 - 6);
+  switch (f.id) {
+    case 'naseer': f.burst = { n: 6, t: 0 }; f.boost = 2.5; SND.sfx('turbo'); break;
+    case 'frankie': duelCone(f, o, a, 340, 0.95, 20, true); SND.sfx('burp', 2); G.shake = 0.5; break;
+    case 'spencer': D.shots.push({ k: 'horn', own: f, x: f.x, y: f.y, z: 84, tx, ty, t: 0, blasts: 3, next: 0.35, arrived: false }); SND.sfx('beep'); break;
+    case 'jaxxs': D.shots.push({ k: 'lob', look: 'cushion', own: f, x0: f.x, y0: f.y, x: f.x, y: f.y, z: 40, tx, ty, t: 0, T: 0.6, trap: true, spin: 0 }); SND.sfx('throw'); break;
+    case 'james': f.aura = 4.5; f.auraT = 0.15; SND.sfx('prank'); break;
+    case 'ollie': f.dash = { t: 0.75, a, hit: false }; SND.sfx('dash'); break;
+    case 'ben': duelShot(f, a, { look: 'frogbolt', speed: 480, range: 640, dmg: 15, r: 24 }, { frog: true, sup: true }); SND.sfx('spell'); break;
+  }
+}
+function duelDash(f, o, dt) { // Ollie's Wheelie Dash: he bikes straight at Crusher, ringing his bell
+  const s = f.dash; s.t -= dt;
+  s.a += clamp(angDiff(Math.atan2(o.y - f.y, o.x - f.x), s.a), -3 * dt, 3 * dt);
+  f.vx = Math.cos(s.a) * 860; f.vy = Math.sin(s.a) * 860 * 0.8; f.face = sign(f.vx) || f.face;
+  if (!s.hit && duelDist(f, o) < f.r + o.r + 14) {
+    s.hit = true; duelHurt(o, 20, f, 'RING RING!', { sup: true }); duelKnock(o, s.a + (Math.random() < 0.5 ? 1.2 : -1.2), 140); SND.sfx('ding');
+    s.t = Math.min(s.t, 0.12);
+  }
+  if (s.t <= 0) { f.dash = null; f.vx = f.vy = 0; }
+}
+
+/* ---------- Crusher ---------- */
+function duelCrusher(f, o, dt) {
+  const D = G.duel, dx = o.x - f.x, dy = o.y - f.y, d = Math.hypot(dx, dy) || 1;
+  if (f.stun > 0) { f.vx = f.vy = 0; f.wind = 0; return; }
+  f.face = sign(dx) || f.face;
+  if (f.wind > 0) { // he plants his feet, then lets go
+    f.vx = f.vy = 0; f.wind -= dt;
+    if (f.wind <= 0) { if (f.windSup) crusherNyah(f); else crusherSock(f, o); }
+    return;
+  }
+  let mx = 0, my = 0, fast = 1;
+  if (d > 350) { mx = dx / d; my = dy / d; } // keeps a throwing distance
+  else if (d < Math.min(260, DUEL_MOVES[o.id].range + 40)) { mx = -dx / d; my = -dy / d * 0.6; } // backs away from close-up annoyers
+  f.strafe += dt * (1 + D.diff * 0.8); my += Math.sin(f.strafe) * 0.9;
+  const L = D.lolly;
+  if (L && f.heat > 20 && Math.hypot(L.x - f.x, L.y - f.y) < Math.hypot(L.x - o.x, L.y - o.y) + 80) { const lx = L.x - f.x, ly = L.y - f.y, ld = Math.hypot(lx, ly) || 1; mx = lx / ld; my = ly / ld; }
+  if (f.dodge > 0) { f.dodge -= dt; mx = f.dx; my = f.dy; fast = 1.5; }
+  else {
+    for (const q of D.shots) { // sidestep annoying things flying his way, sometimes
+      if (q.own !== o || q.dodged || q.k !== 'fly') continue;
+      const rx = f.x - q.x, ry = f.y - q.y, vv = q.vx * q.vx + q.vy * q.vy, tt = vv ? (rx * q.vx + ry * q.vy) / vv : -1;
+      if (tt < 0 || tt > 0.5) continue;
+      const cx = q.x + q.vx * tt - f.x, cy = q.y + q.vy * tt - f.y;
+      if (Math.hypot(cx, cy) > f.r + q.r + 14) continue;
+      q.dodged = true;
+      if (Math.random() < 0.15 + D.diff * 0.3) {
+        const vl = Math.sqrt(vv), px = -q.vy / vl, py = q.vx / vl, side = px * -cx + py * -cy >= 0 ? 1 : -1;
+        f.dodge = 0.32; f.dx = px * side; f.dy = py * side; mx = f.dx; my = f.dy; fast = 1.5;
+      }
+      break;
+    }
+  }
+  const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
+  const sp = (190 + 40 * D.diff) * fast;
+  f.vx = mx * sp; f.vy = my * sp * 0.8;
+  if (f.croak > 0) { // Ben's Frog Voice: all that comes out is RIBBIT
+    if (f.gap <= 0 && d < 480) { f.gap = 1.1; say(f, 'RIBBIT!', 0.9); SND.sfx('ribbit'); }
+    return;
+  }
+  if (f.sup >= 100 && d < 330) { f.wind = 0.6; f.windSup = true; say(f, 'NYAH NYAH NYAH!', 1.2); }
+  else if (f.ammo >= 1 && f.gap <= 0 && d < CRUSHER_SOCK.range) { f.wind = 0.42 - 0.14 * D.diff; f.windSup = false; }
+}
+function crusherSock(f, o) {
+  const D = G.duel, A = duelBounds(), lead = 0.3 + 0.55 * D.diff, err = 50 - 32 * D.diff;
+  let tx = o.x + o.vx * CRUSHER_SOCK.flight * lead + rand(-err, err), ty = o.y + o.vy * CRUSHER_SOCK.flight * lead + rand(-err, err) * 0.6;
+  const dx = tx - f.x, dy = ty - f.y, d = Math.hypot(dx, dy);
+  if (d > CRUSHER_SOCK.range) { tx = f.x + (dx / d) * CRUSHER_SOCK.range; ty = f.y + (dy / d) * CRUSHER_SOCK.range; }
+  tx = clamp(tx, A.x0 + 10, A.x1 - 10); ty = clamp(ty, A.y0 + 6, A.y1 - 4);
+  D.shots.push({ k: 'lob', look: 'sock', own: f, x0: f.x + f.face * 18, y0: f.y, x: f.x, y: f.y, z: 90, tx, ty, t: 0, T: CRUSHER_SOCK.flight, splash: CRUSHER_SOCK.splash, dmg: CRUSHER_SOCK.dmg + 4 * D.diff, spin: rand(0, 6) });
+  f.ammo--; f.gap = 0.95 - 0.25 * D.diff; f.atkT = 0.3; SND.sfx('throw');
+  if (Math.random() < 0.25) say(f, pick(DUEL_LINES.crTaunt), 1.1);
+}
+function crusherNyah(f) { // a ring of NYAH NYAHs in every direction
+  const D = G.duel, n = 10, off = rand(0, Math.PI * 2);
+  for (let i = 0; i < n; i++) {
+    const a = off + (i * Math.PI * 2) / n;
+    D.shots.push({ k: 'fly', look: 'nyah', own: f, x: f.x, y: f.y, z: 52, vx: Math.cos(a) * 330, vy: Math.sin(a) * 330 * 0.8, a, life: 1.7, dmg: 8 + 2 * D.diff, r: 17, bounce: 0, t: 0, hits: 0, cool: 0, sup: true });
+  }
+  f.sup = 0; f.atkT = 0.4; SND.sfx('nyah'); G.shake = 0.25;
+  G.callouts.push({ txt: 'NYAH NYAH!', col: '#ff8ad8', x: f.x, y: f.y - 180 * duelK(f.y), t: 0, n: 3 });
+  if (G.callouts.length > 3) G.callouts.shift();
+}
+
+/* ---------- annoying things in the air ---------- */
+function duelHurt(v, dmg, by, word, o) {
+  o = o || {};
+  const D = G.duel;
+  if (!D || D.phase !== 'fight' || v.heat >= 100) return;
+  v.heat = Math.min(100, v.heat + dmg); v.hitT = 0.35;
+  if (by && by !== v && !o.sup) by.sup = Math.min(100, by.sup + dmg * (by.cr ? 1.5 + D.diff : DUEL_MOVES[by.id].charge || 3.4)); // landing annoying moves charges your Super (a Super doesn't)
+  const k = duelK(v.y);
+  G.callouts.push({ txt: word, col: v.cr ? '#ffd23d' : '#9bff8a', x: v.x, y: v.y - (v.cr ? 188 : 144) * k, t: 0, n: v.cr ? 2 : 1 });
+  if (G.callouts.length > 3) G.callouts.shift();
+  floatText(v.x + rand(-12, 12), v.y - (v.cr ? 160 : 120) * k, `+${Math.round(dmg)}%`, v.cr ? '#ffb38a' : '#ffb3b3', true);
+  if (!o.quiet) {
+    if (v.cr) { if (Math.random() < 0.45) say(v, pick(v.heat > 70 ? DUEL_LINES.crHot : DUEL_LINES.crAnnoyed), 1.2); }
+    else if (Math.random() < 0.35) say(v, pick(DUEL_LINES.heroHit), 1.1);
+  }
+  if (v.cr) { const F = pick(D.fans); if (F) F.cheer = 0.8; }
+  else if (by && by.cr && !D.sockTip && v.heat < 100) { D.sockTip = true; toast(null, 'Watch the ground for the red circle. Move out of it to dodge his stinky socks!', 4); }
+  if (v.heat >= 100) duelEnd(v);
+}
+function duelShots(dt, A) {
+  const D = G.duel, props = duelProps();
+  for (const q of D.shots) {
+    q.t += dt;
+    if (q.t > 9) { q.dead = true; continue; }
+    const foe = q.own === D.me ? D.cr : D.me;
+    if (q.k === 'lob') {
+      const p = Math.min(1, q.t / q.T);
+      q.x = lerp(q.x0, q.tx, p); q.y = lerp(q.y0, q.ty, p); q.z = (1 - p) * 40 + 440 * p * (1 - p); q.spin += dt * 10;
+      if (p >= 1) {
+        if (q.trap) { q.k = 'trap'; q.life = 7; q.z = 0; SND.sfx('pop'); continue; }
+        const d = floorDist(foe, q.x, q.y);
+        if (d < q.splash + foe.r * 0.5) duelHurt(foe, d < q.splash * 0.5 ? q.dmg : Math.round(q.dmg * 0.7), q.own, pick(['STINKY!', 'PEE-YEW!']));
+        puff(q.x, q.y - 10, 10, '#b6e36a', 160); SND.sfx('splat'); q.dead = true;
+      }
+      continue;
+    }
+    if (q.k === 'trap') { // the whoopee cushion waits for Crusher to sit on it
+      q.life -= dt;
+      if (q.life <= 0) { q.dead = true; puff(q.x, q.y - 6, 6, '#ff8ad8', 100); continue; }
+      if (floorDist(foe, q.x, q.y) < 46 + foe.r * 0.5) {
+        q.dead = true; duelHurt(foe, 22, q.own, 'PFFFRRRT!', { sup: true }); foe.stun = 1.3; SND.sfx('fart');
+        puff(q.x, q.y - 16, 18, '#b6e36a', 220); say(foe, 'THAT WASN\'T ME!', 1.6);
+        D.fans.forEach((F) => { F.cheer = 1.6; }); const F = pick(D.fans); if (F) { F.say = 'HA HA HA!'; F.sayT = 1.5; }
+      }
+      continue;
+    }
+    if (q.k === 'horn') { // Spencer's air horn drone flies over Crusher and blasts three times
+      if (!q.arrived) {
+        const dx = q.tx - q.x, dy = q.ty - q.y, d = Math.hypot(dx, dy), st = 700 * dt;
+        if (d <= st) { q.x = q.tx; q.y = q.ty; q.arrived = true; } else { q.x += (dx / d) * st; q.y += (dy / d) * st; }
+      } else {
+        q.next -= dt;
+        if (q.next <= 0) {
+          q.next = 0.45; q.blasts--; D.fx.push({ k: 'ring', x: q.x, y: q.y, t: 0, T: 0.45, r: 125 }); SND.sfx('airhorn');
+          if (floorDist(foe, q.x, q.y) < 125 + foe.r * 0.5) duelHurt(foe, 8, q.own, 'HONK!', { sup: true });
+          if (q.blasts <= 0) q.dead = true;
+        }
+      }
+      continue;
+    }
+    // things that fly
+    q.cool = Math.max(0, q.cool - dt);
+    if (q.homing) {
+      const want = Math.atan2(foe.y - q.y, foe.x - q.x), cur = Math.atan2(q.vy, q.vx), na = cur + clamp(angDiff(want, cur), -q.homing * dt, q.homing * dt), sp = Math.hypot(q.vx, q.vy);
+      q.vx = Math.cos(na) * sp; q.vy = Math.sin(na) * sp; q.a = na;
+    }
+    if (q.yoyo === 'back') {
+      const o = q.own, dx = o.x - q.x, dy = o.y - q.y, d = Math.hypot(dx, dy) || 1;
+      q.vx = (dx / d) * 720; q.vy = (dy / d) * 720;
+      if (d < 26) { q.dead = true; continue; }
+    }
+    q.x += q.vx * dt; q.y += q.vy * dt; q.life -= dt;
+    if (q.wave) q.r = Math.min(46, q.r + dt * 40);
+    if (q.look === 'tickle' && Math.random() < 0.5) G.parts.push({ x: q.x, y: q.y - q.z * duelK(q.y), vx: rand(-30, 30), vy: rand(-30, 30), life: 0.35, max: 0.35, r: 2.5, col: '#ffb3ec', kind: 'spark' });
+    if (q.life <= 0) { if (q.yoyo === 'out') { q.yoyo = 'back'; q.life = 2; } else if (q.yoyo !== 'back') { q.dead = true; continue; } }
+    if (q.x < A.x0 || q.x > A.x1 || q.y < A.y0 - 4 || q.y > A.y1 + 4) { // the edge of the arena
+      if (q.bounce > 0) { q.bounce--; if (q.x < A.x0 || q.x > A.x1) q.vx = -q.vx; else q.vy = -q.vy; q.x = clamp(q.x, A.x0, A.x1); q.y = clamp(q.y, A.y0 - 4, A.y1 + 4); }
+      else if (q.yoyo === 'out') q.yoyo = 'back';
+      else if (q.yoyo !== 'back') { q.dead = true; continue; }
+    }
+    if (q.yoyo !== 'back') { // benches, bins and bushes get in the way
+      const o = props.find((pr) => { const ex = (q.x - pr.x) / (pr.rx + 4), ey = (q.y - pr.y) / (pr.ry + 4); return ex * ex + ey * ey < 1; });
+      if (o) {
+        if (q.bounce > 0) {
+          q.bounce--; let nx = (q.x - o.x) / (o.rx * o.rx), ny = (q.y - o.y) / (o.ry * o.ry); const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+          const dot = q.vx * nx + q.vy * ny; q.vx -= 2 * dot * nx; q.vy -= 2 * dot * ny; q.x += nx * 8; q.y += ny * 8;
+        } else if (q.yoyo === 'out') q.yoyo = 'back';
+        else { puff(q.x, q.y - q.z * duelK(q.y), 6, '#fff', 120); q.dead = true; continue; }
+      }
+    }
+    if (q.cool <= 0 && (!q.yoyo || q.hits < 2) && floorDist(foe, q.x, q.y) < foe.r + q.r + (q.own.cr ? 0 : 6)) {
+      const M = q.own.cr ? null : DUEL_MOVES[q.own.id];
+      duelHurt(foe, q.dmg, q.own, q.look === 'nyah' ? 'NYAH!' : q.frog ? 'RIBBIT!' : pick(M ? M.hit : ['HEY!']), { sup: !!q.sup });
+      sparks(q.x, q.y - q.z * duelK(q.y), 6, q.own.cr ? '#ff8ad8' : '#ffd23d');
+      if (q.frog) { foe.croak = 4; SND.sfx('ribbit'); G.parts.push({ x: foe.x, y: foe.y - 110, vx: 60, vy: -160, g: 600, life: 1, max: 1, r: 8, col: '#7fd36b', kind: 'frog' }); }
+      if (q.yoyo) { q.hits++; q.cool = 0.3; q.yoyo = 'back'; } // the yo-yo can annoy him again on its way back
+      else q.dead = true;
+    }
+  }
+  D.shots = D.shots.filter((q) => !q.dead);
+}
+
+/* ---------- ice lollies cool you down ---------- */
+function duelLolly(dt, A) {
+  const D = G.duel;
+  if (!D.lolly) {
+    D.lollyT -= dt;
+    if (D.lollyT > 0) return;
+    const props = duelProps();
+    for (let i = 0; i < 24; i++) {
+      const x = rand(A.x0 + 60, A.x1 - 60), y = rand(A.y0 + 30, A.y1 - 20);
+      if (props.some((o) => Math.hypot((x - o.x) / (o.rx + 30), (y - o.y) / (o.ry + 30)) < 1)) continue;
+      if (Math.hypot(x - D.me.x, y - D.me.y) < 110 || Math.hypot(x - D.cr.x, y - D.cr.y) < 110) continue;
+      D.lolly = { x, y, t: 0, life: 9 }; SND.sfx('chime'); break;
+    }
+    if (!D.lolly) D.lollyT = 1;
+    return;
+  }
+  const L = D.lolly; L.t += dt; L.life -= dt;
+  if (L.life <= 0) { D.lolly = null; D.lollyT = rand(5, 8); puff(L.x, L.y - 20, 8, '#bff6ff', 100); return; }
+  for (const f of [D.me, D.cr]) {
+    if (floorDist(f, L.x, L.y) > f.r + 26) continue;
+    f.heat = Math.max(0, f.heat - 22);
+    floatText(f.x, f.y - 140 * duelK(f.y), f.cr ? 'Crusher cooled down!' : 'Ahh, cool!', '#bff6ff', true);
+    sparks(L.x, L.y - 20, 14, '#bff6ff'); SND.sfx('cool');
+    if (f.cr) say(f, 'Mmm, ice lolly!', 1.2); else { const F = pick(D.fans); if (F) { F.say = 'Nice!'; F.sayT = 1.2; F.cheer = 1; } }
+    D.lolly = null; D.lollyT = rand(8, 11); break;
+  }
+}
+
+/* ---------- the crew watching from the side ---------- */
+function duelFans(dt) {
+  const D = G.duel;
+  for (const F of D.fans) { F.sayT -= dt; F.cheer = Math.max(0, F.cheer - dt); }
+  if (D.phase !== 'fight' || !D.fans.length) return;
+  D.chat -= dt; if (D.chat > 0) return;
+  D.chat = rand(2.8, 4.5);
+  const F = pick(D.fans), n = HEROES[D.me.id].name;
+  let line = pick(DUEL_LINES.fans).replace('{n}', n);
+  if (D.me.sup >= 100 && Math.random() < 0.6) line = 'Use your Super!';
+  else if (D.lolly && Math.random() < 0.5) line = 'Grab the ice lolly!';
+  else if (D.me.heat > 70 && Math.random() < 0.5) line = `Deep breaths, ${n}!`;
+  F.say = line; F.sayT = 1.8;
+}
+
+/* ===================== Drawing the Annoy-Off ===================== */
+const DUEL_LOOK = {
+  school: { sky: ['#8fd3ff', '#d6f1ff'], back: '#e8735c', dark: '#c95a45', win: '#bfefff', floor: '#5d6f9e', floor2: '#566892', line: 'rgba(255,255,255,0.8)', fence: '#3b4275' },
+  park: { sky: ['#7cc8ff', '#d4f3ff'], back: '#4caf50', dark: '#2f7a4a', win: '#ffe066', floor: '#7cc860', floor2: '#74bd58', line: 'rgba(255,255,255,0.85)', fence: '#8d6e4a' },
+  zombie: { sky: ['#243049', '#4f6a7f'], back: '#3f5a4a', dark: '#2c4236', win: '#9bff8a', floor: '#4a5560', floor2: '#444e59', line: 'rgba(190,255,170,0.65)', fence: '#22302a' },
+  treat: { sky: ['#1b1440', '#4a2f78'], back: '#3a2a5a', dark: '#2a1e44', win: '#ffb347', floor: '#5a4a6e', floor2: '#544567', line: 'rgba(255,190,90,0.75)', fence: '#2a1e44' }
+};
+function drawDuel(c, t) {
+  const Ly = duelLayout(), d = VIEW.dpr, sh = G.shake > 0 ? G.shake * 12 : 0, camSave = G.cam.x, wSave = VIEW.w;
+  c.setTransform(d * Ly.s, 0, 0, d * Ly.s, d * (Ly.ox + rand(-sh, sh)), d * (Ly.oy + rand(-sh, sh)));
+  G.cam.x = Ly.vx0; VIEW.w = Ly.vx1 - Ly.vx0; // speech bubbles and callouts keep themselves on screen using these
+  try { drawDuelScene(c, t, Ly); } finally { G.cam.x = camSave; VIEW.w = wSave; }
+}
+function drawDuelScene(c, t, Ly) {
+  const D = G.duel, A = duelBounds(), L = DUEL_LOOK[G.L.theme] || DUEL_LOOK.school;
+  drawDuelBack(c, A, L, Ly);
+  const n = D.fans.length, mid = (A.x0 + A.x1) / 2;
+  D.fans.forEach((F, i) => { // the crew cheers from behind the fence line
+    F.x = A.x0 + 40 + ((i + 0.5) * (A.w - 80)) / Math.max(1, n); F.y = A.y0 - 4;
+    const pose = (D.phase === 'end' && D.won) || F.cheer > 0 ? 'cheer' : D.phase === 'end' ? 'flail' : 'idle';
+    drawHero(c, F.id, F.x, F.y, { t: t + i * 0.7, pose, scale: 0.7, face: F.x < mid ? 1 : -1, bike: F.id === 'ollie', drone: F.id === 'spencer' });
+  });
+  for (const q of D.shots) if (q.k === 'lob') drawDuelLanding(c, q);
+  for (const q of D.shots) if (q.k === 'trap') drawCushion(c, q.x, q.y, duelK(q.y), t, q.life);
+  const shadow = (x, y, rx, a) => { const k = duelK(y); c.fillStyle = `rgba(20,18,40,${a})`; c.beginPath(); c.ellipse(x, y, rx * k, rx * 0.32 * k, 0, 0, 7); c.fill(); };
+  const M = DUEL_MOVES[D.me.id];
+  if (M.range < 420 && D.phase === 'fight') { // how close you need to be
+    c.save(); c.setLineDash([6, 8]); c.strokeStyle = duelDist(D.me, D.cr) < M.range + D.cr.r ? 'rgba(255,236,120,0.55)' : 'rgba(255,255,255,0.3)'; c.lineWidth = 3;
+    c.beginPath(); c.ellipse(D.me.x, D.me.y, M.range, M.range / DUEL_DY, 0, 0, 7); c.stroke(); c.restore();
+  }
+  for (const f of [D.me, D.cr]) shadow(f.x, f.y, f.cr ? 36 : 26, 0.25);
+  for (const q of D.shots) if (q.k === 'fly' || q.k === 'lob' || q.k === 'horn') shadow(q.x, q.y, 11, 0.16);
+  if (D.lolly) shadow(D.lolly.x, D.lolly.y, 14, 0.2);
+  const list = [];
+  for (const o of duelProps()) list.push([o.y, () => drawDuelProp(c, o)]);
+  if (D.lolly) list.push([D.lolly.y, () => drawIceLolly(c, D.lolly)]);
+  for (const f of [D.me, D.cr]) list.push([f.y, () => drawDuelFighter(c, f, t)]);
+  for (const q of D.shots) if (q.k !== 'trap') list.push([q.y + 0.5, () => drawDuelShot(c, q, t)]);
+  list.sort((a, b) => a[0] - b[0]).forEach((e) => e[1]());
+  for (const e of D.fx) drawDuelFx(c, e);
+  drawParticles(c); drawFloatTexts(c);
+  if (G.callouts.length) drawCallouts(c);
+  for (const f of [D.me, D.cr]) drawDuelBar(c, f);
+  for (const f of [D.me, D.cr]) if (f.sayT > 0) bubble(c, f.x, f.y - (f.cr ? 176 : 140) * duelK(f.y), f.say, !f.cr, f.cr);
+  for (const F of D.fans) if (F.sayT > 0) bubble(c, F.x, F.y - 78, F.say, false);
+}
+function drawDuelBack(c, A, L, Ly) {
+  const X0 = Ly.vx0 - 10, W = Ly.vx1 - Ly.vx0 + 20, top = Ly.vy0 - 10, bottom = Ly.vy1 + 10, th = G.L.theme, y0 = A.y0;
+  const g = c.createLinearGradient(0, top, 0, y0); g.addColorStop(0, L.sky[0]); g.addColorStop(1, L.sky[1]);
+  c.fillStyle = g; c.fillRect(X0, top, W, y0 - top + 2);
+  const sunY = Math.max(top + 46, y0 - 250);
+  if (th === 'zombie' || th === 'treat') { c.fillStyle = '#f6f0c8'; c.beginPath(); c.arc(X0 + W * 0.82, sunY, 30, 0, 7); c.fill(); }
+  else { c.fillStyle = '#ffd23d'; c.beginPath(); c.arc(X0 + W * 0.84, sunY, 28, 0, 7); c.fill(); }
+  if (th === 'park') { // hills and trees
+    c.fillStyle = '#9ed97a'; c.beginPath(); c.ellipse(X0 + W * 0.25, y0 - 40, W * 0.4, 120, 0, Math.PI, 0); c.fill(); c.beginPath(); c.ellipse(X0 + W * 0.8, y0 - 40, W * 0.35, 100, 0, Math.PI, 0); c.fill();
+    for (let x = X0 + 40; x < X0 + W; x += 170) { c.fillStyle = '#7a5230'; c.fillRect(x - 6, y0 - 110, 12, 70); c.beginPath(); c.arc(x, y0 - 128, 40, 0, 7); blob(c, L.back, 2.5); }
+  } else { // a building with windows
+    const bx = X0 + W * 0.06, bw = W * 0.88, by = y0 - 205;
+    c.fillStyle = th === 'treat' ? '#2a1e44' : L.back; c.fillRect(bx, by, bw, 160); c.strokeStyle = INK; c.lineWidth = 3; c.strokeRect(bx, by, bw, 160);
+    c.fillStyle = L.dark; c.fillRect(bx - 10, by - 14, bw + 20, 16); c.strokeRect(bx - 10, by - 14, bw + 20, 16);
+    for (let x = bx + 30; x < bx + bw - 40; x += 90) for (let r = 0; r < 2; r++) {
+      const lit = th !== 'school' ? Math.sin(x * 0.7 + r * 3) > -0.2 : true;
+      c.fillStyle = lit ? L.win : '#1d1b3a'; c.fillRect(x, by + 22 + r * 62, 44, 36); c.strokeStyle = INK; c.lineWidth = 2.5; c.strokeRect(x, by + 22 + r * 62, 44, 36);
+    }
+  }
+  // the fence along the back, where the crew stands
+  c.fillStyle = L.fence; c.fillRect(X0, y0 - 58, W, 6); c.fillRect(X0, y0 - 30, W, 6);
+  for (let x = X0 + 4; x < X0 + W; x += 38) c.fillRect(x, y0 - 70, 6, 66);
+  // the floor
+  c.fillStyle = L.floor; c.fillRect(X0, y0 - 6, W, bottom - y0 + 6);
+  c.fillStyle = L.floor2; for (let y = y0 + 17; y < bottom; y += 34) c.fillRect(X0, y, W, 17);
+  c.fillStyle = INK; c.fillRect(X0, y0 - 7, W, 3);
+  // your half and Crusher's half
+  c.fillStyle = 'rgba(47,140,255,0.13)'; c.fillRect(A.x0, A.y0, A.w / 2, A.d);
+  c.fillStyle = 'rgba(255,77,77,0.13)'; c.fillRect(A.x0 + A.w / 2, A.y0, A.w / 2, A.d);
+  c.strokeStyle = L.line; c.lineWidth = 4; rrect(c, A.x0, A.y0, A.w, A.d, 16); c.stroke();
+  c.beginPath(); c.moveTo(A.x0 + A.w / 2, A.y0); c.lineTo(A.x0 + A.w / 2, A.y1); c.stroke();
+  c.beginPath(); c.ellipse(A.x0 + A.w / 2, A.y0 + A.d / 2, 74, 40, 0, 0, 7); c.stroke();
+}
+function drawDuelProp(c, o) {
+  const k = duelK(o.y);
+  c.save(); c.translate(o.x, o.y); c.scale(k, k);
+  c.fillStyle = 'rgba(20,18,40,0.22)'; c.beginPath(); c.ellipse(0, 0, o.rx + 6, o.ry * 0.7 + 4, 0, 0, 7); c.fill();
+  switch (o.k) {
+    case 'bench':
+      c.fillStyle = INK; c.fillRect(-50, -26, 6, 26); c.fillRect(44, -26, 6, 26); c.fillRect(-50, -60, 5, 30); c.fillRect(45, -60, 5, 30);
+      rrect(c, -60, -34, 120, 11, 3); blob(c, '#c8955a', 2.5); rrect(c, -60, -62, 120, 10, 3); blob(c, '#d9a86a', 2.5); rrect(c, -60, -48, 120, 8, 3); blob(c, '#c8955a', 2.5);
+      break;
+    case 'bin':
+      rrect(c, -20, -54, 40, 54, 6); blob(c, '#4a8f5a', 2.5); ell(c, 0, -54, 23, 7); blob(c, '#3b7a4a', 2.5);
+      c.strokeStyle = 'rgba(29,27,58,0.45)'; c.lineWidth = 2; for (const x of [-10, 0, 10]) { c.beginPath(); c.moveTo(x, -46); c.lineTo(x, -6); c.stroke(); }
+      break;
+    case 'bush':
+      for (const [x, y, r] of [[-18, -22, 20], [16, -24, 22], [0, -40, 22]]) { c.beginPath(); c.arc(x, y, r, 0, 7); blob(c, '#3f9b4a', 2.5); }
+      c.fillStyle = '#ff6150'; for (const [x, y] of [[-14, -30], [12, -36], [2, -20]]) { c.beginPath(); c.arc(x, y, 3, 0, 7); c.fill(); }
+      break;
+    case 'crate':
+      rrect(c, -30, -52, 60, 52, 4); blob(c, '#c8955a', 2.5);
+      c.strokeStyle = INK; c.lineWidth = 2.5; c.beginPath(); c.moveTo(-30, -52); c.lineTo(30, 0); c.moveTo(30, -52); c.lineTo(-30, 0); c.stroke();
+      break;
+    case 'pumpkin':
+      ell(c, 0, -22, 30, 22); blob(c, '#ff8a1f', 2.5); c.strokeStyle = 'rgba(29,27,58,0.5)'; c.lineWidth = 2; ell(c, 0, -22, 12, 22); c.stroke();
+      c.fillStyle = '#4a7a2a'; c.fillRect(-3, -50, 6, 9);
+      c.fillStyle = '#ffe066'; c.beginPath(); c.moveTo(-14, -28); c.lineTo(-6, -20); c.lineTo(-16, -18); c.closePath(); c.moveTo(14, -28); c.lineTo(6, -20); c.lineTo(16, -18); c.closePath(); c.fill();
+      break;
+  }
+  c.restore();
+}
+function drawIceLolly(c, L) {
+  const k = duelK(L.y), bob = Math.sin(L.t * 4) * 4;
+  if (L.life < 2 && Math.floor(L.t * 10) % 2) return; // flashes before it melts away
+  c.save(); c.translate(L.x, L.y - 30 * k + bob); c.scale(k, k);
+  c.shadowColor = '#bff6ff'; c.shadowBlur = 18;
+  rrect(c, -3, 6, 6, 18, 2); blob(c, '#e8c48a', 2);
+  rrect(c, -12, -22, 24, 32, 10); blob(c, '#7fd3ff', 2.5);
+  c.shadowBlur = 0; c.fillStyle = '#ff8ad8'; rrect(c, -10.5, -20.5, 21, 10, 8); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.7)'; c.fillRect(-7, -6, 3, 12);
+  c.restore();
+}
+function drawCushion(c, x, y, k, t, life) {
+  if (life != null && life < 1.5 && Math.floor(t * 10) % 2) return;
+  c.save(); c.translate(x, y); c.scale(k, k);
+  ell(c, 0, -6, 24, 11); blob(c, '#ff6fae', 2.5);
+  rrect(c, 20, -10, 12, 7, 3); blob(c, '#ff6fae', 2);
+  c.fillStyle = 'rgba(255,255,255,0.6)'; ell(c, -8, -10, 7, 3); c.fill();
+  c.restore();
+}
+function drawDuelLanding(c, q) { // where the sock (or cushion) will land
+  const p = Math.min(1, q.t / q.T), r = q.splash || 40, col = q.own.cr ? '255,77,77' : '255,111,174';
+  c.save();
+  c.fillStyle = `rgba(${col},0.18)`; c.beginPath(); c.ellipse(q.tx, q.ty, r, r / DUEL_DY, 0, 0, 7); c.fill();
+  c.setLineDash([8, 6]); c.lineWidth = 3; c.strokeStyle = `rgba(${col},0.9)`; c.stroke(); c.setLineDash([]);
+  c.fillStyle = `rgba(${col},0.3)`; c.beginPath(); c.ellipse(q.tx, q.ty, Math.max(0.5, r * p), Math.max(0.5, r * p / DUEL_DY), 0, 0, 7); c.fill();
+  c.restore();
+}
+function drawDuelFighter(c, f, t) {
+  const D = G.duel, k = duelK(f.y), moving = Math.hypot(f.vx, f.vy) > 25 || !!f.kb;
+  const end = D.phase === 'end', lost = end && D.loser === f, won = end && D.loser !== f;
+  c.save(); c.lineWidth = 4; c.strokeStyle = f.cr ? '#ff4d4d' : '#2f8cff';
+  c.beginPath(); c.ellipse(f.x, f.y, (f.cr ? 40 : 30) * k, (f.cr ? 14 : 11) * k, 0, 0, 7); c.stroke();
+  if (!f.cr && f.sup >= 100 && !end) { c.strokeStyle = `rgba(255,210,61,${0.6 + 0.4 * Math.sin(t * 10)})`; c.lineWidth = 6; c.beginPath(); c.ellipse(f.x, f.y, 38 * k, 14 * k, 0, 0, 7); c.stroke(); }
+  if (f.aura > 0) { c.setLineDash([10, 8]); c.lineDashOffset = -t * 40; c.strokeStyle = 'rgba(160,110,255,0.85)'; c.lineWidth = 3; c.beginPath(); c.ellipse(f.x, f.y, 300, 150, 0, 0, 7); c.stroke(); c.setLineDash([]); }
+  c.restore();
+  if (f.cr) {
+    const st = lost ? (D.t > 1.3 ? 'flee' : 'roar') : won ? 'taunt' : f.stun > 0 || f.hitT > 0.2 ? 'hurt' : f.wind > 0 ? 'wind' : f.atkT > 0 ? 'shove' : moving ? 'walk' : 'taunt';
+    c.save(); c.translate(f.x + (lost && D.t < 1.3 ? rand(-2, 2) : 0), f.y); c.scale(k, k);
+    drawCrusher(c, { x: -25, w: 50, y: -106, h: 106, dir: f.face, state: st, flash: f.hitT > 0.2 ? f.hitT : 0, walk: f.walk }, t);
+    c.restore();
+    if (f.wind > 0) mark(c, f.x, f.y - 162 * k, '!', '#ff6150');
+    if (f.croak > 0) { const fy = f.y - 172 * k + Math.sin(t * 8) * 3; c.save(); c.translate(f.x + 26, fy); ell(c, 0, 0, 12, 9); blob(c, '#7fd36b', 2); c.fillStyle = INK; c.beginPath(); c.arc(-4, -6, 2, 0, 7); c.arc(5, -6, 2, 0, 7); c.fill(); c.restore(); }
+  } else {
+    const pose = lost ? 'flail' : won ? 'cheer' : f.dash ? 'dash' : f.stun > 0 || f.hitT > 0.18 ? 'flail' : f.atkT > 0 ? 'punch' : moving ? 'run' : 'idle';
+    drawHero(c, f.id, f.x + (lost ? rand(-1.5, 1.5) : 0), f.y, { t, pose, face: f.face, phase: f.walk, scale: k * 1.1, bike: f.id === 'ollie' && pose !== 'flail' && pose !== 'cheer', drone: f.id === 'spencer' }); // Ollie stays on his bike
+  }
+  const hot = f.heat / 100;
+  if (hot > 0.5) { // getting red in the face
+    const hy = f.y - (f.cr ? 108 : 82) * k, r = (f.cr ? 32 : 26) * k;
+    const g = c.createRadialGradient(f.x, hy, 2, f.x, hy, r); g.addColorStop(0, `rgba(255,60,60,${(hot - 0.5) * 0.9})`); g.addColorStop(1, 'rgba(255,60,60,0)');
+    c.fillStyle = g; c.fillRect(f.x - r, hy - r, r * 2, r * 2);
+  }
+}
+function heatCol(p) { return p < 0.45 ? '#4fc3f7' : p < 0.7 ? '#ffc83d' : p < 0.85 ? '#ff8a1f' : '#ff3b3b'; }
+function drawDuelBar(c, f) { // Brawl-style bars over their heads
+  const D = G.duel, k = duelK(f.y), w = 72, h = 10, x = f.x - w / 2, y = f.y - (f.cr ? 154 : 118) * k, p = f.heat / 100;
+  c.font = '700 12px Fredoka, sans-serif'; c.textAlign = 'center'; c.lineWidth = 4; c.strokeStyle = INK;
+  const tag = f.cr ? 'CRUSHER' : G.players.length === 2 ? 'P' + (D.pl + 1) : 'YOU';
+  c.strokeText(tag, f.x, y - 5); c.fillStyle = f.cr ? '#ff8a8a' : '#8cc4ff'; c.fillText(tag, f.x, y - 5);
+  rrect(c, x, y, w, h, 4); blob(c, 'rgba(29,27,58,0.6)', 2);
+  if (p > 0) { rrect(c, x + 2, y + 2, (w - 4) * p, h - 4, 3); c.fillStyle = heatCol(p); c.fill(); }
+  if (!f.cr) { // annoy charges, Brawl Stars style
+    const M = DUEL_MOVES[f.id], gw = (w - 4) / DUEL_AMMO;
+    for (let i = 0; i < DUEL_AMMO; i++) {
+      const fill = i < f.ammo ? 1 : i === f.ammo ? f.reload / M.reload : 0;
+      c.fillStyle = 'rgba(29,27,58,0.55)'; c.fillRect(x + i * (gw + 2), y + h + 3, gw, 5);
+      if (fill > 0) { c.fillStyle = '#ff9f1c'; c.fillRect(x + i * (gw + 2), y + h + 3, gw * fill, 5); }
+    }
+  }
+}
+function drawDuelShot(c, q, t) {
+  const k = duelK(q.y), x = q.x, y = q.y - (q.z || 0) * k;
+  if (q.look === 'yoyo') { const o = q.own, hy = o.y - 70 * duelK(o.y); c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(o.x + o.face * 14, hy); c.lineTo(x, y); c.stroke(); }
+  c.save(); c.translate(x, y); c.scale(k, k);
+  switch (q.look) {
+    case 'plane': c.rotate(Math.atan2(q.vy * 0.6, q.vx)); drawThrowable(c, 'plane', 0, 0, 0, 1.05); break;
+    case 'drone':
+      c.rotate(Math.sin(t * 9) * 0.1); rrect(c, -13, -6, 26, 12, 5); blob(c, '#c9cfe8', 2.2);
+      c.strokeStyle = INK; c.lineWidth = 2; for (const sx of [-11, 11]) { const w = Math.abs(Math.sin(t * 40 + sx)) * 9 + 2; c.beginPath(); c.moveTo(sx - w, -11); c.lineTo(sx + w, -11); c.stroke(); c.beginPath(); c.moveTo(sx, -6); c.lineTo(sx, -11); c.stroke(); }
+      c.fillStyle = Math.sin(t * 16) > 0 ? '#ff4d4d' : '#ffd23d'; c.beginPath(); c.arc(0, 0, 3, 0, 7); c.fill();
+      c.font = '700 10px Fredoka, sans-serif'; c.textAlign = 'center'; c.fillStyle = '#fff'; c.lineWidth = 3; c.strokeStyle = INK; c.strokeText('BEEP', 0, -18); c.fillText('BEEP', 0, -18);
+      break;
+    case 'sticker':
+      c.rotate(q.t * 7); rrect(c, -11, -11, 22, 22, 3); blob(c, '#ffe066', 2);
+      c.fillStyle = INK; c.font = '700 7px Fredoka, sans-serif'; c.textAlign = 'center'; c.fillText('KICK', 0, -1); c.fillText('ME', 0, 7);
+      break;
+    case 'yoyo':
+      c.rotate(q.t * 20); c.beginPath(); c.arc(0, 0, 11, 0, 7); blob(c, '#ff6150', 2.5);
+      c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.moveTo(-7, 0); c.lineTo(7, 0); c.stroke(); c.beginPath(); c.arc(0, 0, 3, 0, 7); c.fillStyle = '#fff'; c.fill();
+      break;
+    case 'bell': {
+      c.rotate(Math.atan2(q.vy, q.vx)); c.lineCap = 'round';
+      for (let i = 0; i < 3; i++) { const rr = q.r * (0.5 + i * 0.28); c.beginPath(); c.arc(-i * 7, 0, rr, -0.8, 0.8); c.lineWidth = 7; c.strokeStyle = INK; c.stroke(); c.lineWidth = 4; c.strokeStyle = '#ffd23d'; c.stroke(); }
+      c.rotate(-Math.atan2(q.vy, q.vx)); c.font = '700 11px Fredoka, sans-serif'; c.textAlign = 'center'; c.lineWidth = 3; c.strokeStyle = INK; c.strokeText('DING', 0, -q.r - 6); c.fillStyle = '#fff'; c.fillText('DING', 0, -q.r - 6);
+      break;
+    }
+    case 'tickle': c.rotate(t * 10); c.shadowColor = '#ff8ad8'; c.shadowBlur = 10; starPath(c, 0, 0, 13, 6); blob(c, '#ff8ad8', 2.5); break;
+    case 'frogbolt':
+      c.shadowColor = '#9bff8a'; c.shadowBlur = 16; c.beginPath(); c.arc(0, 0, 20, 0, 7); blob(c, '#7fd36b', 2.5); c.shadowBlur = 0;
+      c.beginPath(); c.arc(-7, -12, 6, 0, 7); c.arc(7, -12, 6, 0, 7); blob(c, '#7fd36b', 2);
+      c.fillStyle = INK; c.beginPath(); c.arc(-7, -12, 2.5, 0, 7); c.arc(7, -12, 2.5, 0, 7); c.fill();
+      c.strokeStyle = INK; c.lineWidth = 2; c.beginPath(); c.arc(0, -2, 8, 0.3, Math.PI - 0.3); c.stroke();
+      break;
+    case 'nyah':
+      rrect(c, -27, -13, 54, 26, 12); blob(c, '#fff', 2.5);
+      c.font = '700 13px Fredoka, sans-serif'; c.textAlign = 'center'; c.fillStyle = '#e8437a'; c.fillText('NYAH!', 0, 5);
+      break;
+    case 'sock':
+      c.rotate(q.spin);
+      rrect(c, -6, -17, 12, 22, 4); blob(c, '#f4f4fa', 2.2); ell(c, 4, 6, 11, 6); blob(c, '#f4f4fa', 2.2);
+      c.fillStyle = '#ff6150'; c.fillRect(-6, -14, 12, 3); c.fillRect(-6, -9, 12, 2);
+      c.rotate(-q.spin); c.strokeStyle = '#8bd04a'; c.lineWidth = 2; for (const sx of [-12, 0, 12]) { c.beginPath(); c.moveTo(sx, -22); c.quadraticCurveTo(sx + 5, -28, sx, -34); c.stroke(); }
+      break;
+    case 'cushion': c.restore(); drawCushion(c, x, y + 8, k, t); return;
+  }
+  if (q.k === 'horn') {
+    rrect(c, -16, -8, 32, 16, 6); blob(c, '#c9cfe8', 2.2);
+    c.beginPath(); c.moveTo(8, 4); c.lineTo(26, 14); c.lineTo(26, 26); c.lineTo(4, 10); c.closePath(); blob(c, '#ffd23d', 2);
+    c.strokeStyle = INK; c.lineWidth = 2; for (const sx of [-12, 12]) { const w = Math.abs(Math.sin(t * 40 + sx)) * 10 + 2; c.beginPath(); c.moveTo(sx - w, -13); c.lineTo(sx + w, -13); c.stroke(); }
+  }
+  c.restore();
+}
+function drawDuelFx(c, e) {
+  const p = e.t / e.T;
+  c.save(); c.globalAlpha = clamp(1 - p, 0, 1);
+  if (e.k === 'cone') { // a burp cloud
+    const k = duelK(e.y), n = e.big ? 9 : 5;
+    for (let i = 0; i < n; i++) {
+      const a = e.a + (i / (n - 1) - 0.5) * e.arc * 1.5, d = e.range * (0.3 + 0.7 * p) * (0.65 + 0.35 * (i % 3) / 2);
+      c.beginPath(); c.arc(e.x + Math.cos(a) * d, e.y - 46 * k + Math.sin(a) * d * 0.6, (e.big ? 28 : 17) * (0.6 + p * 0.8), 0, 7); blob(c, '#b6e36a', 2);
+    }
+    c.font = `${e.big ? 34 : 22}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.lineWidth = 6; c.strokeStyle = INK;
+    const tx = e.x + Math.cos(e.a) * e.range * 0.45, ty = e.y - 70 * k - p * 20;
+    c.strokeText(e.big ? 'BUUURRRP!' : 'BURP!', tx, ty); c.fillStyle = '#d8ff8a'; c.fillText(e.big ? 'BUUURRRP!' : 'BURP!', tx, ty);
+  } else if (e.k === 'ring') {
+    c.strokeStyle = '#ffd23d'; c.lineWidth = 6; c.beginPath(); c.ellipse(e.x, e.y, Math.max(1, e.r * p), Math.max(1, e.r * p / DUEL_DY), 0, 0, 7); c.stroke();
+    c.strokeStyle = INK; c.lineWidth = 2; c.stroke();
+  }
+  c.restore();
+}
+
+/* ---------- on top of everything: the cool bars, Super, VS screen and countdown ---------- */
+const BIG_POR = {};
+function bigPortrait(id) {
+  if (BIG_POR[id]) return BIG_POR[id];
+  const p = document.createElement('canvas'); p.width = p.height = 256;
+  if (id === 'crusher') paintCrusherPortrait(p); else paintPortrait(p, id);
+  return (BIG_POR[id] = p);
+}
+function paintCrusherPortrait(p) {
+  const s = p.width, c = p.getContext('2d');
+  c.save(); c.beginPath(); c.arc(s / 2, s / 2, s / 2, 0, 7); c.clip();
+  const g = c.createLinearGradient(0, 0, 0, s); g.addColorStop(0, '#ff8a6b'); g.addColorStop(1, '#b3261e'); c.fillStyle = g; c.fillRect(0, 0, s, s);
+  c.translate(s / 2, s * 1.46); c.scale(s / 96 * 0.92, s / 96 * 0.92);
+  drawCrusher(c, { x: -25, w: 50, y: -106, h: 106, dir: 1, state: 'taunt', flash: 0, walk: 0 }, 0);
+  c.restore();
+}
+function drawDuelHud(c, t) {
+  const D = G.duel, d = VIEW.dpr, W = VIEW.W, H = VIEW.H;
+  c.setTransform(d, 0, 0, d, 0, 0);
+  if (D.flash > 0) { c.fillStyle = `rgba(255,236,160,${D.flash * 1.6})`; c.fillRect(0, 0, W, H); }
+  const top = SAFE.top + 8, left = SAFE.left + 10, right = W - SAFE.right - 62, ph = duelPanelH();
+  if (duelStacked()) { // one under the other
+    const pw = Math.min(420, right - left);
+    duelPanel(c, left, top, pw, D.me, false, t); duelPanel(c, left, top + ph + 6, pw, D.cr, false, t);
+    duelSuperText(c, left, top + ph * 2 + 26, t);
+  } else {
+    const pw = Math.min(330, (right - left - 12) / 2);
+    duelPanel(c, left, top, pw, D.me, false, t); duelPanel(c, right - pw, top, pw, D.cr, true, t);
+    duelSuperText(c, left, top + ph + 20, t);
+  }
+  if (D.phase === 'vs') duelVs(c, W, H, D.t / 2.3);
+  else if (D.phase === 'count') duelCount(c, W, H);
+}
+function duelPanel(c, x, y, w, f, right, t) {
+  const D = G.duel, tight = VIEW.H < 450, small = tight || w < 190, h = duelPanelH(), por = tight ? 30 : small ? 34 : 44;
+  const nameY = tight ? 16 : small ? 19 : 22, barY = tight ? 21 : small ? 26 : 29, bh = tight ? 12 : small ? 14 : 16;
+  rrect(c, x, y, w, h, 14); blob(c, 'rgba(255,250,240,0.95)', 2.5);
+  const px = right ? x + w - 7 - por : x + 7, py = y + (h - por) / 2;
+  c.save(); c.beginPath(); c.arc(px + por / 2, py + por / 2, por / 2, 0, 7); c.clip(); c.drawImage(bigPortrait(f.id), px, py, por, por); c.restore();
+  c.beginPath(); c.arc(px + por / 2, py + por / 2, por / 2, 0, 7); c.lineWidth = 2.5; c.strokeStyle = f.cr ? '#ff4d4d' : '#2f8cff'; c.stroke();
+  const tx = right ? x + 10 : px + por + 8, tw = w - por - 24;
+  c.textAlign = 'left'; c.font = `${tight ? 14 : small ? 15 : 18}px "Lilita One", sans-serif`; c.fillStyle = INK;
+  c.fillText(f.cr ? 'Crusher' : HEROES[f.id].name, tx, y + nameY, tw * 0.6);
+  const nameW = c.measureText(f.cr ? 'Crusher' : HEROES[f.id].name).width;
+  c.font = `700 ${small ? 9 : 10}px Fredoka, sans-serif`; c.fillStyle = '#6b6890'; c.textAlign = 'right';
+  if (nameW + c.measureText('KEEPING COOL').width + 10 < tw) c.fillText('KEEPING COOL', tx + tw, y + nameY - 1);
+  const by = y + barY, p = f.heat / 100;
+  rrect(c, tx, by, tw, bh, bh / 2); blob(c, '#e8e6f4', 2);
+  if (p > 0) { c.save(); rrect(c, tx, by, tw, bh, bh / 2); c.clip(); c.fillStyle = heatCol(p); c.fillRect(tx, by, tw * p, bh); c.restore(); rrect(c, tx, by, tw, bh, bh / 2); c.lineWidth = 2; c.strokeStyle = INK; c.stroke(); }
+  c.font = `${small ? 12 : 13}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.lineWidth = 3; c.strokeStyle = '#fff';
+  const lab = f.heat >= 100 ? 'LOST IT!' : Math.round(f.heat) + '%';
+  c.strokeText(lab, tx + tw / 2, by + bh - 3); c.fillStyle = INK; c.fillText(lab, tx + tw / 2, by + bh - 3);
+  if (!f.cr) { // the Super meter
+    const sy = by + bh + 4, sh = tight ? 5 : 6, ready = f.sup >= 100;
+    rrect(c, tx, sy, tw, sh, 3); c.fillStyle = 'rgba(29,27,58,0.2)'; c.fill();
+    if (f.sup > 0) { rrect(c, tx, sy, Math.max(sh, tw * f.sup / 100), sh, 3); c.fillStyle = ready ? `rgba(255,${190 + Math.round(40 * Math.sin(t * 10))},40,1)` : '#ffc83d'; c.fill(); }
+  }
+}
+function duelSuperText(c, x, y, t) {
+  const D = G.duel; if (D.me.sup < 100 || D.phase !== 'fight') return;
+  const N = padNames(), key = STATE.pad ? N.move : STATE.touch ? '' : STATE.players === 2 ? (D.pl ? '/' : 'F') : 'X';
+  c.save(); c.globalAlpha = 0.75 + 0.25 * Math.sin(t * 8);
+  c.font = `${VIEW.H < 450 ? 13 : 15}px "Lilita One", sans-serif`; c.textAlign = 'left'; c.lineWidth = 4; c.strokeStyle = INK;
+  const txt = key ? `SUPER READY! Press ${key}` : 'SUPER READY! Tap SUPER';
+  c.strokeText(txt, x + 4, y); c.fillStyle = '#ffd23d'; c.fillText(txt, x + 4, y);
+  c.restore();
+}
+function duelVs(c, W, H, p) {
+  const D = G.duel, inK = clamp(p / 0.18, 0, 1), e = 1 - Math.pow(1 - inK, 3), out = clamp((p - 0.86) / 0.14, 0, 1), off = (1 - e) * W * 0.6;
+  c.save(); c.globalAlpha = 1 - out;
+  c.fillStyle = 'rgba(16,14,40,0.88)'; c.fillRect(0, 0, W, H);
+  c.fillStyle = HEROES[D.me.id].color; c.beginPath(); c.moveTo(-off, 0); c.lineTo(W * 0.56 - off, 0); c.lineTo(W * 0.44 - off, H); c.lineTo(-off, H); c.closePath(); c.fill();
+  c.fillStyle = '#b3261e'; c.beginPath(); c.moveTo(W * 0.56 + off, 0); c.lineTo(W + off + 10, 0); c.lineTo(W + off + 10, H); c.lineTo(W * 0.44 + off, H); c.closePath(); c.fill();
+  c.strokeStyle = INK; c.lineWidth = 6; c.beginPath(); c.moveTo(W * 0.56 - off, 0); c.lineTo(W * 0.44 - off, H); c.stroke(); c.beginPath(); c.moveTo(W * 0.56 + off, 0); c.lineTo(W * 0.44 + off, H); c.stroke();
+  const tall = H > W * 1.2, S = tall ? Math.min(W * 0.42, H * 0.22) : Math.min(W * 0.3, H * 0.34), cy = H * 0.48;
+  const spots = tall ? [[W * 0.3 - off, H * 0.3], [W * 0.7 + off, H * 0.68]] : [[W * 0.25 - off, cy], [W * 0.75 + off, cy]];
+  for (const [id, cx, py, name] of [[D.me.id, spots[0][0], spots[0][1], HEROES[D.me.id].name], ['crusher', spots[1][0], spots[1][1], 'Crusher']]) {
+    c.save(); c.beginPath(); c.arc(cx, py, S / 2, 0, 7); c.clip(); c.drawImage(bigPortrait(id), cx - S / 2, py - S / 2, S, S); c.restore();
+    c.beginPath(); c.arc(cx, py, S / 2, 0, 7); c.lineWidth = 6; c.strokeStyle = '#fff'; c.stroke();
+    c.font = `${Math.round(Math.max(20, S * 0.2))}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.lineWidth = 7; c.strokeStyle = INK;
+    c.strokeText(name, cx, py + S / 2 + Math.max(26, S * 0.26)); c.fillStyle = '#fff'; c.fillText(name, cx, py + S / 2 + Math.max(26, S * 0.26));
+  }
+  const vs = 1 + Math.sin(p * 30) * 0.06 * (1 - out);
+  c.save(); c.translate(tall ? W * 0.56 : W / 2, tall ? H * 0.5 : cy); c.scale(vs * e, vs * e); c.rotate(-0.08);
+  c.font = `${Math.round(tall ? S * 0.5 : S * 0.42)}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineWidth = 10; c.strokeStyle = INK;
+  c.strokeText('VS', 0, 0); c.fillStyle = '#ffd23d'; c.fillText('VS', 0, 0); c.restore();
+  const ty = Math.max(SAFE.top + 44, H * 0.12);
+  c.font = `${Math.round(Math.min(W * 0.09, 54))}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.lineWidth = 9; c.strokeStyle = INK;
+  c.strokeText('ANNOY-OFF!', W / 2, ty); c.fillStyle = '#fff'; c.fillText('ANNOY-OFF!', W / 2, ty);
+  c.font = `600 ${Math.round(Math.min(W * 0.04, 20))}px Fredoka, sans-serif`; c.lineWidth = 5;
+  const sub = 'Annoy him until he loses his cool. No fighting!';
+  c.strokeText(sub, W / 2, ty + Math.min(W * 0.06, 34)); c.fillStyle = '#fff'; c.fillText(sub, W / 2, ty + Math.min(W * 0.06, 34));
+  c.restore();
+}
+function duelCount(c, W, H) {
+  const D = G.duel, n = Math.min(3, Math.floor(D.t / 0.6)), p = (D.t - n * 0.6) / 0.6, txt = n < 3 ? String(3 - n) : 'ANNOY!';
+  const s = p < 0.2 ? lerp(0.3, 1.25, p / 0.2) : p < 0.35 ? lerp(1.25, 1, (p - 0.2) / 0.15) : 1;
+  const Ly = duelLayout(), cy = Ly.oy + Ly.d * 0.45 * Ly.s;
+  c.save(); c.globalAlpha = n < 3 ? 1 : clamp(1 - (p - 0.5) * 2, 0, 1); c.translate(W / 2, cy); c.scale(s, s);
+  c.font = `${Math.round(Math.min(W, H) * (n < 3 ? 0.2 : 0.13))}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.lineWidth = 12; c.strokeStyle = INK; c.strokeText(txt, 0, 0); c.fillStyle = n < 3 ? '#fff' : '#ffd23d'; c.fillText(txt, 0, 0);
+  c.restore();
 }
 
 /* ===================== Backgrounds & platforms ===================== */
@@ -6298,13 +7355,14 @@ function render() {
   const c = ctx, d = VIEW.dpr, s = VIEW.scale;
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.fillStyle = '#16183a'; c.fillRect(0, 0, cv.width, cv.height);
-  const playing = G && ['play', 'pause', 'done', 'story'].includes(STATE.screen);
+  const playing = G && ['play', 'pause', 'done', 'story', 'bully'].includes(STATE.screen);
   const t = playing ? G.t : performance.now() / 1000;
-  const camX = playing ? G.cam.x : 0;
+  const duel = playing && G.duel, camX = playing && !duel ? G.cam.x : 0;
   let sx = 0, sy = 0;
   if (playing && G.shake > 0) { sx = rand(-6, 6) * G.shake * 2; sy = rand(-6, 6) * G.shake * 2; }
   VIEW.shx = sx; VIEW.shy = sy;
   c.setTransform(d * s, 0, 0, d * s, (-camX * s + sx) * d, (VIEW.offY + sy) * d);
+  if (duel) { drawDuel(c, t); c.setTransform(1, 0, 0, 1, 0, 0); drawScreenFx(c, t); drawDuelHud(c, t); return; } // the Annoy-Off has its own zoom
   const top = VIEW.top - 10, bottom = VIEW.bottom + 10;
   for (const z of G_ZONES()) {
     drawZone(c, z, camX, VIEW.w, top, t);
@@ -6317,11 +7375,13 @@ function render() {
   if (playing) drawWorld(c, t, camX); else drawMenuCrew(c, t);
   c.setTransform(1, 0, 0, 1, 0, 0);
   if (playing) { drawWeather(c, t); surpriseDraw(c, t, 'screen'); drawDarkness(c, t); drawBullyFx(c); drawSentHome(c, t); drawScreenFx(c, t); drawBossPointer(c, t); }
-  if (VIEW.portrait && touchControlsOn() && (STATE.screen === 'play' || STATE.screen === 'pause')) {
-    const y = VIEW.ctlTop * d;
-    const g = c.createLinearGradient(0, y, 0, cv.height); g.addColorStop(0, 'rgba(22,24,58,0.55)'); g.addColorStop(1, 'rgba(22,24,58,0.92)');
-    c.fillStyle = g; c.fillRect(0, y, cv.width, cv.height - y);
-  }
+  drawCtlShade(c);
+}
+function drawCtlShade(c) { // a dark band behind the touch buttons on an upright phone
+  if (!(VIEW.portrait && touchControlsOn() && (STATE.screen === 'play' || STATE.screen === 'pause'))) return;
+  const y = VIEW.ctlTop * VIEW.dpr;
+  const g = c.createLinearGradient(0, y, 0, cv.height); g.addColorStop(0, 'rgba(22,24,58,0.55)'); g.addColorStop(1, 'rgba(22,24,58,0.92)');
+  c.fillStyle = g; c.fillRect(0, y, cv.width, cv.height - y);
 }
 
 function drawMenuCrew(c, t) {
@@ -6420,6 +7480,7 @@ function drawWorld(c, t, camX) {
   // crew: followers behind, players in front
   const order = G.crew.slice().sort((a, b) => (a.ctrl >= 0) - (b.ctrl >= 0));
   for (const e of order) drawCrewMember(c, e, t);
+  if (G.cameo) drawCameo(c, t);
   // rope during the pull
   for (const e of G.crew) if (e.pull && e.pull.t > e.pull.delay) {
     const An = G.ropeFrom || L.anchors[0];
@@ -6428,7 +7489,21 @@ function drawWorld(c, t, camX) {
   surpriseDraw(c, t, 'front');
   for (const q of G.proj) drawProj(c, q, t);
   if (G.battle) drawBattle(c, t, 'front');
-  // particles
+  drawParticles(c);
+  if (G.pulse) { c.strokeStyle = 'rgba(57, 225, 255, 0.8)'; c.lineWidth = 14; c.beginPath(); c.arc(G.pulse.x, G.pulse.y, G.pulse.r, 0, 7); c.stroke(); }
+  // speech bubbles and floating text
+  for (const e of G.crew) if (e.sayT > 0 && vis(e.x, e.w)) bubble(c, cxOf(e), e.y - 30, e.say, e.ctrl >= 0);
+  for (const T of G.teachers) if (T.sayT > 0 && vis(T.x - 20, 40)) bubble(c, T.x, T.y - 150, T.say, true, true);
+  if (G.bully) { const Bu = G.bully; if (Bu.sayT > 0) bubble(c, cxOf(Bu), Bu.y - 76, Bu.say, true, true); if (Bu.adult && Bu.adult.sayT > 0) bubble(c, Bu.adult.x, Bu.adult.y - 150, Bu.adult.say, true, true); }
+  drawFloatTexts(c);
+  if (G.callouts.length) drawCallouts(c);
+  drawNeedBubble(c, t);
+  // player markers in 2P
+  if (G.players.length === 2) G.players.forEach((p, i) => { c.fillStyle = i ? '#ff8a1f' : '#2f8cff'; c.beginPath(); const mx = cxOf(p), my = p.y - 26 + Math.sin(t * 5) * 2; c.moveTo(mx - 7, my - 8); c.lineTo(mx + 7, my - 8); c.lineTo(mx, my); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); });
+}
+
+/* particles and floating text, shared by the level and the Annoy-Off */
+function drawParticles(c) {
   for (const q of G.parts) {
     const a = clamp(q.life / q.max, 0, 1);
     c.globalAlpha = a;
@@ -6444,20 +7519,13 @@ function drawWorld(c, t, camX) {
     else { c.fillStyle = q.col; c.beginPath(); c.arc(q.x, q.y, q.r * (q.kind === 'puff' ? 1 + (1 - a) : 1), 0, 7); c.fill(); }
   }
   c.globalAlpha = 1;
-  if (G.pulse) { c.strokeStyle = 'rgba(57, 225, 255, 0.8)'; c.lineWidth = 14; c.beginPath(); c.arc(G.pulse.x, G.pulse.y, G.pulse.r, 0, 7); c.stroke(); }
-  // speech bubbles and floating text
-  for (const e of G.crew) if (e.sayT > 0 && vis(e.x, e.w)) bubble(c, cxOf(e), e.y - 30, e.say, e.ctrl >= 0);
-  for (const T of G.teachers) if (T.sayT > 0 && vis(T.x - 20, 40)) bubble(c, T.x, T.y - 150, T.say, true, true);
-  if (G.bully) { const Bu = G.bully; if (Bu.sayT > 0) bubble(c, cxOf(Bu), Bu.y - 76, Bu.say, true, true); if (Bu.adult && Bu.adult.sayT > 0) bubble(c, Bu.adult.x, Bu.adult.y - 150, Bu.adult.say, true, true); }
+}
+function drawFloatTexts(c) {
   for (const x of G.texts) {
     c.globalAlpha = clamp(x.life * 2, 0, 1); c.font = (x.big ? 26 : 19) + 'px "Lilita One", sans-serif'; c.textAlign = 'center';
     c.lineWidth = 5; c.strokeStyle = INK; c.strokeText(x.txt, x.x, x.y); c.fillStyle = x.col; c.fillText(x.txt, x.x, x.y);
   }
   c.globalAlpha = 1;
-  if (G.callouts.length) drawCallouts(c);
-  drawNeedBubble(c, t);
-  // player markers in 2P
-  if (G.players.length === 2) G.players.forEach((p, i) => { c.fillStyle = i ? '#ff8a1f' : '#2f8cff'; c.beginPath(); const mx = cxOf(p), my = p.y - 26 + Math.sin(t * 5) * 2; c.moveTo(mx - 7, my - 8); c.lineTo(mx + 7, my - 8); c.lineTo(mx, my); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); });
 }
 
 function drawCrewMember(c, e, t) {
@@ -6631,15 +7699,18 @@ const JOY_R = 62, JOY_DEAD = 16;
 Input.joyDir = [0, 0];
 Input.tapped = new Set(); // quick taps still count for one frame
 Input.pad = [{ left: false, right: false, jump: false, action: false, throw: false }, { left: false, right: false, jump: false, action: false, throw: false }];
+const padClear = (P) => { P.left = P.right = P.jump = P.action = P.throw = P.annoy = P.sup = P.du = P.dd = P.dl = P.dr = false; P.ax = P.ay = 0; };
 
 function joyZone(i) {
   const W = VIEW.W, H = VIEW.H, top = VIEW.portrait ? VIEW.ctlTop - 12 : SAFE.top + 100;
   const jx = VIEW.joyX || [W * 0.5, W];
+  if (G && G.duel) return { x0: 0, x1: jx[0], y0: top, y1: H }; // in the Annoy-Off, whoever is playing moves with the left thumb
   return i === 0 ? { x0: 0, x1: jx[0], y0: top, y1: H } : { x0: jx[1], x1: W, y0: top, y1: H };
 }
 function joyStart(e) {
   if (STATE.screen !== 'play' || !STATE.touch || STATE.pad || !G) return false;
   for (let i = 0; i < G.players.length; i++) {
+    if (G.duel && i !== G.duel.pl) continue;
     const z = joyZone(i);
     if (!JOY[i] && e.clientX >= z.x0 && e.clientX < z.x1 && e.clientY >= z.y0 && e.clientY < z.y1) {
       JOY[i] = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY };
@@ -6668,7 +7739,7 @@ function joyUpdate(i) {
 }
 function joyHome(i) { // where the faded joystick rests, inside that player's thumb area
   const W = VIEW.W, jx = VIEW.joyX || [W * 0.5, W];
-  const x = i === 0 ? Math.max(JOY_R + 2, Math.min(SAFE.left + 30 + JOY_R, jx[0] - JOY_R - 4))
+  const x = i === 0 || (G && G.duel) ? Math.max(JOY_R + 2, Math.min(SAFE.left + 30 + JOY_R, jx[0] - JOY_R - 4))
     : Math.min(W - JOY_R - 2, Math.max(W - SAFE.right - 30 - JOY_R, jx[1] + JOY_R + 4));
   return { x, y: VIEW.H - SAFE.bottom - 34 - JOY_R };
 }
@@ -6717,21 +7788,23 @@ function pollPads() {
   const list = padList();
   if (list.length && !STATE.pad) padConnected(list[0]);
   else if (!list.length && STATE.pad) padDisconnected();
-  if (!list.length) { Input.pad.forEach((P) => (P.left = P.right = P.jump = P.action = P.throw = false)); return; }
+  if (!list.length) { Input.pad.forEach(padClear); return; }
   if (STATE.screen !== PAD.lastScreen) { PAD.lastScreen = STATE.screen; if (STATE.screen !== 'play') setTimeout(() => focusPrimary(), 30); }
   for (let i = 0; i < 2; i++) {
     const gp = list[i], P = Input.pad[i];
-    if (!gp) { P.left = P.right = P.jump = P.action = P.throw = false; continue; }
+    if (!gp) { padClear(P); continue; }
     const b = (n) => !!(gp.buttons[n] && gp.buttons[n].pressed), ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;
     P.left = ax < -0.4 || b(14); P.right = ax > 0.4 || b(15);
     P.jump = b(0) || b(12); P.action = b(2); P.throw = b(1);
+    P.ax = ax; P.ay = ay; P.du = b(12); P.dd = b(13); P.dl = b(14); P.dr = b(15); // the Annoy-Off moves in every direction
+    P.annoy = b(0) || b(1); P.sup = b(2) || b(3) || b(6) || b(7);
     const now = { a: b(0), b: b(1), y: b(3), lb: b(4), rb: b(5), lt: b(6), rt: b(7), start: b(9), select: b(8),
       up: b(12) || ay < -0.6, down: b(13) || ay > 0.6, left: P.left, right: P.right };
     const was = PAD.prev[i]; PAD.prev[i] = now;
     const pressed = (k) => now[k] && !was[k];
     if (STATE.screen === 'play' && G) {
-      if (pressed('lb')) padSelect(-1);
-      if (pressed('rb')) padSelect(1);
+      if (!G.duel && pressed('lb')) padSelect(-1);
+      if (!G.duel && pressed('rb')) padSelect(1);
       if (pressed('y')) callHelp(HERO_IDS[PAD.sel]);
       if (pressed('lt') || pressed('rt')) crewCharge();
       if (pressed('start') || pressed('select')) showScreen('pause');
@@ -6801,14 +7874,14 @@ function readSafe() {
     d.remove();
   } catch (e) { /* defaults */ }
 }
-const SCREENS = ['title', 'adv', 'levels', 'crew', 'story', 'pause', 'done', 'help'];
+const SCREENS = ['title', 'adv', 'levels', 'crew', 'story', 'pause', 'done', 'help', 'bully'];
 let helpReturn = 'title';
 function showScreen(name) {
   SCREENS.forEach((s) => { $('s-' + s).hidden = s !== name; });
   if (name !== STATE.screen && $('s-' + name)) $('s-' + name).scrollTop = 0;
   STATE.screen = name;
-  SND.setTrack(['story', 'play', 'pause'].includes(name) && G ? levelTrack() : 'menu');
-  $('hud').hidden = !(name === 'play' || name === 'pause');
+  SND.setTrack(['story', 'play', 'pause', 'bully'].includes(name) && G ? levelTrack() : 'menu');
+  $('hud').hidden = !(name === 'play' || name === 'pause' || name === 'bully');
   $('controls').hidden = !(name === 'play' && STATE.touch && !STATE.pad);
   $('soundBtn').hidden = name === 'play';
   if (name === 'crew') buildCrewSelect();
@@ -6819,7 +7892,8 @@ function showScreen(name) {
 const touchOrKey = (a, b, c) => (STATE.pad && c ? c : STATE.touch ? a : b);
 function levelTrack() {
   const A = G.L.arena, on = A && A.active && !A.done;
-  if (G.boss && G.boss.state !== 'ko') return 'boss';
+  if (G.duel) return 'chase';
+  if ((G.boss && G.boss.state !== 'ko') || (G.bully && G.bully.state !== 'flee')) return 'boss';
   if (G.disco) return 'disco';
   if (on && A.type === 'food') return 'food';
   if (on && A.type === 'survive') return 'survive';
@@ -6893,7 +7967,6 @@ function toggleFriend(id) {
   const picks = crewPicks(), name = HEROES[id].name, cur = STATE.friendsNow || [];
   if (picks.includes(id)) STATE.crewMsg = STATE.players === 1 ? 'That\'s you! Tap the friends you want to bring along.' : `${name} is a player. Tap other friends to bring along.`;
   else if (isGrounded(id)) { SND.sfx('nope'); STATE.crewMsg = `${name} is at home. Win the battle at the end of a level to get ${name} back.`; }
-  else if (neededFriends(picks, STATE.level).includes(id)) { SND.sfx('nope'); const j = levelJobs(STATE.level).find((x) => x.hero === id); STATE.crewMsg = `${name} has a job in this level: ${name} ${j.text}. ${name} has to come!`; }
   else if (cur.includes(id)) { STATE.friends = cur.filter((x) => x !== id); SND.sfx('help'); }
   else if (cur.length >= MAX_FRIENDS) { SND.sfx('nope'); STATE.crewMsg = `You can bring up to ${MAX_FRIENDS} friends. Tap one to leave them behind first.`; }
   else { STATE.friends = cur.concat(id); SND.sfx('help'); }
@@ -6916,18 +7989,19 @@ function refreshCrewSelect() {
     el.classList.toggle('dim', step === 'friends' && !fr && !p1 && !p2 && !home);
     el.querySelectorAll('.badge, .homebadge').forEach((b) => b.remove());
     if (p1 || p2) el.insertAdjacentHTML('afterbegin', `<span class="badge ${p1 ? 'b1' : 'b2'}">${STATE.players === 1 ? 'YOU' : p1 ? 'P1' : 'P2'}</span>`);
-    else if (fr) el.insertAdjacentHTML('afterbegin', `<span class="badge ${nd ? 'bn' : 'bf'}">${nd ? 'NEEDED' : 'FRIEND'}</span>`);
+    else if (fr) el.insertAdjacentHTML('afterbegin', '<span class="badge bf">FRIEND</span>');
+    else if (step === 'friends' && nd && !home) el.insertAdjacentHTML('afterbegin', '<span class="badge bn">HANDY</span>');
     if (home) el.insertAdjacentHTML('beforeend', `<span class="homebadge">${HOUSE_SVG}At home</span>`);
   });
   const jobs = levelJobs(STATE.level);
   $('crewJobs').innerHTML = jobs.length
-    ? '<b>Jobs in this level:</b>' + jobs.map((j) => `<span class="job"><canvas width="48" height="48" data-por="${j.hero}"></canvas>${HEROES[j.hero].name} ${isGrounded(j.hero) && !picks.includes(j.hero) ? 'is at home, so the crew will team up' : j.text}</span>`).join('')
+    ? '<b>Handy friends here:</b>' + jobs.map((j) => { const have = picks.includes(j.hero) || (step === 'friends' && friends.includes(j.hero)); return `<span class="job ${have ? 'have' : ''}"><canvas width="48" height="48" data-por="${j.hero}"></canvas><span>${HEROES[j.hero].name} ${j.text}${have ? ' ✓' : step === 'friends' ? ' <i>(pops in to help)</i>' : ''}</span></span>`; }).join('')
     : '<b>No special jobs in this level.</b> Bring any friends you like.';
   $('crewJobs').querySelectorAll('canvas[data-por]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.por), 0, 0, 48, 48));
   const msg = STATE.crewMsg; STATE.crewMsg = '';
   $('crewHint').textContent = msg || (step === 'hero'
     ? (STATE.players === 1 ? 'Tap a hero to play as them.' : `Player ${pickTurn + 1}, tap your hero.`)
-    : `Tap to bring up to ${MAX_FRIENDS} friends (${friends.length} picked). Friends with a job in this level have to come.`);
+    : `Bring up to ${MAX_FRIENDS} friends (${friends.length} picked). Any mix works!`);
   $('startBtn').textContent = step === 'hero' ? 'Next' : 'Start!';
   const id = STATE.focus, H = HEROES[id], cur = heroThrow(id);
   $('crewDetail').innerHTML = `
@@ -6960,6 +8034,7 @@ let hudCache = {};
 const HOUSE_SVG = '<svg class="hm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12 L12 3.5 L21.5 12 Z" fill="#ff6150" stroke="#1d1b3a" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="11" width="14" height="10" rx="1" fill="#fff3d6" stroke="#1d1b3a" stroke-width="2"/><rect x="10" y="14.5" width="4" height="6.5" fill="#ffc83d" stroke="#1d1b3a" stroke-width="1.5"/></svg>';
 function buildHUD() {
   hudCache = {};
+  $('hud').classList.toggle('duel', !!(G && G.duel));
   $('statBox').innerHTML = G.players.map((p, i) => `<div class="chip" id="hp${i}"><canvas width="48" height="48"></canvas><span class="hearts"></span></div>`).join('') +
     `<div class="chip" id="coinChip"><svg viewBox="0 0 24 24" width="20" height="20"><ellipse cx="12" cy="12" rx="8" ry="9" fill="#ffd23d" stroke="#1d1b3a" stroke-width="2.4"/></svg><span>0</span></div>`;
   G.players.forEach((p, i) => { const c = $('hp' + i).querySelector('canvas'); c.getContext('2d').drawImage(portraitFor(p.id), 0, 0, 48, 48); });
@@ -7004,7 +8079,8 @@ function updateHUD() {
   const m = Math.round(G.meter);
   if (hudCache.meter !== m) { hudCache.meter = m; $('meter').firstElementChild.style.width = m + '%'; $('chargeBtn').hidden = m < 100; }
   const A = G.L.arena, B = G.boss, C = G.L.chase;
-  const Bt = G.battle, Bu = G.bully, showHack = bullyActive() || !!(Bt && !Bt.end) || !!(C && !C.got) || !!(A && ((A.type !== 'boss' && A.started && !A.done) || (B && B.state !== 'ko')));
+  if (G.duel) { const sb = document.querySelector('.tb.duelsup'), sp = Math.round(G.duel.me.sup); if (sb && hudCache.sup !== sp) { hudCache.sup = sp; sb.style.setProperty('--chg', sp + '%'); sb.classList.toggle('ready', sp >= 100); } }
+  const Bt = G.battle, Bu = G.bully, showHack = !G.duel && (bullyActive() || !!(Bt && !Bt.end) || !!(C && !C.got) || !!(A && ((A.type !== 'boss' && A.started && !A.done) || (B && B.state !== 'ko'))));
   if (hudCache.hack !== showHack) { hudCache.hack = showHack; $('hackbar').hidden = !showHack; $('hud').classList.toggle('hacking', showHack); $('hackbar').classList.toggle('boss', !!B); placeOverlays(); }
   if (showHack && bullyActive()) {
     const left = Math.max(0, Math.ceil(Bu.timer)), lab = `Hit Crusher ${Bu.hp === BULLY_HP ? Bu.hp + ' times' : Bu.hp === 1 ? 'once more' : Bu.hp + ' more times'}! 0:${String(left).padStart(2, '0')}`;
@@ -7081,7 +8157,7 @@ function showHint(h) {
   const T = h.t != null ? (G.teachers[h.t] || L.teachers[h.t]) : null, low = (x) => x.charAt(0).toLowerCase() + x.slice(1);
   let id = null, text = '';
   const gone = NEED_HINT[h.kind];
-  if (gone && friendGone(gone)) { toast(null, `${awayText(gone)}. ${h.kind === 'shutters' ? 'Time your run through the gaps!' : 'Keep going and the crew will team up!'}`); return; }
+  if (gone && friendGone(gone)) { toast(gone, `${awayText(gone)}, so ${HEROES[gone].name} will pop in to help!`); return; }
   switch (h.kind) {
     case 'goal': text = L.goal; break;
     case 'move': text = touchOrKey('Slide your thumb on the left side of the screen to run. Tap the up arrow to jump.', one ? 'Run with ← → or A D. Jump with ↑, W or Space.' : 'Player 1: A D to run, W to jump. Player 2: arrow keys.', `Run with the left stick and press ${N.jump} to jump.`); break;
@@ -7119,7 +8195,8 @@ function showLost() {
   $('doneTitle').textContent = all ? 'Everyone sent home!' : 'Sent home!';
   $('nextBtn').hidden = true; $('againBtn').textContent = 'Try again';
   $('photo').setAttribute('aria-label', 'The friends who were sent home, waving from their houses');
-  $('doneStars').innerHTML = all ? `<p class="lostmsg">Crusher got the whole crew in trouble.<small>Next time, hit him ${BULLY_HP} times with your special move before a grown-up comes.</small></p>`
+  $('doneStars').innerHTML = all && G.lose.duel ? '<p class="lostmsg">Crusher won the Annoy-Off, so the whole crew got in trouble.<small>Next time, dodge his stinky socks, grab ice lollies to cool down, and use your Super when it glows.</small></p>'
+    : all ? `<p class="lostmsg">Crusher got the whole crew in trouble.<small>Next time, hit him ${BULLY_HP} times with your special move before a grown-up comes.</small></p>`
     : `<p class="lostmsg">Too many friends were sent home.<small>Jump on baddies, throw at them, or dodge them to keep your crew together.</small></p>`;
   const sec = Math.floor(G.time), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0');
   $('doneStats').innerHTML = `<div><b>${G.coins}</b><span>coins</span></div><div><b>${G.bopped}</b><span>baddies bopped</span></div><div><b>${mm}:${ss}</b><span>time</span></div>`;
@@ -7139,7 +8216,11 @@ function ctlButtons(W, H, two) {
   const m = 14, r = SAFE.right + m, b = SAFE.bottom + m;
   const btns = [], add = (pl, k, x, y, s) => btns.push({ pl, k, x, y, s });
   let joyX;  // the first player's joystick area ends at joyX[0], the second player's starts at joyX[1]
-  if (!two) {
+  if (G && G.duel) {
+    const pl = G.duel.pl, s = clamp(Math.min(W, H) * 0.24, 76, 128), ss = s * 0.74;
+    add(pl, 'throw', W - r - s, H - b - s, s); add(pl, 'action', W - r - s - ss - 16, H - b - ss * 0.92, ss);
+    joyX = [Math.min(W * 0.5, W - r - s - ss - 36), W];
+  } else if (!two) {
     const s = clamp(Math.min(W, H) * 0.2, 64, 112), sj = s * 1.12, ax = W - r - sj - s - 12;
     add(0, 'jump', W - r - sj, H - b - sj, sj); add(0, 'action', ax, H - b - s - sj * 0.3, s);
     add(0, 'throw', W - r - sj + (sj - s * 0.9) / 2, H - b - sj - s * 0.9 - 42, s * 0.9);
@@ -7161,14 +8242,16 @@ function layoutControls() {
   const box = $('controls'); if (!box) return;
   const W = VIEW.W, H = VIEW.H, two = twoPlayers();
   const { btns, joyX } = ctlButtons(W, H, two);
-  const label = (q) => !G ? '' : q.k === 'action' ? G.players[q.pl].H.move : q.k === 'throw' ? THROWS[heroThrow(G.players[q.pl].id)].name : '';
+  const duel = G && G.duel;
+  const label = (q) => !G ? '' : duel ? (q.k === 'throw' ? DUEL_MOVES[duel.me.id].annoy : DUEL_MOVES[duel.me.id].sup) : q.k === 'action' ? G.players[q.pl].H.move : q.k === 'throw' ? THROWS[heroThrow(G.players[q.pl].id)].name : '';
   btns.forEach((q) => { q.label = label(q); });
   VIEW.joyX = joyX;
   VIEW.ctlSide = Math.max(two ? 0 : 170, ...btns.map((q) => Math.min(q.x + q.s, W - q.x))) + 4;
-  VIEW.toastTop = two;
-  const joys = two ? [0, 1] : [0];
-  box.innerHTML = btns.map((q) => `<div class="tb ${two ? 'p' + (q.pl + 1) : ''}" data-b="${q.pl}:${q.k}" style="left:${q.x}px;top:${q.y}px;width:${q.s}px;height:${q.s}px">${q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? G.players[q.pl].id : 'naseer')}"></canvas>` : ICON[q.k]}${q.label ? `<span class="lbl">${q.label}</span>` : ''}</div>`).join('') +
-    joys.map((i) => `<div class="joy ghost ${two ? 'p' + (i + 1) : ''}" id="joy${i}"><i></i><span class="lbl">Move</span></div>`).join('');
+  VIEW.toastTop = two && !duel;
+  const joys = duel ? [duel.pl] : two ? [0, 1] : [0];
+  const face = (q) => duel ? `<span class="big">${q.k === 'throw' ? 'ANNOY' : 'SUPER'}<small>${q.label}</small></span>` : q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? G.players[q.pl].id : 'naseer')}"></canvas>` : ICON[q.k];
+  box.innerHTML = btns.map((q) => `<div class="tb ${two && !duel ? 'p' + (q.pl + 1) : ''} ${duel ? (q.k === 'throw' ? 'duelann' : 'duelsup') : ''}" data-b="${q.pl}:${q.k}" style="left:${q.x}px;top:${q.y}px;width:${q.s}px;height:${q.s}px">${face(q)}${q.label && !duel ? `<span class="lbl">${q.label}</span>` : ''}</div>`).join('') +
+    joys.map((i) => `<div class="joy ghost ${two && !duel ? 'p' + (i + 1) : ''}" id="joy${i}"><i></i><span class="lbl">Move</span></div>`).join('');
   joys.forEach((i) => joyDraw(i));
   box.querySelectorAll('canvas[data-obj]').forEach((cv) => drawThrowable(cv.getContext('2d'), cv.dataset.obj, 48, 48, 0.6, 2.4));
 }
@@ -7207,6 +8290,7 @@ window.addEventListener('keydown', (e) => {
     if (STATE.touch && ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight'].includes(e.code)) { STATE.touch = false; $('controls').hidden = true; buildHUD(); resize(); }
     Input.keys.add(e.code);
   } else if (STATE.screen === 'pause' && (e.code === 'KeyP' || e.code === 'Escape')) showScreen('play');
+  else if (STATE.screen === 'bully') bullyKey(e);
 });
 window.addEventListener('keyup', (e) => Input.keys.delete(e.code));
 window.addEventListener('blur', () => { Input.keys.clear(); if (STATE.screen === 'play') showScreen('pause'); });
@@ -7283,7 +8367,7 @@ function frame(now) {
     pollPads();
     if (STATE.screen === 'play' && G) {
       acc += dt; let n = 0;
-      while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
+      while (acc >= STEP && n < 6 && STATE.screen === 'play') { update(STEP); acc -= STEP; n++; }
       if (n >= 6) acc = 0;
       updateHUD();
     } else acc = 0;
