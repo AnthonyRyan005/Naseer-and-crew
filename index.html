@@ -233,6 +233,11 @@ h2.title {
 .hearts svg { width: 17px; height: 17px; }
 #crewbar { display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: auto; }
 .portraits { display: flex; gap: 5px; }
+.portraits.many { gap: 4px; }
+.portraits.many .por { width: 40px; height: 40px; }
+@media (max-width: 380px) { .portraits.many .por { width: 36px; height: 36px; } }
+.allrow { margin: -6px 0 -4px; }
+#crewScreen:not(.friends-step) .allrow { display: none; }
 .por { position: relative; width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--ink); background: #fff; padding: 0;
   cursor: pointer; touch-action: none; box-shadow: 0 3px 0 var(--ink); }
 .por canvas { width: 100%; height: 100%; border-radius: 50%; display: block; }
@@ -337,7 +342,7 @@ h2.title {
 @media (max-height: 460px) { #bullyFace { display: none; } .choice { padding: 6px 12px; } .choice canvas, .choice .ico { width: 40px; height: 40px; } .choice b { font-size: 19px; } .choice small { font-size: 13px; } }
 
 /* ---------- the Annoy-Off: the cool bars are drawn on the game itself ---------- */
-#hud.duel .stat, #hud.duel #crewbar, #hud.duel #hackbar { visibility: hidden; }
+#hud.duel .stat, #hud.duel #crewbar, #hud.duel #hackbar { visibility: hidden; } /* the Annoy-Off and the boss games draw their own bars */
 .tb.duelsup { background: conic-gradient(rgba(255, 200, 61, 0.95) var(--chg, 0%), rgba(255, 255, 255, 0.45) 0); }
 .tb.duelsup.ready { animation: supGlow 0.6s ease-in-out infinite alternate; }
 @keyframes supGlow { from { box-shadow: 0 4px 0 rgba(29, 27, 58, 0.5), 0 0 0 0 rgba(255, 210, 61, 0.9); } to { box-shadow: 0 4px 0 rgba(29, 27, 58, 0.5), 0 0 0 12px rgba(255, 210, 61, 0); } }
@@ -463,6 +468,7 @@ h2.title {
         <button id="p1Btn" class="on">1 Player</button><button id="p2Btn">2 Players</button>
       </div>
       <p class="hint-line" id="crewHint">Tap a hero to play as them.</p>
+      <div class="row allrow"><button class="btn alt small" id="allBtn">Bring everyone</button></div>
       <div class="jobs" id="crewJobs"></div>
       <div class="crewgrid" id="crewGrid"></div>
       <div class="detail" id="crewDetail"></div>
@@ -545,6 +551,7 @@ h2.title {
           <li>Jump on Glitch Bots to bop them, throw your object at them, or use your special move. Pick what each hero throws on the "Pick your hero" screen.</li>
           <li>Before each level, pick your hero and up to 3 friends. Any mix works: if a job needs a friend who isn't in your crew, they pop in to help.</li>
           <li>If a baddie gets you, a friend is sent home and you lose a heart. Lose all 4 hearts and you start the level again.</li>
+          <li>Every level ends with a boss battle: Bully Invaders, Bully Pong, Bully Maze or the Schoolyard Showdown. Lose one and you can try it again straight away.</li>
           <li>Watch out for Crusher the bully! Stop him with special moves before a grown-up comes, or take him on one on one in an Annoy-Off. Annoy him until his keeping cool bar hits 100%. If yours gets there first, everyone gets sent home.</li>
           <li>If a grown-up catches you, they march a friend home. Win them back in a promise battle at the end of a level.</li>
           <li>Teachers can't be fought. Stand still in an open locker to hide, sneak behind them, or get Jaxxs to distract them.</li>
@@ -2151,7 +2158,7 @@ function startLevel() {
     needHero: null, need: null, chargeFlash: 0, winT: 0, pulse: null, hackTalk: 0, eshots: [], boss: null, hits: 0, ropeFrom: null, puddles: [],
     goop: [], darkK: L.dark ? 1 : 0, darkTo: L.dark ? 1 : 0, flashT: 0, boltT: rand(5, 9), chain: 0, chainT: -9, callouts: [], scene: null, party: null, chaseX: 0, thief: null,
     sp: null, movers: [], gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, boltFlash: 0,
-    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null, cameo: null, duel: null
+    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null, cameo: null, duel: null, mini: null, miniDone: false, miniStarting: false
   };
   G.bullyPlan = planBully(L); // Crusher the bully may turn up somewhere in this level
   // your hero (or two players' heroes) and up to 3 friends, always including friends with a job here
@@ -2743,6 +2750,7 @@ function update(dt) {
     return;
   }
   if (G.duel) { updateDuel(dt); return; } // the Annoy-Off with Crusher takes over until it's done
+  if (G.mini) { updateMini(dt); return; } // so does the boss game at the end of the level
   if (G.freeze > 0) {
     G.freeze -= dt;
     G.teachers.forEach((T) => (T.sayT -= dt));
@@ -2993,7 +3001,7 @@ function botsOnScreen() { return G.bots.filter((b) => live(b) && onScreen(b)); }
 const bossActive = () => G.boss && G.boss.state !== 'ko' && G.boss.state !== 'intro';
 
 function callHelp(id) {
-  if (!G || STATE.screen !== 'play' || G.trans || G.freeze > 0 || G.over || G.duel) return;
+  if (!G || STATE.screen !== 'play' || G.trans || G.freeze > 0 || G.over || G.duel || G.mini) return;
   if (G.cd[id] > 0) { portraitShake(id); SND.sfx('nope'); return; }
   const h = heroById(id), ld = leader();
   if (!h) { portraitShake(id); SND.sfx('nope'); toast(id, `${HEROES[id].name} was sent home and can't help this time.`); return; }
@@ -3120,7 +3128,7 @@ function combo(name) {
   banner('COMBO!', name + ' (+5 coins)');
 }
 function crewCharge() {
-  if (!G || G.meter < 100 || G.trans || G.freeze > 0 || G.over || G.duel || STATE.screen !== 'play') return;
+  if (!G || G.meter < 100 || G.trans || G.freeze > 0 || G.over || G.duel || G.mini || STATE.screen !== 'play') return;
   G.meter = 0; G.chargeFlash = 0.7; G.shake = 0.5; SND.sfx('charge');
   banner('CREW CHARGE!', 'Everyone, all at once');
   G.shield = Math.max(G.shield, 5);
@@ -3209,6 +3217,7 @@ function updateArena(dt) {
 }
 
 function levelComplete() {
+  if (miniPending()) return; // the boss game comes first
   G.over = true;
   const L = G.L, third = L.star3 === 'nohit' ? G.hits === 0 : G.caught === 0;
   const stars = [true, L.goldStar.got, third];
@@ -5751,7 +5760,7 @@ function battleWon() {
   G.homeIds = G.homeIds.filter((id) => id !== B.id);
   const h = makeHero(B.id); h.x = B.hx + 165 - h.w / 2; h.y = GROUND - h.h; h.face = -1; h.cheer = 2.5; h.inv = 0;
   G.crew.push(h); followers().forEach((e, i) => { e.slot = i; }); buildCrewBar();
-  if (STATE.friends && STATE.friends.length < MAX_FRIENDS && !STATE.friends.includes(B.id)) { STATE.friends = STATE.friends.concat(B.id); SAVE.friends = STATE.friends; writeSave(); }
+  if (STATE.friends && !STATE.friends.includes(B.id)) { STATE.friends = STATE.friends.concat(B.id); SAVE.friends = STATE.friends; writeSave(); }
   say(T, 'Oh, all right. But you\'d better behave!', 2.8);
   setTimeout(() => { if (G && G.battle === B) say(h, 'I\'m back! I\'ll be good, promise!', 2.2); }, 700);
   banner(`${NAME} IS BACK IN THE CREW!`, `${B.A.name} said yes. Now behave!`, { huge: true, dur: 3.2 });
@@ -5829,9 +5838,9 @@ function drawChore(c, q) {
 }
 
 /* ===================== Picking the crew ===================== */
-// Before each level you pick your hero and up to 3 friends.
+// Before each level you pick your hero and as many friends as you like: none, one, or the whole crew.
 // Any friend with a job in that level (like Spencer and the computer) always comes along.
-const MAX_FRIENDS = 3;
+const DEFAULT_FRIENDS = 3; // the first time you play, three friends come along
 const HACK_JOB = { school: 'switches on the AI computer', zombie: 'reverses the Goo Machine', treat: 'fixes the porch light' };
 const JOB_TEXT = {
   barrier: (th) => `smashes ${THEMES[th].n.barrier.toLowerCase()}`,
@@ -5857,8 +5866,8 @@ function neededFriends(picks, id) { return levelJobs(id).map((j) => j.hero).filt
 // any mix works: friends with a job here are handy, but if they're missing they pop in to help
 function crewFriends(picks, id) {
   const ok = (h) => HEROES[h] && !picks.includes(h) && !isGrounded(h);
-  if (STATE.friends) return STATE.friends.filter(ok).slice(0, MAX_FRIENDS);
-  return [...new Set(neededFriends(picks, id).concat(HERO_IDS.filter(ok)))].slice(0, MAX_FRIENDS); // first time: a full crew, handy friends first
+  if (STATE.friends) return STATE.friends.filter(ok);
+  return [...new Set(neededFriends(picks, id).concat(HERO_IDS.filter(ok)))].slice(0, DEFAULT_FRIENDS); // first time: handy friends first
 }
 // who shows in the crew bar: the crew, plus anyone sent home during this level
 function barIds() { return G ? HERO_IDS.filter((id) => G.crew.some((e) => e.id === id) || G.homeIds.includes(id)) : HERO_IDS; }
@@ -7091,6 +7100,995 @@ function duelCount(c, W, H) {
   c.restore();
 }
 
+/* ===================== Boss games at the end of every level ===================== */
+// Once a level's last job is done, a boss game decides it: Bully Invaders, Bully Pong, Bully Maze or the
+// Schoolyard Showdown. They take turns from one level to the next. Lose one, and you simply try that boss game again.
+const MINI_KINDS = ['invaders', 'pong', 'maze', 'fighter'];
+const MINI_GAMES = {}; // each boss game adds itself: size, start, update, draw, hud, buttons, help
+const MINI_INFO = {
+  invaders: { title: 'BULLY INVADERS!', goal: 'Throw poo at the bullies before they reach you. Hide behind the walls!', col: '#6a4cff', music: 'chase' },
+  pong: { title: 'BULLY PONG!', goal: 'Bat the poo past the bully with your lunch tray. First to 5 wins!', col: '#22c993', music: 'food' },
+  maze: { title: 'BULLY MAZE!', goal: 'Grab the coins and dodge the bullies. A golden toilet roll lets you chase them!', col: '#ff8a1f', music: 'disco' },
+  fighter: { title: 'SCHOOLYARD SHOWDOWN!', goal: 'Bonk the big bully until he gives up!', col: '#ff4d4d', music: 'boss' }
+};
+const MINI_HUD_H = 50;
+
+function miniFor(L) {
+  if (!L || L.battle || !L.id) return null;
+  let n = 0;
+  for (const a of ADV) for (let i = 0; i < a.levels.length; i++, n++) if (`${a.id}-${i + 1}` === L.id) return MINI_KINDS[n % MINI_KINDS.length];
+  return null;
+}
+function miniDiff(tries) { // later adventures are harder, and every try makes it a little easier again
+  const L = G.L, ai = Math.max(0, ADV.findIndex((a) => a.id === L.adv)), li = L.levelIdx || 0;
+  return clamp(0.12 + ai * 0.16 + li * 0.03 - tries * 0.12, 0, 0.75);
+}
+// called by levelComplete: true while the boss game still has to be won
+function miniPending() {
+  if (G.miniDone || G.mini || !MINI_GAMES[miniFor(G.L)]) return false;
+  if (!G.miniStarting) { G.miniStarting = true; startTrans(() => startMini()); }
+  return true;
+}
+
+/* ---------- starting, winning, losing ---------- */
+function startMini(retry) {
+  const kind = miniFor(G.L), game = kind && MINI_GAMES[kind];
+  G.miniStarting = false;
+  if (!game) { G.miniDone = true; return false; }
+  const tries = retry && G.mini ? G.mini.tries + 1 : 0, kids = G.players.map((p, i) => ({ pl: i, id: p.id }));
+  G.mini = { kind, kids }; // for a moment, so the screen layout knows which buttons this game has
+  const area = miniArea(), size = game.size(area.w, area.h);
+  const M = G.mini = {
+    kind, phase: retry ? 'count' : 'intro', t: 0, T: 0, count: -1, tries, diff: miniDiff(tries), w: size.w, h: size.h, vert: !!size.vert,
+    kids, fans: followers().map((e) => e.id), prev: [{}, {}], flash: 0, coins: 0
+  };
+  game.start(M);
+  G.parts = []; G.texts = []; G.callouts = []; G.shake = 0;
+  try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) { /* ignore */ }
+  joyEnd(); Input.held.clear(); Input.tapped.clear();
+  $('hud').classList.add('duel'); $('banner').hidden = true; $('toast').hidden = true;
+  layoutControls(); placeOverlays();
+  SND.setTrack(MINI_INFO[kind].music); if (!retry) SND.sfx('vs');
+  return true;
+}
+function miniWin(sub) {
+  const M = G.mini; if (!M || M.phase !== 'play') return;
+  M.phase = 'won'; M.t = 0; M.coins += 10;
+  banner('BOSS BEATEN!', `${sub} +${M.coins} coins`, { huge: true, dur: 2.6 });
+  SND.sfx('win'); G.shake = 0.3; M.flash = 0.3;
+}
+function miniLose(sub) {
+  const M = G.mini; if (!M || M.phase !== 'play') return;
+  M.phase = 'lost'; M.t = 0;
+  banner('SO CLOSE!', `${sub} Try again!`, { huge: true, dur: 2.6 });
+  SND.sfx('sad');
+}
+function finishMini() {
+  const M = G.mini;
+  G.mini = null; G.miniDone = true; G.parts = []; G.texts = []; G.callouts = [];
+  $('hud').classList.remove('duel'); $('toast').hidden = true;
+  joyEnd(); layoutControls(); placeOverlays();
+  G.coins += M.coins;
+  levelComplete();
+}
+function miniHelpToast() {
+  const M = G.mini, h = MINI_GAMES[M.kind].help, N = padNames();
+  const keys = STATE.players === 2 ? `Player 1: ${h.keys2[0]} Player 2: ${h.keys2[1]}` : h.keys;
+  toast(M.kids[0].id, touchOrKey(h.touch, keys, h.pad(N)), 6);
+}
+
+/* ---------- every frame ---------- */
+function updateMini(dt) {
+  const M = G.mini;
+  M.t += dt; M.flash = Math.max(0, M.flash - dt);
+  if (M.phase === 'intro' && M.t > 2.6) { M.phase = 'count'; M.t = 0; }
+  else if (M.phase === 'count') {
+    const n = Math.floor(M.t / 0.6);
+    if (n !== M.count && n <= 3) { M.count = n; SND.sfx(n < 3 ? 'tick' : 'go'); if (n === 0) miniHelpToast(); }
+    if (M.t > 2.4) { M.phase = 'play'; M.t = 0; }
+  } else if (M.phase === 'won' && M.t > 2.8) { finishMini(); return; }
+  else if (M.phase === 'lost' && M.t > 2.8) { startMini(true); return; }
+  if (M.phase === 'play') M.T += dt;
+  MINI_GAMES[M.kind].update(M, dt);
+  Input.tapped.clear();
+}
+
+/* ---------- controls ---------- */
+const MINI_KEYS1 = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'],
+  a: ['Space', 'KeyJ', 'KeyZ', 'KeyQ', 'Enter'], b: ['KeyX', 'KeyK', 'KeyF', 'KeyE'], c: ['KeyC', 'KeyL', 'KeyV', 'KeyR', 'ShiftLeft', 'ShiftRight'] };
+const MINI_KEYS2 = [
+  { up: ['KeyW'], down: ['KeyS'], left: ['KeyA'], right: ['KeyD'], a: ['Space', 'KeyQ'], b: ['KeyF', 'KeyE'], c: ['KeyR', 'KeyG'] },
+  { up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'], a: ['Enter', 'ShiftRight'], b: ['Slash', 'Quote'], c: ['Period', 'Comma'] }
+];
+// one call per player per frame: moves (-1 to 1), buttons held, and buttons just pressed
+function miniInput(pl) {
+  const M = G.mini, map = STATE.players === 2 ? MINI_KEYS2[pl] || MINI_KEYS1 : MINI_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
+  let mx = (has('right') ? 1 : 0) - (has('left') ? 1 : 0), my = (has('down') ? 1 : 0) - (has('up') ? 1 : 0);
+  const J = JOY[pl];
+  if (J) { const dx = J.x - J.ox, dy = J.y - J.oy; if (Math.hypot(dx, dy) > 8) { mx = dx / JOY_R; my = dy / JOY_R; } }
+  const P = Input.pad[pl];
+  if (P) {
+    if (Math.abs(P.ax || 0) > 0.2 || Math.abs(P.ay || 0) > 0.2) { mx = P.ax; my = P.ay; }
+    if (P.dl) mx = -1; if (P.dr) mx = 1; if (P.du) my = -1; if (P.dd) my = 1;
+  }
+  const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
+  const tb = (k) => Input.held.has(pl + ':' + k) || Input.tapped.has(pl + ':' + k);
+  const a = has('a') || tb('throw') || !!(P && (P.ba || P.rt)), b = has('b') || tb('action') || !!(P && P.bx), c = has('c') || tb('jump') || !!(P && (P.bb || P.by));
+  const pv = M.prev[pl] || {};
+  M.prev[pl] = { a, b, c, my };
+  return { mx, my, a, b, c, aP: a && !pv.a, bP: b && !pv.b, cP: c && !pv.c, upP: my < -0.5 && !(pv.my < -0.5) };
+}
+
+/* ---------- fitting the game on the screen ---------- */
+function miniArea() { // the part of the screen a boss game can use, in CSS pixels
+  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), top = SAFE.top + 8 + MINI_HUD_H + 8;
+  let bottom = H - SAFE.bottom - 6;
+  if (touch && (VIEW.portrait || twoPlayers())) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers()).top - 12); // keep the game clear of the buttons
+  else if (touch) bottom -= 8;
+  const left = SAFE.left + 6, right = W - SAFE.right - 6;
+  return { left, top, w: right - left, h: Math.max(160, bottom - top) };
+}
+let MINI_LAY = null, MINI_LAY_KEY = '';
+function miniLayout() {
+  const M = G.mini, W = VIEW.W, H = VIEW.H;
+  const key = [W, H, VIEW.portrait, touchControlsOn(), SAFE.top, SAFE.bottom, SAFE.left, SAFE.right, M.kind, M.w, M.h, G.players.length].join();
+  if (MINI_LAY && key === MINI_LAY_KEY) return MINI_LAY;
+  const A = miniArea(), s = Math.min(A.w / M.w, A.h / M.h, 1.6);
+  const ox = A.left + (A.w - M.w * s) / 2, oy = A.top + (A.h - M.h * s) / 2;
+  MINI_LAY_KEY = key;
+  return (MINI_LAY = { s, ox, oy, vx0: -ox / s, vx1: (W - ox) / s, vy0: -oy / s, vy1: (H - oy) / s });
+}
+
+/* ---------- drawing ---------- */
+function drawMini(c, t) {
+  const M = G.mini, game = MINI_GAMES[M.kind], Ly = miniLayout(), d = VIEW.dpr, sh = G.shake > 0 ? G.shake * 10 : 0, camSave = G.cam.x, wSave = VIEW.w;
+  c.setTransform(d * Ly.s, 0, 0, d * Ly.s, d * (Ly.ox + rand(-sh, sh)), d * (Ly.oy + rand(-sh, sh)));
+  G.cam.x = Ly.vx0; VIEW.w = Ly.vx1 - Ly.vx0; // bubbles and callouts keep themselves on screen using these
+  try {
+    game.draw(c, t, M, Ly);
+    drawParticles(c); drawFloatTexts(c);
+    if (G.callouts.length) drawCallouts(c);
+  } finally { G.cam.x = camSave; VIEW.w = wSave; }
+}
+function drawMiniOverlay(c, t) { // screen space: the game's top bar, the title card and the countdown
+  const M = G.mini, d = VIEW.dpr, W = VIEW.W, H = VIEW.H;
+  c.setTransform(d, 0, 0, d, 0, 0);
+  if (M.flash > 0) { c.fillStyle = `rgba(255,236,160,${M.flash * 1.6})`; c.fillRect(0, 0, W, H); }
+  MINI_GAMES[M.kind].hud(c, t, M);
+  if (M.phase === 'intro') miniTitle(c, t, M);
+  else if (M.phase === 'count') miniCount(c, M);
+}
+// the bar along the top: a box on the left for your side, one in the middle, one on the right
+function miniHudBoxes(c) {
+  const W = VIEW.W, top = SAFE.top + 8, left = SAFE.left + 10, right = W - SAFE.right - 62, h = MINI_HUD_H;
+  const side = Math.min(240, (right - left) * 0.3), mid = right - left - side * 2 - 16;
+  return { top, h, L: { x: left, w: side }, M: { x: left + side + 8, w: mid }, R: { x: right - side, w: side } };
+}
+function miniBox(c, x, y, w, h) { rrect(c, x, y, w, h, 14); blob(c, 'rgba(255,250,240,0.95)', 2.5); }
+function miniLabel(c, txt, x, y, size, col, align, maxW) {
+  c.font = `${size}px "Lilita One", sans-serif`; c.textAlign = align || 'center'; c.fillStyle = col || INK;
+  c.fillText(txt, x, y, maxW);
+}
+function heartPath(c, x, y, s) {
+  c.beginPath(); c.moveTo(x, y + s * 0.9);
+  c.bezierCurveTo(x - s * 1.4, y - s * 0.1, x - s * 0.8, y - s * 1.0, x, y - s * 0.3);
+  c.bezierCurveTo(x + s * 0.8, y - s * 1.0, x + s * 1.4, y - s * 0.1, x, y + s * 0.9); c.closePath();
+}
+function miniHearts(c, x, y, n, max, s) { // a row of hearts, filled for the ones you still have
+  for (let i = 0; i < max; i++) { heartPath(c, x + s + i * s * 2.5, y, s); blob(c, i < n ? '#ff4d6d' : '#d9d6ec', 2); }
+}
+function miniTitle(c, t, M) {
+  const W = VIEW.W, H = VIEW.H, info = MINI_INFO[M.kind], p = M.t / 2.6, inK = clamp(p / 0.15, 0, 1), e = 1 - Math.pow(1 - inK, 3), out = clamp((p - 0.88) / 0.12, 0, 1);
+  c.save(); c.globalAlpha = 1 - out;
+  c.fillStyle = 'rgba(16,14,40,0.92)'; c.fillRect(0, 0, W, H);
+  c.save(); c.translate(W / 2, H * 0.46); c.rotate(t * 0.25); c.fillStyle = info.col; c.globalAlpha = (1 - out) * 0.22;
+  const R = Math.max(W, H);
+  for (let i = 0; i < 12; i++) { c.rotate(Math.PI / 6); c.beginPath(); c.moveTo(0, 0); c.lineTo(-R * 0.18, -R); c.lineTo(R * 0.18, -R); c.closePath(); c.fill(); }
+  c.restore();
+  const S = Math.min(W * 0.26, H * 0.24), cy = H * 0.5;
+  c.save(); c.translate(W / 2, cy); c.scale(e, e);
+  // your hero, a poo, and a bully
+  const kx = -Math.min(W * 0.28, S * 1.3), bx = Math.min(W * 0.28, S * 1.3);
+  c.save(); c.beginPath(); c.arc(kx, 0, S / 2, 0, 7); c.clip(); c.drawImage(bigPortrait(M.kids[0].id), kx - S / 2, -S / 2, S, S); c.restore();
+  c.beginPath(); c.arc(kx, 0, S / 2, 0, 7); c.lineWidth = 6; c.strokeStyle = '#fff'; c.stroke();
+  c.save(); c.beginPath(); c.arc(bx, 0, S / 2, 0, 7); c.clip(); c.fillStyle = '#b3261e'; c.fillRect(bx - S / 2, -S / 2, S, S);
+  drawMiniBully(c, bx, S * 0.62, S / 64, { col: '#4b5160' }); c.restore();
+  c.beginPath(); c.arc(bx, 0, S / 2, 0, 7); c.lineWidth = 6; c.strokeStyle = '#fff'; c.stroke();
+  drawPoo(c, 0, Math.sin(t * 6) * 6, S / 46, { face: true, rot: Math.sin(t * 4) * 0.2 });
+  c.restore();
+  const ty = Math.max(SAFE.top + 50, cy - S / 2 - Math.min(W * 0.13, 84));
+  c.font = `700 ${Math.round(Math.min(W * 0.04, 18))}px Fredoka, sans-serif`; c.textAlign = 'center'; c.fillStyle = '#ffd23d';
+  c.fillText(M.tries ? 'BOSS BATTLE: TRY AGAIN' : 'BOSS BATTLE', W / 2, ty - Math.min(W * 0.09, 50));
+  c.font = `${Math.round(Math.min(W * 0.085, 54))}px "Lilita One", sans-serif`; c.lineWidth = 9; c.strokeStyle = INK;
+  c.strokeText(info.title, W / 2, ty, W - 24); c.fillStyle = '#fff'; c.fillText(info.title, W / 2, ty, W - 24);
+  c.font = `600 ${Math.round(Math.min(W * 0.04, 20))}px Fredoka, sans-serif`; c.lineWidth = 5;
+  const gy = cy + S / 2 + Math.min(H * 0.08, 56);
+  miniWrap(c, info.goal, W / 2, gy, Math.min(W - 40, 560), Math.round(Math.min(W * 0.04, 20)) + 6);
+  c.restore();
+}
+function miniWrap(c, txt, x, y, maxW, lh) { // centred text over more than one line if it needs to be
+  const words = txt.split(' '), lines = []; let line = '';
+  for (const w of words) { const test = line ? line + ' ' + w : w; if (c.measureText(test).width > maxW && line) { lines.push(line); line = w; } else line = test; }
+  if (line) lines.push(line);
+  lines.forEach((ln, i) => { c.strokeStyle = INK; c.strokeText(ln, x, y + i * lh); c.fillStyle = '#fff'; c.fillText(ln, x, y + i * lh); });
+}
+function miniCount(c, M) {
+  const W = VIEW.W, H = VIEW.H, Ly = miniLayout(), n = Math.min(3, Math.floor(M.t / 0.6)), p = (M.t - n * 0.6) / 0.6, txt = n < 3 ? String(3 - n) : 'GO!';
+  const s = p < 0.2 ? lerp(0.3, 1.25, p / 0.2) : p < 0.35 ? lerp(1.25, 1, (p - 0.2) / 0.15) : 1;
+  c.save(); c.globalAlpha = n < 3 ? 1 : clamp(1 - (p - 0.5) * 2, 0, 1); c.translate(W / 2, Ly.oy + M.h * Ly.s * 0.45); c.scale(s, s);
+  c.font = `${Math.round(Math.min(W, H) * 0.2)}px "Lilita One", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.lineWidth = 12; c.strokeStyle = INK; c.strokeText(txt, 0, 0); c.fillStyle = n < 3 ? '#fff' : '#ffd23d'; c.fillText(txt, 0, 0);
+  c.restore();
+}
+
+/* ---------- things the boss games share ---------- */
+function drawPoo(c, x, y, s, o) { // a cartoon poo swirl. The bullies' poo is darker and stinkier
+  o = o || {};
+  c.save(); c.translate(x, y); c.scale(s, s); if (o.rot) c.rotate(o.rot);
+  const col = o.bully ? '#5e4024' : o.gold ? '#ffc83d' : '#8b5a2b', hi = o.bully ? '#7a5634' : o.gold ? '#fff3b0' : '#b07a42';
+  ell(c, 0, 8, 17, 7); blob(c, col, 2.2);
+  ell(c, 0, 0, 13, 6.5); blob(c, col, 2.2);
+  ell(c, 0, -7, 9, 5.5); blob(c, col, 2.2);
+  c.beginPath(); c.moveTo(-4, -11); c.quadraticCurveTo(1, -21, 5, -14); c.quadraticCurveTo(3, -10, -4, -11); blob(c, col, 2);
+  c.fillStyle = hi; ell(c, -6, 6, 4, 1.6); c.fill(); ell(c, -4, -1, 3, 1.4); c.fill();
+  if (o.face) {
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(-4, 1, 3, 0, 7); c.arc(4, 1, 3, 0, 7); c.fill();
+    c.fillStyle = INK; c.beginPath(); c.arc(-3.5, 1.5, 1.4, 0, 7); c.arc(4.5, 1.5, 1.4, 0, 7); c.fill();
+    c.strokeStyle = INK; c.lineWidth = 1.6; c.beginPath(); c.arc(0, 5, 3, 0.2, Math.PI - 0.2); c.stroke();
+  }
+  if (o.stink) { c.strokeStyle = '#8bd04a'; c.lineWidth = 2; for (const sx of [-10, 0, 10]) { c.beginPath(); c.moveTo(sx, -18); c.quadraticCurveTo(sx + 5, -24, sx, -30); c.stroke(); } }
+  c.restore();
+}
+function drawMiniBully(c, x, y, s, o) { // a bully kid for the boss games (feet at x, y)
+  o = o || {};
+  const hood = o.scared ? '#a9c8ff' : o.col || '#4b5160', skin = o.scared ? '#e1ebff' : '#f0c6a0', up = o.frame ? 1 : 0;
+  c.save(); c.translate(x, y); c.scale(s * (o.face || 1), s);
+  if (o.alpha != null) c.globalAlpha *= o.alpha;
+  c.fillStyle = INK; c.fillRect(-10, -16, 8, 16); c.fillRect(2, -16, 8, 16);
+  ell(c, -6, -1, 7, 3.5); blob(c, '#fff', 1.6); ell(c, 6, -1, 7, 3.5); blob(c, '#fff', 1.6);
+  const ay = up ? -64 : -30, fist = (fx, fy) => { c.beginPath(); c.arc(fx, fy, 5, 0, 7); blob(c, skin, 1.8); };
+  limb(c, [-13, -36, -20, ay], 7, shade(hood, -0.1)); limb(c, [13, -36, 20, ay], 7, shade(hood, -0.1)); fist(-20, ay); fist(20, ay);
+  rrect(c, -15, -42, 30, 28, 9); blob(c, hood, 2.2);
+  c.fillStyle = o.scared ? '#7a9ad8' : '#e8432f'; c.beginPath(); c.moveTo(1, -38); c.lineTo(-4, -29); c.lineTo(0, -29); c.lineTo(-3, -21); c.lineTo(5, -31); c.lineTo(1, -31); c.lineTo(4, -38); c.closePath(); c.fill();
+  c.beginPath(); c.arc(0, -56, 15, 0, 7); blob(c, skin, 2.2);
+  c.beginPath(); c.arc(0, -56, 15.5, Math.PI * 1.02, Math.PI * 1.98); c.quadraticCurveTo(0, -66, -15, -58); c.closePath(); blob(c, o.scared ? '#5a6a8a' : '#3a2a20', 1.8);
+  c.strokeStyle = INK; c.lineCap = 'round';
+  if (o.scared) { // big worried eyes and a wobbly mouth
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(-5, -57, 4.5, 0, 7); c.arc(6, -57, 4.5, 0, 7); c.fill(); c.lineWidth = 1.5; c.stroke();
+    c.fillStyle = INK; c.beginPath(); c.arc(-5, -56, 1.8, 0, 7); c.arc(6, -56, 1.8, 0, 7); c.fill();
+    c.lineWidth = 2; c.beginPath(); c.moveTo(-6, -47); for (let i = 1; i <= 4; i++) c.lineTo(-6 + i * 3, -47 + (i % 2 ? -2 : 0)); c.stroke();
+  } else {
+    c.lineWidth = 2.5; c.beginPath(); c.moveTo(-9, -63); c.lineTo(-2, -59); c.moveTo(9, -63); c.lineTo(2, -59); c.stroke();
+    c.fillStyle = INK; c.beginPath(); c.arc(-5, -56, 2.1, 0, 7); c.arc(5, -56, 2.1, 0, 7); c.fill();
+    c.lineWidth = 2.2; c.beginPath(); c.moveTo(-5, -47); c.quadraticCurveTo(0, -50, 6, -47); c.stroke();
+  }
+  c.restore();
+}
+function drawToiletRoll(c, x, y, s, t) { // the golden toilet roll power-up
+  c.save(); c.translate(x, y + Math.sin(t * 4) * 2); c.scale(s, s);
+  c.shadowColor = '#ffe066'; c.shadowBlur = 14;
+  rrect(c, -11, -12, 22, 24, 6); blob(c, '#fffdf4', 2.2); c.shadowBlur = 0;
+  ell(c, 0, -12, 11, 4); blob(c, '#fffdf4', 2); ell(c, 0, -12, 4, 1.6); c.fillStyle = '#c8a24a'; c.fill();
+  c.fillStyle = '#ffd23d'; c.fillRect(-11, -2, 22, 4);
+  c.restore();
+}
+
+/* ---------- Boss game 1: Bully Invaders (like Space Invaders) ---------- */
+// Rows of bullies march side to side and creep down. Throw poo up at them before they reach you.
+// They throw poo back, and every splat knocks a brick out of your walls.
+const INV_SKY = { school: ['#1b2a5a', '#46609e'], park: ['#2c5d8f', '#8fd3ff'], zombie: ['#101a28', '#2f4a3a'], treat: ['#140f33', '#43307a'] };
+const INV_GROUND = { school: '#5d6f9e', park: '#5aa84a', zombie: '#3a4a40', treat: '#4e4062' };
+const INV_ROWS = ['#b3261e', '#6a3fc0', '#2f6b4f', '#4b5160'];
+const INV_CELL = 14;
+MINI_GAMES.invaders = {
+  buttons: [{ k: 'throw', label: 'THROW', sub: 'Poo' }],
+  help: {
+    touch: 'Move with your left thumb. Hold THROW to throw poo at the bullies. Hide behind the walls!',
+    keys: 'Move with ← → or A D. Hold Space to throw poo at the bullies. Hide behind the walls!',
+    keys2: ['A D move, Space throws.', '← → move, Enter throws.'],
+    pad: (N) => `Move with the stick. Hold ${N.jump} to throw poo at the bullies. Hide behind the walls!`
+  },
+  size(aw, ah) { const h = aw / ah > 1.6 ? 500 : 640; return { w: clamp(Math.round((h * aw) / ah), 520, 900), h }; }, // shorter on wide screens, so it fills them
+  start(M) {
+    const w = M.w, n = M.kids.length;
+    M.ky = M.h - 34; M.wy = M.ky - 138; // where the kids stand, and the top of their walls
+    M.kids.forEach((k, i) => Object.assign(k, { x: w * (n === 2 ? 0.35 + i * 0.3 : 0.5), y: M.ky, face: 1, cd: 0, throwT: 0, hurtT: 0, walk: 0, vx: 0 }));
+    M.hearts = M.maxHearts = n === 2 ? 6 : 4;
+    const cols = clamp(Math.floor((w - 150) / 80), 5, 8), rows = M.diff < 0.3 ? 3 : 4; // fewer bullies in the early adventures
+    M.cols = cols; M.sx = 74; M.sy = 60;
+    M.bullies = [];
+    for (let r = 0; r < rows; r++) for (let c2 = 0; c2 < cols; c2++) M.bullies.push({ r, c: c2, alive: true });
+    M.total = M.bullies.length;
+    M.gx = (w - (cols - 1) * M.sx) / 2 - 40; M.gy = 108; M.dir = 1; M.frame = 0; M.frameT = 0; M.note = 0;
+    M.poos = []; M.fireT = 1.6; M.ufo = null; M.ufoT = rand(9, 14);
+    const nw = w > 700 ? 4 : 3, cw = 7;
+    M.walls = Array.from({ length: nw }, (_, i) => {
+      const x = (w * (i + 1)) / (nw + 1) - (cw * INV_CELL) / 2;
+      const cells = [0, 1, 2].map((r) => Array.from({ length: cw }, (_, c2) => !(r === 2 && c2 >= 2 && c2 <= 4) && !(r === 0 && (c2 === 0 || c2 === cw - 1))));
+      return { x, y: M.wy, cells };
+    });
+  },
+  bullyPos(M, B) { return { x: M.gx + B.c * M.sx, y: M.gy + B.r * M.sy }; },
+  update(M, dt) {
+    const play = M.phase === 'play', w = M.w, alive = M.bullies.filter((B) => B.alive), left = alive.length / M.total;
+    // the march: faster as there are fewer of them, and with every new adventure
+    M.frameT -= dt;
+    if (M.frameT <= 0) { M.frameT = 0.18 + 0.4 * left; M.frame ^= 1; if (play) { SND.tone([98, 92, 87, 82][M.note++ % 4], 0.09, 'triangle', 0.16); } }
+    for (const k of M.kids) { k.throwT = Math.max(0, k.throwT - dt); k.hurtT = Math.max(0, k.hurtT - dt); k.cd = Math.max(0, k.cd - dt); }
+    if (!play) { M.poos.forEach((q) => { q.y += q.vy * dt; }); M.poos = M.poos.filter((q) => q.y > -40 && q.y < M.h + 40); return; }
+    const v = (24 + 130 * Math.pow(1 - left, 1.6)) * (1 + M.diff * 0.7);
+    M.gx += M.dir * v * dt;
+    let minX = Infinity, maxX = -Infinity, maxY = 0;
+    for (const B of alive) { const p = this.bullyPos(M, B); minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); }
+    if ((M.dir > 0 && maxX > w - 34) || (M.dir < 0 && minX < 34)) { M.dir = -M.dir; M.gy += 24; }
+    for (const B of alive) { // bullies knock out any bricks they walk into
+      const p = this.bullyPos(M, B);
+      for (const Wl of M.walls) Wl.cells.forEach((row, r) => row.forEach((on, c2) => { if (on && Math.abs(Wl.x + (c2 + 0.5) * INV_CELL - p.x) < 24 && p.y > Wl.y + r * INV_CELL && p.y - 46 < Wl.y + (r + 1) * INV_CELL) row[c2] = false; }));
+    }
+    if (maxY >= M.ky - 44) { miniLose('The bullies got to you!'); return; }
+    // the kids
+    for (const k of M.kids) {
+      const inp = miniInput(k.pl);
+      k.vx = inp.mx * 360; k.x = clamp(k.x + k.vx * dt, 28, w - 28);
+      if (Math.abs(inp.mx) > 0.2) { k.face = sign(inp.mx); k.walk += dt * 14; }
+      if (inp.a && k.cd <= 0 && M.poos.filter((q) => q.kid === k).length < 2) {
+        M.poos.push({ kid: k, x: k.x, y: k.y - 74, vy: -640, spin: 0 }); k.cd = 0.3; k.throwT = 0.18; SND.sfx('throw');
+      }
+    }
+    // the bullies throw back, from the front of each row of them
+    M.fireT -= dt;
+    const maxB = 2 + Math.round(M.diff * 3);
+    if (M.fireT <= 0 && alive.length) {
+      M.fireT = rand(1.1, 2.0) * (1 - M.diff * 0.45) * (0.55 + 0.45 * left);
+      if (M.poos.filter((q) => !q.kid).length < maxB) {
+        const front = {};
+        for (const B of alive) if (!front[B.c] || front[B.c].r < B.r) front[B.c] = B;
+        const cands = Object.values(front), aim = pick(M.kids);
+        const B = Math.random() < 0.55 ? cands.reduce((a, b) => (Math.abs(this.bullyPos(M, b).x - aim.x) < Math.abs(this.bullyPos(M, a).x - aim.x) ? b : a)) : pick(cands);
+        const p = this.bullyPos(M, B); B.throwT = 0.25;
+        M.poos.push({ x: p.x, y: p.y - 20, vy: 170 + 130 * M.diff, spin: 0 });
+      }
+    }
+    for (const B of alive) if (B.throwT > 0) B.throwT -= dt;
+    // Crusher scoots across the top now and then. Splat him for bonus coins
+    M.ufoT -= dt;
+    if (!M.ufo && M.ufoT <= 0) { const fromL = Math.random() < 0.5; M.ufo = { x: fromL ? -60 : w + 60, y: 52, vx: (fromL ? 1 : -1) * 150, t: 0 }; SND.sfx('honk'); }
+    if (M.ufo) { const U = M.ufo; U.x += U.vx * dt; U.t += dt; if (U.x < -90 || U.x > w + 90) { M.ufo = null; M.ufoT = rand(12, 18); } }
+    // poo in the air
+    for (const q of M.poos) {
+      q.y += q.vy * dt; q.spin += dt * 9;
+      if (q.kid) {
+        for (const B of alive) {
+          const p = this.bullyPos(M, B);
+          if (B.alive && Math.abs(q.x - p.x) < 24 && q.y < p.y && q.y > p.y - 50) {
+            B.alive = false; q.dead = true; M.coins += 1;
+            puff(p.x, p.y - 24, 12, '#8b5a2b', 200); floatText(p.x, p.y - 56, pick(['SPLAT!', 'EWWW!', 'YUCK!']), '#ffd23d'); SND.sfx('splat');
+            break;
+          }
+        }
+        if (!q.dead && M.ufo && Math.abs(q.x - M.ufo.x) < 40 && Math.abs(q.y - (M.ufo.y - 20)) < 34) {
+          q.dead = true; M.coins += 5; puff(M.ufo.x, M.ufo.y - 20, 18, '#8b5a2b', 260); floatText(M.ufo.x, M.ufo.y + 10, '+5 coins!', '#ffd23d', true); SND.sfx('coin');
+          M.ufo = null; M.ufoT = rand(12, 18);
+        }
+        if (!q.dead) for (const o of M.poos) if (!o.kid && !o.dead && Math.abs(o.x - q.x) < 16 && Math.abs(o.y - q.y) < 18) { o.dead = q.dead = true; puff(q.x, q.y, 6, '#8b5a2b', 100); SND.sfx('pop'); break; }
+        if (q.y < -30) q.dead = true;
+      } else {
+        for (const Wl of M.walls) { // bully poo knocks bricks out of your walls
+          const c2 = Math.floor((q.x - Wl.x) / INV_CELL), r = Math.floor((q.y + 6 - Wl.y) / INV_CELL);
+          if (r >= 0 && r < 3 && c2 >= 0 && c2 < Wl.cells[0].length && Wl.cells[r][c2]) {
+            Wl.cells[r][c2] = false; q.dead = true;
+            const nb = [[r + 1, c2], [r, c2 - 1], [r, c2 + 1]].filter(([rr, cc]) => rr < 3 && cc >= 0 && cc < Wl.cells[0].length && Wl.cells[rr][cc]);
+            if (nb.length && Math.random() < 0.6) { const [rr, cc] = pick(nb); Wl.cells[rr][cc] = false; }
+            puff(q.x, q.y, 8, '#c65a3a', 120); SND.sfx('thud'); break;
+          }
+        }
+        if (!q.dead) for (const k of M.kids) {
+          if (Math.abs(q.x - k.x) < 22 && q.y > k.y - 72 && q.y < k.y) {
+            q.dead = true; puff(q.x, q.y, 10, '#5e4024', 160);
+            if (k.hurtT <= 0) {
+              k.hurtT = 1.6; M.hearts--; G.shake = 0.25; SND.sfx('splat'); floatText(k.x, k.y - 90, pick(['EWW!', 'GROSS!', 'YUCK!']), '#9bff8a', true);
+              if (M.hearts <= 0) { miniLose('Too much bully poo!'); return; }
+            }
+            break;
+          }
+        }
+        if (q.y > M.h + 30) q.dead = true;
+      }
+    }
+    M.poos = M.poos.filter((q) => !q.dead);
+    if (!M.bullies.some((B) => B.alive)) miniWin('All the bullies ran home!');
+  },
+  draw(c, t, M, Ly) {
+    const th = G.L.theme, sky = INV_SKY[th] || INV_SKY.school, x0 = Ly.vx0 - 10, x1 = Ly.vx1 + 10, y0 = Ly.vy0 - 10, y1 = Ly.vy1 + 10;
+    const KY = M.ky, g = c.createLinearGradient(0, y0, 0, KY); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]);
+    c.fillStyle = g; c.fillRect(x0, y0, x1 - x0, KY - y0);
+    if (th !== 'park') for (let i = 0; i < 40; i++) { const sx = x0 + ((i * 137.5) % (x1 - x0)), sy = y0 + ((i * 71.3) % (KY - y0 - 120)); c.fillStyle = `rgba(255,255,255,${0.35 + 0.35 * Math.sin(t * 2 + i)})`; c.fillRect(sx, sy, 2.5, 2.5); }
+    c.fillStyle = th === 'park' ? '#ffd23d' : '#f6f0c8'; c.beginPath(); c.arc(M.w - 70, 70, 26, 0, 7); c.fill();
+    c.fillStyle = INV_GROUND[th] || INV_GROUND.school; c.fillRect(x0, KY + 4, x1 - x0, y1 - KY); c.fillStyle = INK; c.fillRect(x0, KY + 3, x1 - x0, 3);
+    // how far down the bullies may come
+    c.save(); c.setLineDash([10, 10]); c.strokeStyle = 'rgba(255,97,80,0.55)'; c.lineWidth = 3; c.beginPath(); c.moveTo(0, KY - 44); c.lineTo(M.w, KY - 44); c.stroke(); c.restore();
+    for (const Wl of M.walls) Wl.cells.forEach((row, r) => row.forEach((on, c2) => {
+      if (!on) return;
+      const bx = Wl.x + c2 * INV_CELL, by = Wl.y + r * INV_CELL;
+      c.fillStyle = '#c65a3a'; c.fillRect(bx, by, INV_CELL, INV_CELL); c.fillStyle = '#e07a54'; c.fillRect(bx, by, INV_CELL, 3);
+      c.strokeStyle = INK; c.lineWidth = 1.5; c.strokeRect(bx, by, INV_CELL, INV_CELL);
+    }));
+    for (const B of M.bullies) if (B.alive) { const p = this.bullyPos(M, B); drawMiniBully(c, p.x, p.y, 0.64, { col: INV_ROWS[B.r % INV_ROWS.length], frame: B.throwT > 0 ? 1 : M.frame, face: (B.c + B.r) % 2 ? 1 : -1 }); }
+    if (M.ufo) { // Crusher on his scooter
+      const U = M.ufo, d = sign(U.vx);
+      c.save(); c.translate(U.x, U.y); c.scale(d, 1);
+      c.strokeStyle = INK; c.lineWidth = 3; c.beginPath(); c.moveTo(-20, 8); c.lineTo(18, 8); c.lineTo(22, -34); c.stroke(); c.beginPath(); c.moveTo(16, -34); c.lineTo(28, -34); c.stroke();
+      for (const wx of [-18, 18]) { c.beginPath(); c.arc(wx, 12, 6, 0, 7); blob(c, '#5a5f7a', 2); }
+      c.restore();
+      drawMiniBully(c, U.x - d * 2, U.y + 6, 0.6, { col: '#4b5160', face: d, frame: 1 });
+    }
+    for (const q of M.poos) drawPoo(c, q.x, q.y, q.kid ? 0.8 : 0.72, q.kid ? { rot: Math.sin(q.spin) * 0.3 } : { bully: true, stink: true, rot: Math.sin(q.spin) * 0.25 });
+    M.kids.forEach((k, i) => {
+      const blink = k.hurtT > 0 && Math.floor(t * 12) % 2 ? 0.35 : 1;
+      drawHero(c, k.id, k.x, k.y, { t, pose: k.throwT > 0 ? 'punch' : Math.abs(k.vx) > 30 ? 'run' : 'idle', face: k.face, phase: k.walk, alpha: blink, bike: k.id === 'ollie', drone: k.id === 'spencer' });
+      if (M.kids.length === 2) { c.fillStyle = i ? '#ff8a1f' : '#2f8cff'; c.beginPath(); const my = k.y - 100 + Math.sin(t * 5) * 2; c.moveTo(k.x - 7, my - 8); c.lineTo(k.x + 7, my - 8); c.lineTo(k.x, my); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); }
+    });
+  },
+  hud(c, t, M) {
+    const B = miniHudBoxes(c), y = B.top, h = B.h, left = M.bullies.filter((b) => b.alive).length;
+    miniBox(c, B.L.x, y, B.L.w, h); miniHearts(c, B.L.x + 10, y + h / 2 + 2, M.hearts, M.maxHearts, Math.min(9, (B.L.w - 20) / (M.maxHearts * 2.5)));
+    miniBox(c, B.M.x, y, B.M.w, h);
+    miniLabel(c, 'BULLY INVADERS', B.M.x + B.M.w / 2, y + 20, 15, '#6a4cff', 'center', B.M.w - 12);
+    miniLabel(c, `Bullies left: ${left}`, B.M.x + B.M.w / 2, y + 40, 16, INK, 'center', B.M.w - 12);
+    miniBox(c, B.R.x, y, B.R.w, h);
+    ell(c, B.R.x + 22, y + h / 2, 9, 10); blob(c, '#ffd23d', 2.2); miniLabel(c, String(M.coins), B.R.x + 40, y + h / 2 + 7, 20, INK, 'left');
+  }
+};
+
+/* ---------- Boss game 2: Bully Pong ---------- */
+// Bat a poo back and forth with a lunch tray. Get it past the bully 5 times before he gets it past you 5 times.
+// Sideways on wide screens; on an upright phone it plays up and down instead, with you at the bottom.
+const PONG_COURT = { school: ['#3f7d5a', '#478c65'], park: ['#3f8f4a', '#4a9c55'], zombie: ['#3a4a40', '#425346'], treat: ['#4e3a6e', '#574278'] };
+MINI_GAMES.pong = {
+  buttons: [],
+  help: {
+    touch: 'Hold your thumb on the screen and slide it to move your lunch tray. Bat the poo past the bully!',
+    keys: 'Move your lunch tray with the arrow keys or W A S D. Bat the poo past the bully!',
+    keys2: ['W S (or A D) move your tray.', 'The arrow keys move your tray.'],
+    pad: () => 'Move your lunch tray with the stick. Bat the poo past the bully!'
+  },
+  size(aw, ah) { return Math.min(aw / 460, ah / 780) > Math.min(aw / 900, ah / 500) * 1.05 ? { w: 460, h: 780, vert: true } : { w: 900, h: 500 }; }, // whichever way round shows it bigger
+  start(M) {
+    M.LEN = M.vert ? M.h : M.w; M.WID = M.vert ? M.w : M.h;
+    const two = M.kids.length === 2;
+    const ku = M.vert ? 112 : 74; // upright, everyone stands a little further in so they stay on the court
+    M.kids.forEach((k, i) => Object.assign(k, { u: two && i === 1 ? ku + 104 : ku, v: M.WID / 2, len: two ? 108 : 124, vel: 0, hitT: 0 }));
+    M.bully = { u: M.LEN - (M.vert ? 122 : 74), v: M.WID / 2, len: 100, vel: 0, target: M.WID / 2, thinkT: 0, hitT: 0, say: '', sayT: 0 };
+    M.ball = { u: M.LEN / 2, v: M.WID / 2, vu: 0, vv: 0, r: 17, speed: 0, spin: 0, smash: 0 };
+    M.score = [0, 0]; M.goal = 5; M.serveT = 1.0; M.serveDir = -1; M.hits = 0; M.trail = [];
+  },
+  map(M, u, v) { return M.vert ? { x: v, y: M.LEN - u } : { x: u, y: v }; }, // court position to drawing position
+  update(M, dt) {
+    const play = M.phase === 'play', ball = M.ball, B = M.bully;
+    B.sayT -= dt; B.hitT = Math.max(0, B.hitT - dt);
+    for (const k of M.kids) {
+      k.hitT = Math.max(0, k.hitT - dt);
+      if (!play) continue;
+      const inp = miniInput(k.pl), axis = M.vert ? inp.mx || inp.my : inp.my || inp.mx;
+      k.vel = axis * 560; k.v = clamp(k.v + k.vel * dt, k.len / 2, M.WID - k.len / 2);
+    }
+    if (!play) return;
+    // the bully watches the poo and moves his tray to where it will arrive, not always quickly enough
+    B.thinkT -= dt;
+    if (B.thinkT <= 0) {
+      B.thinkT = 0.16 - 0.08 * M.diff + rand(0, 0.08);
+      const err = (75 - 45 * M.diff) * (0.5 + ball.speed / 600); // fast poo is harder to judge
+      B.target = ball.vu > 0 && M.serveT <= 0 ? this.predict(M, B.u - 9 - ball.r) + rand(-1, 1) * err + (B.fumble || 0) : M.WID / 2 + (ball.v - M.WID / 2) * 0.3;
+    }
+    const maxV = 280 + 280 * M.diff;
+    B.vel = clamp((B.target - B.v) * 8, -maxV, maxV); B.v = clamp(B.v + B.vel * dt, B.len / 2, M.WID - B.len / 2);
+    if (M.serveT > 0) {
+      M.serveT -= dt; ball.u = M.LEN / 2; ball.v = M.WID / 2; ball.vu = ball.vv = 0;
+      if (M.serveT <= 0) { const a = rand(-0.45, 0.45); ball.speed = 360 + 120 * M.diff; ball.vu = Math.cos(a) * ball.speed * M.serveDir; ball.vv = Math.sin(a) * ball.speed; ball.smash = 0; M.hits = 0; SND.sfx('whistle'); }
+      return;
+    }
+    ball.u += ball.vu * dt; ball.v += ball.vv * dt; ball.spin += dt * sign(ball.vu) * 9;
+    M.trail.push({ u: ball.u, v: ball.v }); if (M.trail.length > 8) M.trail.shift();
+    if (ball.v < ball.r) { ball.v = ball.r; ball.vv = Math.abs(ball.vv); SND.sfx('bounce'); }
+    if (ball.v > M.WID - ball.r) { ball.v = M.WID - ball.r; ball.vv = -Math.abs(ball.vv); SND.sfx('bounce'); }
+    const hits = (p) => ball.u - ball.r <= p.u + 8 && ball.u + ball.r >= p.u - 8 && Math.abs(ball.v - p.v) <= p.len / 2 + ball.r * 0.8;
+    if (ball.vu < 0) { for (const k of M.kids.slice().sort((a, b) => b.u - a.u)) if (hits(k)) { this.bat(M, k, 1); break; } }
+    else if (hits(B)) this.bat(M, B, -1);
+    if (ball.u < -ball.r) this.point(M, false);
+    else if (ball.u > M.LEN + ball.r) this.point(M, true);
+  },
+  predict(M, atU) { // where the poo will cross a line, bouncing off the sides on the way
+    const b = M.ball, tt = (atU - b.u) / (b.vu || 1), v = b.v + b.vv * Math.max(0, tt), lo = b.r, span = M.WID - 2 * b.r;
+    let x = (v - lo) % (2 * span); if (x < 0) x += 2 * span;
+    return lo + (x > span ? 2 * span - x : x);
+  },
+  bat(M, p, dir) {
+    const b = M.ball, off = clamp((b.v - p.v) / (p.len / 2), -1, 1), ang = clamp(off * 0.95 + (p.vel / 560) * (dir > 0 ? 0.35 : 0.15), -1.05, 1.05); // hitting it while you move sends it at an angle
+    b.speed = Math.min(b.speed * 1.08, 980); // every hit is a bit faster, so rallies always end
+    let sp = b.speed;
+    b.smash = 0;
+    if (dir < 0 && ++M.hits >= 4 && Math.random() < 0.25 + M.diff * 0.5) { // the bully's Stinky Smash: extra fast
+      M.hits = 0; b.smash = 1; sp *= 1.35; p.say = 'STINKY SMASH!'; p.sayT = 1.2; SND.sfx('roar');
+    }
+    b.vu = Math.cos(ang) * sp * dir; b.vv = Math.sin(ang) * sp; b.u = p.u + dir * (9 + b.r);
+    p.hitT = 0.2; SND.sfx(dir > 0 ? 'kick' : 'bounce');
+    if (dir > 0) M.bully.fumble = Math.random() < 0.16 - 0.1 * M.diff ? pick([-1, 1]) * rand(70, 110) : 0; // now and then the bully just gets it wrong
+    const m = this.map(M, b.u, b.v); sparks(m.x, m.y, 6, dir > 0 ? '#ffd23d' : '#ff8a8a');
+    if (dir > 0 && Math.random() < 0.3) floatText(m.x, m.y - 30, pick(['WHACK!', 'BOINK!', 'TAKE THAT!']), '#ffd23d');
+  },
+  point(M, kids) {
+    const b = M.ball, m = this.map(M, clamp(b.u, 0, M.LEN), b.v);
+    M.score[kids ? 0 : 1]++;
+    puff(m.x, m.y, 16, '#8b5a2b', 220); G.shake = 0.3; SND.sfx('splat');
+    G.callouts.push({ txt: kids ? 'POINT!' : 'SPLAT!', col: kids ? '#9bff8a' : '#ff8a8a', x: m.x, y: m.y - 30, t: 0, n: kids ? 3 : 2 });
+    if (kids) { M.bully.say = pick(['NO FAIR!', 'EWWW!', 'Lucky shot!']); M.bully.sayT = 1.4; }
+    if (M.score[0] >= M.goal) { miniWin('The bully got splatted!'); return; }
+    if (M.score[1] >= M.goal) { miniLose('The bully won this time.'); return; }
+    M.serveT = 1.1; M.serveDir = kids ? 1 : -1; M.trail = []; // the next serve goes to whoever lost the point
+  },
+  draw(c, t, M, Ly) {
+    const th = G.L.theme, col = PONG_COURT[th] || PONG_COURT.school, x0 = Ly.vx0 - 10, y0 = Ly.vy0 - 10, x1 = Ly.vx1 + 10, y1 = Ly.vy1 + 10;
+    c.fillStyle = shade(col[0], -0.25); c.fillRect(x0, y0, x1 - x0, y1 - y0);
+    const W = M.w, H = M.h;
+    rrect(c, 0, 0, W, H, 16); blob(c, col[0], 4);
+    c.save(); rrect(c, 0, 0, W, H, 16); c.clip();
+    for (let i = 0; i < 12; i += 2) { c.fillStyle = col[1]; if (M.vert) c.fillRect(0, (H / 12) * i, W, H / 12); else c.fillRect((W / 12) * i, 0, W / 12, H); }
+    const end = (u0, u1, fill) => { const a = this.map(M, u0, 0), b = this.map(M, u1, M.WID); c.fillStyle = fill; c.fillRect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y)); };
+    end(0, 40, 'rgba(47,140,255,0.25)'); end(M.LEN - 40, M.LEN, 'rgba(255,77,77,0.25)');
+    c.restore();
+    c.save(); c.setLineDash([14, 12]); c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 4;
+    const n0 = this.map(M, M.LEN / 2, 0), n1 = this.map(M, M.LEN / 2, M.WID); c.beginPath(); c.moveTo(n0.x, n0.y); c.lineTo(n1.x, n1.y); c.stroke(); c.restore();
+    c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 4; c.beginPath(); const cc = this.map(M, M.LEN / 2, M.WID / 2); c.arc(cc.x, cc.y, 60, 0, 7); c.stroke();
+    // trays, and the kids and the bully holding them
+    const tray = (p, colr) => {
+      const m = this.map(M, p.u, p.v), tw = M.vert ? p.len : 16, tht = M.vert ? 16 : p.len;
+      rrect(c, m.x - tw / 2, m.y - tht / 2, tw, tht, 6); blob(c, p.hitT > 0 ? '#ffffff' : colr, 3);
+      c.strokeStyle = 'rgba(29,27,58,0.35)'; c.lineWidth = 2;
+      for (const f of [-0.2, 0.2]) { c.beginPath(); if (M.vert) { c.moveTo(m.x + p.len * f, m.y - 5); c.lineTo(m.x + p.len * f, m.y + 5); } else { c.moveTo(m.x - 5, m.y + p.len * f); c.lineTo(m.x + 5, m.y + p.len * f); } c.stroke(); }
+    };
+    M.kids.forEach((k, i) => {
+      const s = this.map(M, k.u - (M.vert ? 28 : 46), k.v);
+      drawHero(c, k.id, s.x, s.y + (M.vert ? 0 : 34), { t, pose: k.hitT > 0 ? 'punch' : Math.abs(k.vel) > 40 ? 'run' : 'idle', face: M.vert ? (k.vel < 0 ? -1 : 1) : 1, phase: t * 12, scale: 0.85, bike: false, drone: k.id === 'spencer' });
+      tray(k, i ? '#ffcf9a' : '#bfe0ff');
+    });
+    const B = M.bully, bs = this.map(M, B.u + (M.vert ? 24 : 50), B.v);
+    c.save(); c.translate(bs.x, bs.y + (M.vert ? 0 : 40)); c.scale(0.62, 0.62);
+    drawCrusher(c, { x: -25, w: 50, y: -106, h: 106, dir: M.vert ? 1 : -1, state: B.hitT > 0 ? 'shove' : Math.abs(B.vel) > 40 ? 'walk' : 'taunt', flash: 0, walk: t * 8 }, t);
+    c.restore();
+    tray(B, '#ffb3b3');
+    // the poo
+    const b = M.ball;
+    if (M.serveT <= 0 || M.phase !== 'play') {
+      M.trail.forEach((q, i) => { const m = this.map(M, q.u, q.v); c.globalAlpha = (i / M.trail.length) * 0.35; c.fillStyle = b.smash ? '#8bd04a' : '#8b5a2b'; c.beginPath(); c.arc(m.x, m.y, b.r * 0.6, 0, 7); c.fill(); });
+      c.globalAlpha = 1;
+    }
+    const bm = this.map(M, b.u, b.v);
+    drawPoo(c, bm.x, bm.y + 4, 1.0, { rot: b.spin * 0.3, face: true, stink: !!b.smash, bully: !!b.smash });
+    if (B.sayT > 0) { const sm = this.map(M, B.u + 40, B.v); bubble(c, sm.x, sm.y - (M.vert ? 70 : 64), B.say, true, true); }
+  },
+  hud(c, t, M) {
+    const Bx = miniHudBoxes(c), y = Bx.top, h = Bx.h;
+    const side = (box, name, n, colr) => {
+      miniBox(c, box.x, y, box.w, h); miniLabel(c, name, box.x + 12, y + 31, 16, colr, 'left', box.w - 60);
+      miniLabel(c, String(n), box.x + box.w - 14, y + 37, 30, INK, 'right');
+    };
+    side(Bx.L, STATE.players === 2 ? 'Kids' : HEROES[M.kids[0].id].name, M.score[0], '#2f8cff');
+    side(Bx.R, 'Crusher', M.score[1], '#ff4d4d');
+    miniBox(c, Bx.M.x, y, Bx.M.w, h);
+    miniLabel(c, 'BULLY PONG', Bx.M.x + Bx.M.w / 2, y + 20, 15, '#22c993', 'center', Bx.M.w - 12);
+    miniLabel(c, `First to ${M.goal} wins`, Bx.M.x + Bx.M.w / 2, y + 40, 16, INK, 'center', Bx.M.w - 12);
+  }
+};
+
+/* ---------- Boss game 3: Bully Maze (like Pac-Man) ---------- */
+// Grab enough coins in the maze while bullies chase you. A golden toilet roll turns the tables for a few
+// seconds: the bullies get scared, and catching one sends him back to the bully room.
+const MAZE_WIDE = ['#####################', '#o........#........o#', '#.###.###.#.###.###.#', '#...................#', '#.###.#.##-##.#.###.#',
+  '#.....#.#BBB#.#.....#', '###.#.#.#####.#.#.###', '#...#.....K.....#...#', '#.#.###.#####.###.#.#', '#.#.....#...#.....#.#', '#.###.#.#.#.#.#.###.#',
+  '#o....#...#...#....o#', '#####################'];
+const MAZE_TALL = ['#############', '#o.........o#', '#.##.###.##.#', '#...........#', '#.#.##-##.#.#', '#.#.#BBB#.#.#', '#...#####...#', '###.#...#.###',
+  '#.....#.....#', '#.###.#.###.#', '#.....K.....#', '#.#.#####.#.#', '#.#...#...#.#', '#.###.#.###.#', '#...........#', '#.##.###.##.#', '#o.........o#', '#############'];
+const MAZE_T = 40, MAZE_DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const MAZE_LOOK = { school: ['#4a63b8', '#6a83d8', '#e8e6f4'], park: ['#3f8f4a', '#5aaf5f', '#d9efc4'], zombie: ['#5a6470', '#78838f', '#c9d3cc'], treat: ['#5a3f8a', '#7a5fae', '#e2d6f0'] };
+const MAZE_BULLY_COLS = ['#b3261e', '#6a3fc0', '#2f6b4f', '#4b5160'];
+MINI_GAMES.maze = {
+  buttons: [],
+  help: {
+    touch: 'Slide your left thumb to steer. Grab the coins. A golden toilet roll lets you chase the bullies!',
+    keys: 'Steer with the arrow keys or W A S D. Grab the coins. A golden toilet roll lets you chase the bullies!',
+    keys2: ['W A S D steer.', 'The arrow keys steer.'],
+    pad: () => 'Steer with the stick. Grab the coins. A golden toilet roll lets you chase the bullies!'
+  },
+  size(aw, ah) { // whichever maze shows bigger on this screen
+    const fit = (g) => Math.min(aw / (g[0].length * MAZE_T), ah / (g.length * MAZE_T)), g = fit(MAZE_TALL) > fit(MAZE_WIDE) * 1.05 ? MAZE_TALL : MAZE_WIDE;
+    return { w: g[0].length * MAZE_T, h: g.length * MAZE_T, vert: g === MAZE_TALL };
+  },
+  start(M) {
+    const src = M.vert ? MAZE_TALL : MAZE_WIDE;
+    M.grid = src.map((row) => row.split('')); M.rows = M.grid.length; M.cols = M.grid[0].length; M.left = 0;
+    M.pen = [];
+    M.grid.forEach((row, r) => row.forEach((ch, c2) => { if (ch === '.') M.left++; if (ch === 'K') M.kstart = { c: c2, r }; if (ch === 'B') M.pen.push({ c: c2, r }); if (ch === '-') M.door = { c: c2, r }; }));
+    M.hearts = M.maxHearts = M.kids.length === 2 ? 8 : 4; // two kids are twice as easy to catch
+    const nb = M.diff < 0.25 ? 2 : 3; // a third bully in the later adventures
+    M.bullies = Array.from({ length: nb }, (_, i) => ({ i, col: MAZE_BULLY_COLS[i % 4], c: 0, r: 0, dx: 0, dy: 0, p: 0, wait: 0, scared: false, face: 1, walk: 0 }));
+    M.powerT = 0; M.modeT = 0; M.freezeT = 0; M.cache = null;
+    this.reset(M, true);
+    for (const k of M.kids) if (M.grid[k.r][k.c] === '.') { M.grid[k.r][k.c] = ' '; M.left--; } // the coins you start on
+    M.left = Math.round(M.left * (0.38 + 0.18 * M.diff)); // you don't need every coin: under half of them
+  },
+  reset(M, first) { // everyone back to where they started
+    M.kids.forEach((k, i) => Object.assign(k, { c: M.kstart.c + (M.kids.length === 2 ? (i ? 1 : -1) : 0), r: M.kstart.r, dx: 0, dy: 0, p: 0, want: null, face: 1, walk: 0, hurtT: first ? 0 : 1.5 }));
+    M.bullies.forEach((b, i) => { const s = M.pen[i % M.pen.length]; Object.assign(b, { c: s.c, r: s.r, dx: 0, dy: 0, p: 0, wait: 1.5 + i * 2.2, scared: false }); });
+  },
+  open(M, c2, r, bully) { const ch = M.grid[r] && M.grid[r][c2]; return ch !== undefined && ch !== '#' && ((ch !== '-' && ch !== 'B') || bully); },
+  pos(e) { return { x: (e.c + e.dx * e.p + 0.5) * MAZE_T, y: (e.r + e.dy * e.p + 0.5) * MAZE_T }; },
+  dist(M, from, bully) { // steps from one tile to every other tile
+    const D = M.grid.map((row) => row.map(() => 1e9)), q = [[from.c, from.r]]; D[from.r][from.c] = 0;
+    for (let i = 0; i < q.length; i++) {
+      const [c2, r] = q[i];
+      for (const [dx, dy] of MAZE_DIRS) if (this.open(M, c2 + dx, r + dy, bully) && D[r + dy][c2 + dx] > D[r][c2] + 1) { D[r + dy][c2 + dx] = D[r][c2] + 1; q.push([c2 + dx, r + dy]); }
+    }
+    return D;
+  },
+  update(M, dt) {
+    if (M.phase !== 'play') return;
+    M.powerT = Math.max(0, M.powerT - dt); M.modeT += dt;
+    if (M.freezeT > 0) { M.freezeT -= dt; if (M.freezeT <= 0) this.reset(M, false); return; }
+    for (const k of M.kids) this.moveKid(M, k, dt);
+    for (const b of M.bullies) this.moveBully(M, b, dt);
+    if (M.powerT <= 0) M.bullies.forEach((b) => { b.scared = false; });
+    // bumping into each other
+    for (const k of M.kids) {
+      if (k.hurtT > 0) { k.hurtT -= dt; continue; }
+      const kp = this.pos(k);
+      for (const b of M.bullies) {
+        if (b.wait > 0) continue;
+        const bp = this.pos(b);
+        if (Math.hypot(kp.x - bp.x, kp.y - bp.y) > MAZE_T * 0.45) continue;
+        if (b.scared) { // caught him! back to the bully room
+          puff(bp.x, bp.y - 10, 14, '#a9c8ff', 200); floatText(bp.x, bp.y - 30, 'SENT HOME! +5', '#ffd23d', true); SND.sfx('senthome');
+          M.coins += 5; const s = M.pen[b.i % M.pen.length]; Object.assign(b, { c: s.c, r: s.r, dx: 0, dy: 0, p: 0, wait: 3, scared: false });
+        } else {
+          M.hearts--; G.shake = 0.35; SND.sfx('hurt'); floatText(kp.x, kp.y - 30, 'GOTCHA!', '#ff8a8a', true); puff(kp.x, kp.y - 10, 12, '#fff', 160);
+          if (M.hearts <= 0) { miniLose('The bullies caught you.'); return; }
+          M.freezeT = 1.2; return;
+        }
+      }
+    }
+  },
+  moveKid(M, k, dt) {
+    const inp = miniInput(k.pl);
+    if (Math.abs(inp.mx) > 0.4 || Math.abs(inp.my) > 0.4) k.want = Math.abs(inp.mx) > Math.abs(inp.my) ? [sign(inp.mx), 0] : [0, sign(inp.my)];
+    const w = k.want;
+    if (w && (k.dx || k.dy) && w[0] === -k.dx && w[1] === -k.dy) { k.c += k.dx; k.r += k.dy; k.dx = -k.dx; k.dy = -k.dy; k.p = 1 - k.p; } // turn round on the spot
+    if (!k.dx && !k.dy) { if (w && this.open(M, k.c + w[0], k.r + w[1])) { k.dx = w[0]; k.dy = w[1]; k.p = 0; } }
+    else {
+      k.p += 5.0 * dt; k.walk += dt * 14;
+      while (k.p >= 1) {
+        k.p -= 1; k.c += k.dx; k.r += k.dy; this.eat(M, k);
+        if (w && this.open(M, k.c + w[0], k.r + w[1])) { k.dx = w[0]; k.dy = w[1]; } // turn the corner you asked for
+        else if (!this.open(M, k.c + k.dx, k.r + k.dy)) { k.dx = k.dy = 0; k.p = 0; break; }
+      }
+    }
+    if (k.dx) k.face = k.dx;
+  },
+  eat(M, k) {
+    const ch = M.grid[k.r][k.c], p = this.pos(k);
+    if (ch === '.') { M.grid[k.r][k.c] = ' '; M.left--; M.coins += M.left % 4 === 0 ? 1 : 0; if (M.left % 2 === 0) SND.tone(988 + (M.left % 3) * 120, 0.05, 'square', 0.05); if (M.left <= 0) miniWin('You grabbed enough coins and the bullies ran home!'); }
+    else if (ch === 'o') {
+      M.grid[k.r][k.c] = ' '; M.powerT = 7 - 2 * M.diff; SND.sfx('power'); sparks(p.x, p.y, 16, '#ffe066');
+      G.callouts.push({ txt: 'GOLDEN ROLL!', col: '#ffd23d', x: p.x, y: p.y - 30, t: 0, n: 4 });
+      M.bullies.forEach((b) => { if (b.wait <= 0) { b.scared = true; if (b.dx || b.dy) { b.c += b.dx; b.r += b.dy; b.dx = -b.dx; b.dy = -b.dy; b.p = 1 - b.p; } } }); // they turn and run
+    }
+  },
+  moveBully(M, b, dt) {
+    b.walk += dt * 10;
+    if (b.wait > 0) { b.wait -= dt; if (b.wait <= 0) { const s = M.pen[1] || M.pen[0]; b.c = s.c; b.r = s.r; b.dx = 0; b.dy = -1; b.p = 0; } return; }
+    const speed = b.scared ? 2.3 : 2.7 + 0.8 * M.diff; // always well slower than you (5 tiles a second)
+    if (!b.dx && !b.dy) this.steer(M, b);
+    b.p += speed * dt;
+    while (b.p >= 1) { b.p -= 1; b.c += b.dx; b.r += b.dy; this.steer(M, b); }
+    if (b.dx) b.face = b.dx;
+  },
+  steer(M, b) { // at every junction: chase, wander, or run away when scared
+    const home = (ch) => ch === 'B' || ch === '-', inside = home(M.grid[b.r][b.c]);
+    const opts = MAZE_DIRS.filter(([dx, dy]) => this.open(M, b.c + dx, b.r + dy, true) && (inside || !home(M.grid[b.r + dy][b.c + dx]))); // once out, they stay out
+    let choices = opts.filter(([dx, dy]) => !(dx === -b.dx && dy === -b.dy));
+    if (!choices.length) choices = opts;
+    if (!choices.length) { b.dx = b.dy = 0; return; }
+    const inPen = inside;
+    const kid = M.kids.reduce((a, k) => (Math.abs(k.c - b.c) + Math.abs(k.r - b.r) < Math.abs(a.c - b.c) + Math.abs(a.r - b.r) ? k : a), M.kids[0]);
+    let target;
+    if (inPen) target = { c: M.door.c, r: M.door.r - 1 };
+    else if (b.scared) target = null;
+    else if (M.modeT % 13 > 8) target = [{ c: 1, r: 1 }, { c: M.cols - 2, r: 1 }, { c: 1, r: M.rows - 2 }, { c: M.cols - 2, r: M.rows - 2 }][b.i % 4]; // a breather: they go back to their corners
+    else if (b.i === 1) target = { c: clamp(kid.c + kid.dx * 3, 0, M.cols - 1), r: clamp(kid.r + kid.dy * 3, 0, M.rows - 1) };
+    else target = { c: kid.c, r: kid.r };
+    let pickDir;
+    if (b.scared) { const D = this.dist(M, kid, true); pickDir = choices.reduce((a, d) => (D[b.r + d[1]][b.c + d[0]] > D[b.r + a[1]][b.c + a[0]] ? d : a)); if (Math.random() < 0.3) pickDir = pick(choices); }
+    else if (!inPen && Math.random() < (b.i === 2 ? 0.7 : 0.45) - 0.15 * M.diff) pickDir = pick(choices); // not too clever, and one of them mostly wanders
+    else { const D = this.dist(M, target, true); pickDir = choices.reduce((a, d) => (D[b.r + d[1]][b.c + d[0]] < D[b.r + a[1]][b.c + a[0]] ? d : a)); }
+    b.dx = pickDir[0]; b.dy = pickDir[1];
+  },
+  draw(c, t, M, Ly) {
+    const th = G.L.theme, L = MAZE_LOOK[th] || MAZE_LOOK.school, x0 = Ly.vx0 - 10, y0 = Ly.vy0 - 10;
+    c.fillStyle = shade(L[2], -0.55); c.fillRect(x0, y0, Ly.vx1 - x0 + 10, Ly.vy1 - y0 + 10);
+    c.fillStyle = L[2]; c.fillRect(0, 0, M.cols * MAZE_T, M.rows * MAZE_T);
+    // the walls, drawn once into their own picture and reused every frame
+    const k = Ly.s * VIEW.dpr;
+    if (!M.cache || M.cache.k !== k || M.cache.th !== th) {
+      const cv2 = document.createElement('canvas'); cv2.width = Math.ceil(M.cols * MAZE_T * k); cv2.height = Math.ceil(M.rows * MAZE_T * k);
+      const g = cv2.getContext('2d'); g.scale(k, k);
+      const wall = (fn) => M.grid.forEach((row, r) => row.forEach((ch, c2) => { if (ch === '#') fn(c2 * MAZE_T, r * MAZE_T); }));
+      g.fillStyle = INK; wall((x, y) => { g.beginPath(); g.roundRect ? g.roundRect(x - 3, y - 3, MAZE_T + 6, MAZE_T + 6, 10) : g.rect(x - 3, y - 3, MAZE_T + 6, MAZE_T + 6); g.fill(); });
+      g.fillStyle = L[0]; wall((x, y) => g.fillRect(x - 0.5, y - 0.5, MAZE_T + 1, MAZE_T + 1)); // a little overlap, so joined walls have no seams
+      const isWall = (c2, r) => M.grid[r] && M.grid[r][c2] === '#';
+      g.fillStyle = L[1]; wall((x, y) => { const c2 = x / MAZE_T, r = y / MAZE_T; if (!isWall(c2, r - 1)) g.fillRect(x - 0.5, y + 3, MAZE_T + 1, 6); }); // a light top edge
+      M.cache = { k, th, cv: cv2 };
+    }
+    c.drawImage(M.cache.cv, 0, 0, M.cols * MAZE_T, M.rows * MAZE_T);
+    c.fillStyle = '#ff8ad8'; c.fillRect(M.door.c * MAZE_T + 2, M.door.r * MAZE_T + MAZE_T / 2 - 4, MAZE_T - 4, 8);
+    // coins and golden toilet rolls
+    M.grid.forEach((row, r) => row.forEach((ch, c2) => {
+      const x = (c2 + 0.5) * MAZE_T, y = (r + 0.5) * MAZE_T;
+      if (ch === '.') { c.beginPath(); c.arc(x, y, 5.5, 0, 7); c.fillStyle = '#ffd23d'; c.fill(); c.lineWidth = 1.8; c.strokeStyle = INK; c.stroke(); }
+      else if (ch === 'o') drawToiletRoll(c, x, y + 2, 1.0, t + c2);
+    }));
+    const flash = M.powerT > 0 && M.powerT < 1.6 && Math.floor(t * 8) % 2;
+    for (const b of M.bullies) {
+      const p = this.pos(b), still = b.wait > 0;
+      drawMiniBully(c, p.x, p.y + MAZE_T * 0.42, 0.5, { col: b.col, scared: b.scared && !flash, frame: still ? 0 : Math.floor(b.walk) % 2, face: b.face, alpha: still ? 0.75 : 1 });
+    }
+    M.kids.forEach((k2, i) => {
+      const p = this.pos(k2), blink = k2.hurtT > 0 && Math.floor(t * 12) % 2 ? 0.35 : 1, moving = !!(k2.dx || k2.dy);
+      drawHero(c, k2.id, p.x, p.y + MAZE_T * 0.42, { t, pose: M.freezeT > 0 ? 'flail' : moving ? 'run' : 'idle', face: k2.face, phase: k2.walk, scale: 0.56, alpha: blink, drone: k2.id === 'spencer' });
+      if (M.kids.length === 2) { c.fillStyle = i ? '#ff8a1f' : '#2f8cff'; c.beginPath(); const my = p.y - 34; c.moveTo(p.x - 6, my - 7); c.lineTo(p.x + 6, my - 7); c.lineTo(p.x, my); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); }
+    });
+  },
+  hud(c, t, M) {
+    const B = miniHudBoxes(c), y = B.top, h = B.h;
+    miniBox(c, B.L.x, y, B.L.w, h); miniHearts(c, B.L.x + 10, y + h / 2 + 2, M.hearts, M.maxHearts, Math.min(9, (B.L.w - 20) / (M.maxHearts * 2.5)));
+    miniBox(c, B.M.x, y, B.M.w, h);
+    miniLabel(c, M.powerT > 0 ? `GOLDEN ROLL! ${Math.ceil(M.powerT)}` : 'BULLY MAZE', B.M.x + B.M.w / 2, y + 20, 15, M.powerT > 0 ? '#c8a200' : '#ff8a1f', 'center', B.M.w - 12);
+    miniLabel(c, `Coins to grab: ${Math.max(0, M.left)}`, B.M.x + B.M.w / 2, y + 40, 16, INK, 'center', B.M.w - 12);
+    miniBox(c, B.R.x, y, B.R.w, h);
+    ell(c, B.R.x + 22, y + h / 2, 9, 10); blob(c, '#ffd23d', 2.2); miniLabel(c, String(M.coins), B.R.x + 40, y + h / 2 + 7, 20, INK, 'left');
+  }
+};
+
+/* ---------- Boss game 4: Schoolyard Showdown (like Street Fighter) ---------- */
+// One big bully, health bars and a clock. Bonk him, kick him and throw poo-balls until he gives up.
+// Hold away from him (or down) to block. Landing hits fills your super meter for a MEGA poo-ball.
+const FIGHT_FLOOR = 452, FIGHT_TIME = 60;
+const FIGHT_MOVES = {
+  bonk: { start: 0.06, end: 0.15, total: 0.32, reach: 80, dmg: 6, kb: 140, word: ['BONK!', 'BOP!'] },
+  kick: { start: 0.12, end: 0.23, total: 0.48, reach: 100, dmg: 9, kb: 240, word: ['POW!', 'WHAM!'] },
+  air: { start: 0.04, end: 0.32, total: 0.34, reach: 88, dmg: 8, kb: 200, word: ['FLYING KICK!', 'BOOF!'] },
+  throw: { start: 9, end: 9, total: 0.24 }
+};
+const FIGHT_SKY = { school: ['#ff9f6b', '#ffd9a8'], park: ['#7cc8ff', '#d4f3ff'], zombie: ['#243049', '#56708a'], treat: ['#1b1440', '#5a3f8a'] };
+MINI_GAMES.fighter = {
+  buttons: [{ k: 'throw', label: 'BONK', sub: 'Punch' }, { k: 'action', label: 'KICK', sub: '' }, { k: 'jump', label: 'POO', sub: 'Poo-ball' }],
+  help: {
+    touch: 'Move with your left thumb. Push up to jump, down to block. Tap BONK, KICK and POO. When you see the ! block or back off!',
+    keys: '← → move, ↑ jumps, ↓ blocks. Space bonks, X kicks, C throws a poo-ball. Beat the big bully!',
+    keys2: ['A D move, W jumps, S blocks, Space bonks, F kicks, R throws.', '← → move, ↑ jumps, ↓ blocks, Enter bonks, / kicks, . throws.'],
+    pad: (N) => `Move with the stick, up to jump, down to block. ${N.jump} bonks, ${N.move} kicks, ${N.throw} throws a poo-ball.`
+  },
+  size(aw, ah) { const h = 520; return { w: clamp(Math.round((h * aw) / ah), 640, 1000), h }; },
+  start(M) {
+    const two = M.kids.length === 2, w = M.w;
+    M.kids.forEach((k, i) => Object.assign(k, { x: w * (two ? 0.18 + i * 0.12 : 0.26), y: FIGHT_FLOOR, vx: 0, vy: 0, face: 1, hp: 100, maxHp: 100, atk: null, hurtT: 0, inv: 0, cd: 0, sup: 0, ground: true, block: false, low: false, ko: false, walk: 0, say: '', sayT: 0 }));
+    const hp = Math.round((270 + 110 * M.diff) * (two ? 1.6 : 1));
+    M.boss = { x: w * 0.74, y: FIGHT_FLOOR, vx: 0, vy: 0, face: -1, hp, maxHp: hp, st: 'taunt', t: 0, think: 0.8, cd: { shove: 0.8, stomp: 3, throw: 2, block: 0 }, ground: true, flash: 0, walk: 0, roared: false, say: '', sayT: 0, hit: false, thrown: false, combo: 0, lastHit: -9 };
+    M.balls = []; M.clock = FIGHT_TIME;
+  },
+  update(M, dt) {
+    const play = M.phase === 'play';
+    for (const k of M.kids) this.kid(M, k, dt, play);
+    this.boss(M, dt, play);
+    for (const q of M.balls) {
+      q.x += q.vx * dt; q.spin += dt * 10;
+      if (q.x < -80 || q.x > M.w + 80) q.dead = true;
+      if (!play || q.dead) continue;
+      if (q.own === 'boss') {
+        for (const k of M.kids) if (!k.ko && k.inv <= 0 && Math.abs(q.x - k.x) < 26 + q.r * 0.3 && q.y > k.y - 100 && q.y < k.y + 10) { this.hurtKid(M, k, q.dmg, sign(q.vx), 'SPLAT!'); q.dead = true; break; }
+      } else {
+        const B = M.boss;
+        if (B.st !== 'ko' && Math.abs(q.x - B.x) < 40 + q.r * 0.4 && q.y > B.y - 165 && q.y < B.y) { this.hurtBoss(M, q.dmg, q.own, q.mega ? 320 : 160, q.mega ? 'MEGA SPLAT!' : 'SPLAT!'); q.dead = true; puff(q.x, q.y, q.mega ? 20 : 10, '#8b5a2b', 200); }
+        for (const o of M.balls) if (o.own === 'boss' && !o.dead && Math.abs(o.x - q.x) < 30 && Math.abs(o.y - q.y) < 40) { o.dead = true; if (!q.mega) q.dead = true; puff(q.x, q.y, 10, '#8b5a2b', 150); SND.sfx('pop'); }
+      }
+    }
+    M.balls = M.balls.filter((q) => !q.dead);
+    if (!play) return;
+    M.clock -= dt;
+    if (M.clock <= 0) { // time's up: whoever has more puff left wins (a tie goes to the kids)
+      const kidsLeft = M.kids.reduce((a, k) => a + k.hp, 0) / M.kids.reduce((a, k) => a + k.maxHp, 0), B = M.boss;
+      M.clock = 0;
+      if (kidsLeft >= B.hp / B.maxHp) { B.st = 'ko'; B.t = 0; say(B, 'Fine, you win!', 2.4); miniWin('Time! You had more puff left.'); }
+      else miniLose('Time ran out.');
+    }
+  },
+  kid(M, k, dt, play) {
+    k.hurtT = Math.max(0, k.hurtT - dt); k.inv = Math.max(0, k.inv - dt); k.cd = Math.max(0, k.cd - dt); k.sayT -= dt;
+    const B = M.boss, toward = sign(B.x - k.x) || k.face;
+    const inp = play && !k.ko && k.hurtT <= 0 ? miniInput(k.pl) : { mx: 0, my: 0 };
+    if (!k.ko && k.hurtT <= 0 && play) {
+      if (!k.atk && k.ground) k.face = toward;
+      k.low = k.ground && !k.atk && inp.my > 0.5;
+      k.block = k.ground && !k.atk && (k.low || inp.mx * toward < -0.3);
+      if (k.atk) {
+        k.atk.t += dt; const mv = FIGHT_MOVES[k.atk.k];
+        if (!k.atk.hit && k.atk.t >= mv.start && k.atk.t <= mv.end) this.tryHit(M, k, mv);
+        if (k.atk.t >= mv.total) k.atk = null;
+        if (k.ground) k.vx *= 0.8;
+      } else {
+        if (k.ground) k.vx = k.low ? 0 : k.block ? inp.mx * 120 : inp.mx * 270;
+        else k.vx = clamp(k.vx + inp.mx * 900 * dt, -300, 300);
+        if (inp.upP && k.ground) { k.vy = -880; k.ground = false; SND.sfx('jump'); }
+        if (inp.aP) { k.atk = { k: k.ground ? 'bonk' : 'air', t: 0, hit: false }; SND.sfx('whack'); }
+        else if (inp.bP) { k.atk = { k: k.ground ? 'kick' : 'air', t: 0, hit: false }; SND.sfx('kick'); }
+        else if (inp.cP && k.cd <= 0) this.throwBall(M, k);
+      }
+    }
+    k.vy += 2400 * dt; k.x += k.vx * dt; k.y += k.vy * dt;
+    if (k.y >= FIGHT_FLOOR) { if (!k.ground && k.vy > 300) puff(k.x, FIGHT_FLOOR, 5, '#fff', 80); k.y = FIGHT_FLOOR; k.vy = 0; k.ground = true; if (k.ko || k.hurtT > 0) k.vx *= 0.85; }
+    else k.ground = false;
+    k.x = clamp(k.x, 40, M.w - 40);
+    if (Math.abs(k.vx) > 20 && k.ground) k.walk += dt * 14;
+  },
+  tryHit(M, k, mv) {
+    const B = M.boss, dx = (B.x - k.x) * k.face;
+    if (B.st === 'ko') return;
+    if (dx > -10 && dx < mv.reach + 32 && k.y > B.y - 175 && k.y - 95 < B.y) { k.atk.hit = true; this.hurtBoss(M, mv.dmg, k, mv.kb, pick(mv.word)); }
+  },
+  throwBall(M, k) {
+    const mega = k.sup >= 100;
+    M.balls.push({ x: k.x + k.face * 40, y: k.y - 72, vx: k.face * (mega ? 480 : 560), own: k, dmg: mega ? 22 : 10, r: mega ? 34 : 18, mega, spin: 0 });
+    k.cd = 1.3; k.atk = { k: 'throw', t: 0, hit: true };
+    if (mega) { k.sup = 0; G.callouts.push({ txt: 'MEGA POO-BALL!', col: '#ffd23d', x: k.x, y: k.y - 140, t: 0, n: 4 }); SND.sfx('charge'); M.flash = 0.2; }
+    else SND.sfx('throw');
+  },
+  hurtBoss(M, dmg, by, kb, word) {
+    const B = M.boss; if (B.st === 'ko' || M.phase !== 'play') return;
+    const blocked = B.st === 'block', d = blocked ? Math.ceil(dmg * 0.25) : dmg, face = by.face || 1;
+    B.hp = Math.max(0, B.hp - d); B.flash = 0.25;
+    by.sup = Math.min(100, (by.sup || 0) + d * 3.5);
+    const hx = B.x - face * 24, hy = B.y - 95;
+    if (blocked) { floatText(hx, hy - 30, 'BLOCKED!', '#fff'); B.vx = face * 80; SND.sfx('thud'); }
+    else {
+      sparks(hx, hy, 8, '#ffd23d'); G.callouts.push({ txt: word, col: '#ffd23d', x: hx, y: hy - 40, t: 0, n: 2 }); if (G.callouts.length > 3) G.callouts.shift();
+      if (['walk', 'taunt', 'throwing'].includes(B.st)) { B.st = 'hurt'; B.t = 0; } // a good hit stops what he was doing, but not a shove he's winding up
+      B.combo = M.T - B.lastHit < 1.4 ? B.combo + 1 : 1; B.lastHit = M.T;
+      if (B.combo >= 4 + Math.round(M.diff * 2) && B.hp > d) { B.combo = 0; B.st = 'roar'; B.t = 0; say(B, 'ENOUGH!', 1.1); SND.sfx('roar'); } // too many hits in a row: he shrugs them off
+      B.vx = face * kb * 0.6; SND.sfx('bop'); G.shake = Math.max(G.shake, 0.12);
+      if (Math.random() < 0.3) say(B, pick(['OW!', 'Hey!', 'No fair!', 'Quit it!']), 1);
+    }
+    if (B.hp <= 0) { B.st = 'ko'; B.t = 0; say(B, 'OK, OK! I GIVE UP!', 2.4); SND.sfx('roar'); M.balls = []; miniWin('The big bully gave up!'); }
+  },
+  hurtKid(M, k, dmg, dir, word) {
+    if (k.ko || k.inv > 0 || M.phase !== 'play') return;
+    const blocked = k.block, d = blocked ? Math.ceil(dmg * 0.2) : dmg;
+    k.hp = Math.max(0, k.hp - d); k.sup = Math.min(100, k.sup + d * 1.5);
+    if (blocked) { k.vx = dir * 120; floatText(k.x, k.y - 120, 'BLOCKED!', '#bfe0ff'); SND.sfx('thud'); }
+    else { k.hurtT = 0.35; k.inv = 0.5; k.vx = dir * 300; k.vy = -260; k.ground = false; k.atk = null; floatText(k.x, k.y - 120, word, '#ff8a8a', true); SND.sfx('hurt'); G.shake = Math.max(G.shake, 0.2); }
+    if (k.hp <= 0) {
+      k.ko = true; k.hurtT = 0; k.vx = dir * 200; k.vy = -300; say(k, 'I need a rest!', 1.8);
+      if (M.kids.every((q) => q.ko)) miniLose('The big bully was too tough.');
+    }
+  },
+  boss(M, dt, play) {
+    const B = M.boss, to = (st) => { B.st = st; B.t = 0; };
+    B.t += dt; B.sayT -= dt; B.flash = Math.max(0, B.flash - dt);
+    for (const k in B.cd) B.cd[k] -= dt;
+    const wasUp = !B.ground;
+    B.vy += 2400 * dt; B.x += B.vx * dt; B.y += B.vy * dt;
+    if (B.y >= FIGHT_FLOOR) {
+      B.y = FIGHT_FLOOR; B.vy = 0; B.ground = true;
+      if (wasUp && B.st === 'stomp') { // THUD: everyone near him on the ground gets knocked over
+        G.shake = 0.5; SND.sfx('thud'); puff(B.x, FIGHT_FLOOR, 16, '#e8d6b0', 260);
+        for (const k of M.kids) if (k.ground && Math.abs(k.x - B.x) < 150) this.hurtKid(M, k, Math.round(9 + 4 * M.diff), sign(k.x - B.x) || 1, 'STOMP!');
+        to('taunt'); B.vx = 0;
+      }
+    } else B.ground = false;
+    B.x = clamp(B.x, 50, M.w - 50);
+    if (B.st === 'ko') { B.vx *= 0.9; return; }
+    const kids = M.kids.filter((k) => !k.ko);
+    if (!play || !kids.length) { B.vx *= 0.8; if (B.ground) B.st = 'taunt'; return; }
+    const T = kids.reduce((a, k) => (Math.abs(k.x - B.x) < Math.abs(a.x - B.x) ? k : a)), dx = T.x - B.x, dist = Math.abs(dx);
+    if (B.ground && ['taunt', 'walk', 'hurt', 'block'].includes(B.st)) B.face = sign(dx) || B.face;
+    switch (B.st) {
+      case 'hurt': B.vx *= 0.85; if (B.t > 0.22) to('taunt'); break;
+      case 'block': B.vx *= 0.8; if (B.t > 0.45) to('taunt'); break;
+      case 'wind': B.vx = 0; if (B.t > 0.42 - 0.15 * M.diff) { to('shove'); B.vx = B.face * 260; B.hit = false; SND.sfx('whack'); } break;
+      case 'shove':
+        if (!B.hit) for (const k of kids) if (Math.abs(k.x - (B.x + B.face * 60)) < 72 && k.y > B.y - 140) { this.hurtKid(M, k, Math.round(8 + 4 * M.diff), B.face, 'SHOVE!'); B.hit = true; }
+        B.vx *= 0.9; if (B.t > 0.24) to('taunt'); break;
+      case 'throwing':
+        B.vx = 0;
+        if (B.t > 0.35 && !B.thrown) { B.thrown = true; M.balls.push({ x: B.x + B.face * 50, y: B.y - 110, vx: B.face * (400 + 140 * M.diff), own: 'boss', dmg: Math.round(7 + 4 * M.diff), r: 18, spin: 0 }); SND.sfx('throw'); }
+        if (B.t > 0.62) to('taunt'); break;
+      case 'stomp': break; // in the air
+      case 'roar':
+        B.vx = 0; for (const k of kids) if (Math.abs(k.x - B.x) < 300 && k.ground) k.vx += sign(k.x - B.x) * 900 * dt;
+        if (B.t > 1.0) to('taunt'); break;
+      default:
+        B.think -= dt;
+        if (T.atk && dist < 150 && B.cd.block <= 0 && Math.random() < (0.25 + 0.35 * M.diff) * dt * 10) { to('block'); B.cd.block = 1.1; break; }
+        if (!B.roared && B.hp < B.maxHp * 0.5) { B.roared = true; to('roar'); say(B, 'RAAAAAH!', 1.2); SND.sfx('roar'); G.shake = 0.6; break; }
+        if (B.think <= 0) {
+          B.think = rand(0.2, 0.4) * (1.2 - M.diff * 0.5);
+          if (dist < 125 && B.cd.shove <= 0) { to('wind'); B.cd.shove = 1.3 - 0.45 * M.diff; break; }
+          if (dist > 260 && B.cd.throw <= 0 && Math.random() < 0.55) { to('throwing'); B.thrown = false; B.cd.throw = 2.8 - M.diff; say(B, pick(['Catch!', 'Stinky!', 'Here you go!']), 1); break; }
+          if (dist > 160 && dist < 420 && B.cd.stomp <= 0 && Math.random() < 0.3) { to('stomp'); B.vy = -780; B.vx = clamp(dx * 1.25, -420, 420); B.ground = false; B.cd.stomp = 5 - 2 * M.diff; break; }
+        }
+        B.vx = dist > 100 ? sign(dx) * (140 + 70 * M.diff) : 0; B.st = Math.abs(B.vx) > 1 ? 'walk' : 'taunt'; B.walk += dt * 8;
+    }
+  },
+  draw(c, t, M, Ly) {
+    const th = G.L.theme, sky = FIGHT_SKY[th] || FIGHT_SKY.school, x0 = Ly.vx0 - 10, x1 = Ly.vx1 + 10, y0 = Ly.vy0 - 10, y1 = Ly.vy1 + 10, F = FIGHT_FLOOR;
+    const g = c.createLinearGradient(0, y0, 0, F); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]);
+    c.fillStyle = g; c.fillRect(x0, y0, x1 - x0, F - y0);
+    c.fillStyle = th === 'zombie' || th === 'treat' ? '#f6f0c8' : '#ffd23d'; c.beginPath(); c.arc(M.w * 0.82, 80, 32, 0, 7); c.fill();
+    const L = DUEL_LOOK[th] || DUEL_LOOK.school, bx = M.w * 0.06, bw = M.w * 0.88, by = F - 300;
+    if (th === 'park') { // hills and trees in the park
+      c.fillStyle = '#9ed97a'; c.beginPath(); c.ellipse(M.w * 0.25, F - 60, M.w * 0.42, 150, 0, Math.PI, 0); c.fill(); c.beginPath(); c.ellipse(M.w * 0.82, F - 60, M.w * 0.36, 120, 0, Math.PI, 0); c.fill();
+      for (let x = x0 + 60; x < x1; x += 190) { c.fillStyle = '#7a5230'; c.fillRect(x - 7, F - 190, 14, 100); c.beginPath(); c.arc(x, F - 214, 52, 0, 7); blob(c, '#4caf50', 3); }
+    } else {
+      c.fillStyle = th === 'treat' ? '#2a1e44' : L.back; c.fillRect(bx, by, bw, 200); c.strokeStyle = INK; c.lineWidth = 3; c.strokeRect(bx, by, bw, 200);
+      for (let x = bx + 30; x < bx + bw - 40; x += 92) for (let r = 0; r < 2; r++) { c.fillStyle = th === 'school' ? L.win : Math.sin(x + r) > -0.2 ? L.win : INK; c.fillRect(x, by + 26 + r * 72, 46, 40); c.strokeRect(x, by + 26 + r * 72, 46, 40); }
+    }
+    c.fillStyle = L.fence; c.fillRect(x0, F - 96, x1 - x0, 6); c.fillRect(x0, F - 64, x1 - x0, 6); for (let x = x0 + 4; x < x1; x += 40) c.fillRect(x, F - 110, 6, 72);
+    const n = M.fans.length;
+    M.fans.forEach((id, i) => drawHero(c, id, M.w * 0.08 + ((i + 0.5) * M.w * 0.84) / Math.max(1, n), F - 40, { t: t + i * 0.6, pose: M.phase === 'won' ? 'cheer' : Math.sin(t * 2 + i) > 0.6 ? 'cheer' : 'idle', scale: 0.66, face: i < n / 2 ? 1 : -1, bike: id === 'ollie', drone: id === 'spencer' }));
+    c.fillStyle = L.floor; c.fillRect(x0, F - 40, x1 - x0, y1 - F + 40); c.fillStyle = L.floor2; for (let y = F - 23; y < y1; y += 34) c.fillRect(x0, y, x1 - x0, 17);
+    c.fillStyle = INK; c.fillRect(x0, F - 41, x1 - x0, 3);
+    c.strokeStyle = L.line; c.lineWidth = 4; c.beginPath(); c.ellipse(M.w / 2, F + 8, M.w * 0.32, 30, 0, 0, 7); c.stroke();
+    const shadow = (x, w2) => { c.fillStyle = 'rgba(20,18,40,0.25)'; c.beginPath(); c.ellipse(x, F + 2, w2, w2 * 0.28, 0, 0, 7); c.fill(); };
+    const B = M.boss; shadow(B.x, 52); M.kids.forEach((k) => shadow(k.x, 30));
+    const bst = B.st === 'ko' ? 'flee' : B.st === 'block' ? 'taunt' : B.st === 'throwing' ? (B.thrown ? 'shove' : 'wind') : B.st === 'stomp' ? 'roar' : B.st;
+    c.save(); c.translate(B.x + (B.st === 'ko' ? Math.sin(t * 30) * 1.5 : 0), B.y); c.scale(1.25, 1.25);
+    drawCrusher(c, { x: -25, w: 50, y: -106, h: 106, dir: B.face, state: bst, flash: B.flash, walk: B.walk }, t);
+    c.restore();
+    if (B.st === 'block') { c.save(); c.strokeStyle = 'rgba(191,224,255,0.9)'; c.lineWidth = 5; c.beginPath(); c.arc(B.x + B.face * 30, B.y - 100, 70, -0.9, 0.9); c.stroke(); c.restore(); }
+    if (B.st === 'wind' || (B.st === 'throwing' && !B.thrown)) mark(c, B.x, B.y - 200, '!', '#ff6150'); // he's about to shove: block or back off
+    M.kids.forEach((k, i) => {
+      const mv = k.atk && k.atk.k;
+      const pose = k.ko || k.hurtT > 0 ? 'flail' : mv === 'bonk' || mv === 'throw' ? 'punch' : mv ? 'kick' : !k.ground ? 'jump' : k.block ? 'hack' : Math.abs(k.vx) > 20 ? 'run' : 'idle';
+      drawHero(c, k.id, k.x, k.y, { t, pose, face: k.face, phase: k.walk, scale: 1.35, alpha: k.inv > 0 && Math.floor(t * 14) % 2 ? 0.45 : 1, rot: k.ko && k.ground ? -1.45 * k.face : 0, squash: k.low ? 0.78 : 1, drone: k.id === 'spencer' });
+      if (k.block && !k.ko) { c.save(); c.strokeStyle = 'rgba(191,224,255,0.9)'; c.lineWidth = 4; c.beginPath(); c.arc(k.x + k.face * 22, k.y - (k.low ? 50 : 75), 46, -0.9, 0.9); c.stroke(); c.restore(); }
+      if (k.ko) for (let s = 0; s < 3; s++) { const a = t * 4 + s * 2.1; c.save(); c.translate(k.x + Math.cos(a) * 22, k.y - 40 + Math.sin(a) * 6); starPath(c, 0, 0, 7, 3); blob(c, '#ffd23d', 1.5); c.restore(); }
+      if (M.kids.length === 2) { c.fillStyle = i ? '#ff8a1f' : '#2f8cff'; c.beginPath(); const my = k.y - 140 + Math.sin(t * 5) * 2; c.moveTo(k.x - 7, my - 8); c.lineTo(k.x + 7, my - 8); c.lineTo(k.x, my); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); }
+    });
+    for (const q of M.balls) {
+      if (q.mega) { c.save(); c.globalAlpha = 0.35; c.fillStyle = '#ffe066'; c.beginPath(); c.arc(q.x, q.y, q.r * 1.3, 0, 7); c.fill(); c.restore(); }
+      drawPoo(c, q.x, q.y + 6, q.mega ? 2.0 : 1.05, q.own === 'boss' ? { bully: true, stink: true, rot: q.spin * 0.3 } : { rot: q.spin * 0.3, face: q.mega });
+    }
+    if (B.sayT > 0) bubble(c, B.x, B.y - 205, B.say, true, true);
+    for (const k of M.kids) if (k.sayT > 0) bubble(c, k.x, k.y - 150, k.say, true);
+  },
+  hud(c, t, M) {
+    const H = miniHudBoxes(c), y = H.top, h = H.h, B = M.boss;
+    const bar = (x, by, w, bh, p, col) => { rrect(c, x, by, w, bh, bh / 2); blob(c, '#e8e6f4', 2); if (p > 0) { c.save(); rrect(c, x, by, w, bh, bh / 2); c.clip(); c.fillStyle = col; c.fillRect(x, by, w * p, bh); c.restore(); rrect(c, x, by, w, bh, bh / 2); c.lineWidth = 2; c.strokeStyle = INK; c.stroke(); } };
+    const hpCol = (p) => (p > 0.5 ? '#22c993' : p > 0.25 ? '#ffc83d' : '#ff4d4d');
+    miniBox(c, H.L.x, y, H.L.w, h);
+    const por = 34, two = M.kids.length === 2;
+    c.save(); c.beginPath(); c.arc(H.L.x + 8 + por / 2, y + h / 2, por / 2, 0, 7); c.clip(); c.drawImage(bigPortrait(M.kids[0].id), H.L.x + 8, y + h / 2 - por / 2, por, por); c.restore();
+    const lx = H.L.x + 16 + por, lw = H.L.w - por - 26;
+    M.kids.forEach((k, i) => bar(lx, y + (two ? 8 + i * 15 : 10), lw, two ? 11 : 16, k.hp / k.maxHp, hpCol(k.hp / k.maxHp)));
+    const sup = Math.max(...M.kids.map((k) => k.sup)), ready = sup >= 100;
+    rrect(c, lx, y + h - 13, lw, 6, 3); c.fillStyle = 'rgba(29,27,58,0.2)'; c.fill();
+    if (sup > 0) { rrect(c, lx, y + h - 13, Math.max(6, (lw * sup) / 100), 6, 3); c.fillStyle = ready ? `rgba(255,${190 + Math.round(40 * Math.sin(t * 10))},40,1)` : '#ffc83d'; c.fill(); }
+    miniBox(c, H.R.x, y, H.R.w, h);
+    c.save(); c.beginPath(); c.arc(H.R.x + H.R.w - 8 - por / 2, y + h / 2, por / 2, 0, 7); c.clip(); c.drawImage(bigPortrait('crusher'), H.R.x + H.R.w - 8 - por, y + h / 2 - por / 2, por, por); c.restore();
+    const rw = H.R.w - por - 26; bar(H.R.x + 10, y + 10, rw, 16, B.hp / B.maxHp, hpCol(B.hp / B.maxHp));
+    miniLabel(c, 'Crusher', H.R.x + 12, y + h - 7, 13, '#ff4d4d', 'left', rw);
+    miniBox(c, H.M.x, y, H.M.w, h);
+    miniLabel(c, ready ? 'MEGA POO READY!' : 'SHOWDOWN', H.M.x + H.M.w / 2, y + 18, 14, ready ? '#c8a200' : '#ff4d4d', 'center', H.M.w - 10);
+    miniLabel(c, String(Math.ceil(M.clock)), H.M.x + H.M.w / 2, y + 43, 26, M.clock < 10 ? '#ff4d4d' : INK, 'center');
+  }
+};
+
 /* ===================== Backgrounds & platforms ===================== */
 const ZONE_SKY = { yard: ['#6fd0ff', '#d8f3ff'], court: ['#7bd4ff', '#ffe9c2'] };
 
@@ -7357,12 +8355,13 @@ function render() {
   c.fillStyle = '#16183a'; c.fillRect(0, 0, cv.width, cv.height);
   const playing = G && ['play', 'pause', 'done', 'story', 'bully'].includes(STATE.screen);
   const t = playing ? G.t : performance.now() / 1000;
-  const duel = playing && G.duel, camX = playing && !duel ? G.cam.x : 0;
+  const duel = playing && G.duel, mini = playing && G.mini, camX = playing && !duel && !mini ? G.cam.x : 0;
   let sx = 0, sy = 0;
   if (playing && G.shake > 0) { sx = rand(-6, 6) * G.shake * 2; sy = rand(-6, 6) * G.shake * 2; }
   VIEW.shx = sx; VIEW.shy = sy;
   c.setTransform(d * s, 0, 0, d * s, (-camX * s + sx) * d, (VIEW.offY + sy) * d);
   if (duel) { drawDuel(c, t); c.setTransform(1, 0, 0, 1, 0, 0); drawScreenFx(c, t); drawDuelHud(c, t); return; } // the Annoy-Off has its own zoom
+  if (mini) { drawMini(c, t); drawMiniOverlay(c, t); c.setTransform(1, 0, 0, 1, 0, 0); drawScreenFx(c, t); return; } // and so do the boss games
   const top = VIEW.top - 10, bottom = VIEW.bottom + 10;
   for (const z of G_ZONES()) {
     drawZone(c, z, camX, VIEW.w, top, t);
@@ -7699,12 +8698,12 @@ const JOY_R = 62, JOY_DEAD = 16;
 Input.joyDir = [0, 0];
 Input.tapped = new Set(); // quick taps still count for one frame
 Input.pad = [{ left: false, right: false, jump: false, action: false, throw: false }, { left: false, right: false, jump: false, action: false, throw: false }];
-const padClear = (P) => { P.left = P.right = P.jump = P.action = P.throw = P.annoy = P.sup = P.du = P.dd = P.dl = P.dr = false; P.ax = P.ay = 0; };
+const padClear = (P) => { P.left = P.right = P.jump = P.action = P.throw = P.annoy = P.sup = P.du = P.dd = P.dl = P.dr = P.ba = P.bb = P.bx = P.by = P.rt = false; P.ax = P.ay = 0; };
 
 function joyZone(i) {
   const W = VIEW.W, H = VIEW.H, top = VIEW.portrait ? VIEW.ctlTop - 12 : SAFE.top + 100;
   const jx = VIEW.joyX || [W * 0.5, W];
-  if (G && G.duel) return { x0: 0, x1: jx[0], y0: top, y1: H }; // in the Annoy-Off, whoever is playing moves with the left thumb
+  if (G && (G.duel || (G.mini && G.players.length === 1))) return { x0: 0, x1: jx[0], y0: top, y1: H }; // one player in a duel or boss game: the left thumb moves
   return i === 0 ? { x0: 0, x1: jx[0], y0: top, y1: H } : { x0: jx[1], x1: W, y0: top, y1: H };
 }
 function joyStart(e) {
@@ -7798,13 +8797,14 @@ function pollPads() {
     P.jump = b(0) || b(12); P.action = b(2); P.throw = b(1);
     P.ax = ax; P.ay = ay; P.du = b(12); P.dd = b(13); P.dl = b(14); P.dr = b(15); // the Annoy-Off moves in every direction
     P.annoy = b(0) || b(1); P.sup = b(2) || b(3) || b(6) || b(7);
+    P.ba = b(0); P.bb = b(1); P.bx = b(2); P.by = b(3); P.rt = b(6) || b(7); // the boss games' three buttons
     const now = { a: b(0), b: b(1), y: b(3), lb: b(4), rb: b(5), lt: b(6), rt: b(7), start: b(9), select: b(8),
       up: b(12) || ay < -0.6, down: b(13) || ay > 0.6, left: P.left, right: P.right };
     const was = PAD.prev[i]; PAD.prev[i] = now;
     const pressed = (k) => now[k] && !was[k];
     if (STATE.screen === 'play' && G) {
-      if (!G.duel && pressed('lb')) padSelect(-1);
-      if (!G.duel && pressed('rb')) padSelect(1);
+      if (!G.duel && !G.mini && pressed('lb')) padSelect(-1);
+      if (!G.duel && !G.mini && pressed('rb')) padSelect(1);
       if (pressed('y')) callHelp(HERO_IDS[PAD.sel]);
       if (pressed('lt') || pressed('rt')) crewCharge();
       if (pressed('start') || pressed('select')) showScreen('pause');
@@ -7893,6 +8893,7 @@ const touchOrKey = (a, b, c) => (STATE.pad && c ? c : STATE.touch ? a : b);
 function levelTrack() {
   const A = G.L.arena, on = A && A.active && !A.done;
   if (G.duel) return 'chase';
+  if (G.mini) return MINI_INFO[G.mini.kind].music;
   if ((G.boss && G.boss.state !== 'ko') || (G.bully && G.bully.state !== 'flee')) return 'boss';
   if (G.disco) return 'disco';
   if (on && A.type === 'food') return 'food';
@@ -7968,8 +8969,13 @@ function toggleFriend(id) {
   if (picks.includes(id)) STATE.crewMsg = STATE.players === 1 ? 'That\'s you! Tap the friends you want to bring along.' : `${name} is a player. Tap other friends to bring along.`;
   else if (isGrounded(id)) { SND.sfx('nope'); STATE.crewMsg = `${name} is at home. Win the battle at the end of a level to get ${name} back.`; }
   else if (cur.includes(id)) { STATE.friends = cur.filter((x) => x !== id); SND.sfx('help'); }
-  else if (cur.length >= MAX_FRIENDS) { SND.sfx('nope'); STATE.crewMsg = `You can bring up to ${MAX_FRIENDS} friends. Tap one to leave them behind first.`; }
-  else { STATE.friends = cur.concat(id); SND.sfx('help'); }
+  else { STATE.friends = HERO_IDS.filter((h) => h === id || cur.includes(h)); SND.sfx('help'); } // kept in crew order
+  SAVE.friends = STATE.friends; writeSave();
+  refreshCrewSelect();
+}
+function toggleAllFriends() { // bring everyone who can come, or clear them all
+  const picks = crewPicks(), all = HERO_IDS.filter((h) => !picks.includes(h) && !isGrounded(h)), cur = STATE.friendsNow || [];
+  STATE.friends = cur.length >= all.length ? [] : all; SND.sfx('help');
   SAVE.friends = STATE.friends; writeSave();
   refreshCrewSelect();
 }
@@ -8001,7 +9007,10 @@ function refreshCrewSelect() {
   const msg = STATE.crewMsg; STATE.crewMsg = '';
   $('crewHint').textContent = msg || (step === 'hero'
     ? (STATE.players === 1 ? 'Tap a hero to play as them.' : `Player ${pickTurn + 1}, tap your hero.`)
-    : `Bring up to ${MAX_FRIENDS} friends (${friends.length} picked). Any mix works!`);
+    : `Tap friends to bring them. ${friends.length === 1 ? '1 friend' : friends.length + ' friends'} picked. Any number works!`);
+  const free = HERO_IDS.filter((h) => !picks.includes(h) && !isGrounded(h)).length;
+  $('allBtn').textContent = friends.length >= free && free > 0 ? 'Clear all' : 'Bring everyone';
+  $('allBtn').disabled = free === 0;
   $('startBtn').textContent = step === 'hero' ? 'Next' : 'Start!';
   const id = STATE.focus, H = HEROES[id], cur = heroThrow(id);
   $('crewDetail').innerHTML = `
@@ -8034,13 +9043,14 @@ let hudCache = {};
 const HOUSE_SVG = '<svg class="hm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12 L12 3.5 L21.5 12 Z" fill="#ff6150" stroke="#1d1b3a" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="11" width="14" height="10" rx="1" fill="#fff3d6" stroke="#1d1b3a" stroke-width="2"/><rect x="10" y="14.5" width="4" height="6.5" fill="#ffc83d" stroke="#1d1b3a" stroke-width="1.5"/></svg>';
 function buildHUD() {
   hudCache = {};
-  $('hud').classList.toggle('duel', !!(G && G.duel));
+  $('hud').classList.toggle('duel', !!(G && (G.duel || G.mini)));
   $('statBox').innerHTML = G.players.map((p, i) => `<div class="chip" id="hp${i}"><canvas width="48" height="48"></canvas><span class="hearts"></span></div>`).join('') +
     `<div class="chip" id="coinChip"><svg viewBox="0 0 24 24" width="20" height="20"><ellipse cx="12" cy="12" rx="8" ry="9" fill="#ffd23d" stroke="#1d1b3a" stroke-width="2.4"/></svg><span>0</span></div>`;
   G.players.forEach((p, i) => { const c = $('hp' + i).querySelector('canvas'); c.getContext('2d').drawImage(portraitFor(p.id), 0, 0, 48, 48); });
   buildCrewBar();
 }
 function buildCrewBar() {
+  $('portraits').classList.toggle('many', barIds().length > 5); // smaller faces for a big crew
   $('portraits').innerHTML = barIds().map((id, i) => {
     const pl = G.players.findIndex((p) => p.id === id);
     const tag = pl < 0 ? '' : `<span class="you ${pl ? 'p2' : ''}">${G.players.length === 1 ? 'YOU' : 'P' + (pl + 1)}</span>`;
@@ -8080,7 +9090,7 @@ function updateHUD() {
   if (hudCache.meter !== m) { hudCache.meter = m; $('meter').firstElementChild.style.width = m + '%'; $('chargeBtn').hidden = m < 100; }
   const A = G.L.arena, B = G.boss, C = G.L.chase;
   if (G.duel) { const sb = document.querySelector('.tb.duelsup'), sp = Math.round(G.duel.me.sup); if (sb && hudCache.sup !== sp) { hudCache.sup = sp; sb.style.setProperty('--chg', sp + '%'); sb.classList.toggle('ready', sp >= 100); } }
-  const Bt = G.battle, Bu = G.bully, showHack = !G.duel && (bullyActive() || !!(Bt && !Bt.end) || !!(C && !C.got) || !!(A && ((A.type !== 'boss' && A.started && !A.done) || (B && B.state !== 'ko'))));
+  const Bt = G.battle, Bu = G.bully, showHack = !G.duel && !G.mini && (bullyActive() || !!(Bt && !Bt.end) || !!(C && !C.got) || !!(A && ((A.type !== 'boss' && A.started && !A.done) || (B && B.state !== 'ko'))));
   if (hudCache.hack !== showHack) { hudCache.hack = showHack; $('hackbar').hidden = !showHack; $('hud').classList.toggle('hacking', showHack); $('hackbar').classList.toggle('boss', !!B); placeOverlays(); }
   if (showHack && bullyActive()) {
     const left = Math.max(0, Math.ceil(Bu.timer)), lab = `Hit Crusher ${Bu.hp === BULLY_HP ? Bu.hp + ' times' : Bu.hp === 1 ? 'once more' : Bu.hp + ' more times'}! 0:${String(left).padStart(2, '0')}`;
@@ -8216,7 +9226,14 @@ function ctlButtons(W, H, two) {
   const m = 14, r = SAFE.right + m, b = SAFE.bottom + m;
   const btns = [], add = (pl, k, x, y, s) => btns.push({ pl, k, x, y, s });
   let joyX;  // the first player's joystick area ends at joyX[0], the second player's starts at joyX[1]
-  if (G && G.duel) {
+  const miniKeys = G && G.mini ? MINI_GAMES[G.mini.kind].buttons.map((q) => q.k) : null;
+  if (miniKeys && !two) { // a boss game for one player: the main button bottom right, the others beside and above it
+    const s = clamp(Math.min(W, H) * 0.22, 72, 120), ss = s * 0.78;
+    if (miniKeys[0]) add(0, miniKeys[0], W - r - s, H - b - s, s);
+    if (miniKeys[1]) add(0, miniKeys[1], W - r - s - ss - 14, H - b - ss * 0.92, ss);
+    if (miniKeys[2]) add(0, miniKeys[2], W - r - s + (s - ss) / 2, H - b - s - ss - 24, ss);
+    joyX = [miniKeys.length ? Math.min(W * 0.55, W - r - s - (miniKeys[1] ? ss + 34 : 24)) : W * 0.75, W];
+  } else if (G && G.duel) {
     const pl = G.duel.pl, s = clamp(Math.min(W, H) * 0.24, 76, 128), ss = s * 0.74;
     add(pl, 'throw', W - r - s, H - b - s, s); add(pl, 'action', W - r - s - ss - 16, H - b - ss * 0.92, ss);
     joyX = [Math.min(W * 0.5, W - r - s - ss - 36), W];
@@ -8236,21 +9253,22 @@ function ctlButtons(W, H, two) {
     add(0, 'throw', edge + 6, H - b - 2 * s - 46, s); add(1, 'throw', W - edge - 6 - s, H - b - 2 * s - 46, s);
     joyX = [W * 0.3, W * 0.7];
   }
-  return { btns, joyX, top: Math.min(...btns.map((q) => q.y)) };
+  const used = miniKeys && two ? btns.filter((q) => miniKeys.includes(q.k)) : btns; // two players: only the buttons this boss game uses
+  return { btns: used, joyX, top: used.length ? Math.min(...used.map((q) => q.y)) : H - SAFE.bottom - 150 };
 }
 function layoutControls() {
   const box = $('controls'); if (!box) return;
   const W = VIEW.W, H = VIEW.H, two = twoPlayers();
   const { btns, joyX } = ctlButtons(W, H, two);
-  const duel = G && G.duel;
-  const label = (q) => !G ? '' : duel ? (q.k === 'throw' ? DUEL_MOVES[duel.me.id].annoy : DUEL_MOVES[duel.me.id].sup) : q.k === 'action' ? G.players[q.pl].H.move : q.k === 'throw' ? THROWS[heroThrow(G.players[q.pl].id)].name : '';
+  const duel = G && G.duel, mini = G && G.mini, mb = (q) => MINI_GAMES[mini.kind].buttons.find((x) => x.k === q.k) || { label: '' };
+  const label = (q) => !G ? '' : mini ? mb(q).sub || '' : duel ? (q.k === 'throw' ? DUEL_MOVES[duel.me.id].annoy : DUEL_MOVES[duel.me.id].sup) : q.k === 'action' ? G.players[q.pl].H.move : q.k === 'throw' ? THROWS[heroThrow(G.players[q.pl].id)].name : '';
   btns.forEach((q) => { q.label = label(q); });
   VIEW.joyX = joyX;
   VIEW.ctlSide = Math.max(two ? 0 : 170, ...btns.map((q) => Math.min(q.x + q.s, W - q.x))) + 4;
   VIEW.toastTop = two && !duel;
   const joys = duel ? [duel.pl] : two ? [0, 1] : [0];
-  const face = (q) => duel ? `<span class="big">${q.k === 'throw' ? 'ANNOY' : 'SUPER'}<small>${q.label}</small></span>` : q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? G.players[q.pl].id : 'naseer')}"></canvas>` : ICON[q.k];
-  box.innerHTML = btns.map((q) => `<div class="tb ${two && !duel ? 'p' + (q.pl + 1) : ''} ${duel ? (q.k === 'throw' ? 'duelann' : 'duelsup') : ''}" data-b="${q.pl}:${q.k}" style="left:${q.x}px;top:${q.y}px;width:${q.s}px;height:${q.s}px">${face(q)}${q.label && !duel ? `<span class="lbl">${q.label}</span>` : ''}</div>`).join('') +
+  const face = (q) => mini ? `<span class="big">${mb(q).label}<small>${q.label}</small></span>` : duel ? `<span class="big">${q.k === 'throw' ? 'ANNOY' : 'SUPER'}<small>${q.label}</small></span>` : q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? G.players[q.pl].id : 'naseer')}"></canvas>` : ICON[q.k];
+  box.innerHTML = btns.map((q) => `<div class="tb ${two && !duel ? 'p' + (q.pl + 1) : ''} ${duel ? (q.k === 'throw' ? 'duelann' : 'duelsup') : mini ? 'duelann' : ''}" data-b="${q.pl}:${q.k}" style="left:${q.x}px;top:${q.y}px;width:${q.s}px;height:${q.s}px">${face(q)}${q.label && !duel && !mini ? `<span class="lbl">${q.label}</span>` : ''}</div>`).join('') +
     joys.map((i) => `<div class="joy ghost ${two && !duel ? 'p' + (i + 1) : ''}" id="joy${i}"><i></i><span class="lbl">Move</span></div>`).join('');
   joys.forEach((i) => joyDraw(i));
   box.querySelectorAll('canvas[data-obj]').forEach((cv) => drawThrowable(cv.getContext('2d'), cv.dataset.obj, 48, 48, 0.6, 2.4));
@@ -8283,7 +9301,7 @@ window.addEventListener('keydown', (e) => {
     if (GAME_KEYS.includes(e.code)) e.preventDefault();
     if (!e.repeat) {
       const n = parseInt(e.key, 10);
-      if (n >= 1 && n <= 6 && barIds()[n - 1]) callHelp(barIds()[n - 1]);
+      if (n >= 1 && n <= 9 && barIds()[n - 1]) callHelp(barIds()[n - 1]);
       if (e.code === 'KeyE') crewCharge();
       if (e.code === 'KeyP' || e.code === 'Escape') { showScreen('pause'); return; }
     }
@@ -8344,6 +9362,7 @@ function wireButtons() {
     if (STATE.crewStep !== 'friends') { STATE.crewStep = 'friends'; SND.sfx('help'); refreshCrewSelect(); $('s-crew').scrollTop = 0; return; }
     STATE.friends = STATE.friendsNow; SAVE.friends = STATE.friends; writeSave(); beginPlay();
   };
+  $('allBtn').onclick = () => toggleAllFriends();
   $('crewBack').onclick = () => { if (STATE.crewStep === 'friends') { STATE.crewStep = 'hero'; refreshCrewSelect(); } else showScreen('levels'); };
   $('storyGo').onclick = () => enterPlay();
   $('pauseBtn').onclick = () => showScreen('pause');
@@ -8379,7 +9398,7 @@ function frame(now) {
 }
 function boot(data) {
   loadSave(); readSafe(); TUTORIAL_HTML = $('storyBody').innerHTML;
-  if (Array.isArray(SAVE.friends)) STATE.friends = SAVE.friends.slice(0, MAX_FRIENDS);
+  if (Array.isArray(SAVE.friends)) STATE.friends = SAVE.friends.filter((h) => HEROES[h]);
   if (data && data.picks) { STATE.players = data.players || 1; STATE.picks = data.picks; STATE.focus = data.picks[0]; }
   if (data && data.adv && ADV.some((a) => a.id === data.adv)) STATE.adv = data.adv;
   if (data && data.level) { try { levelDef(data.level); STATE.level = data.level; } catch (e) { /* ignore */ } }
