@@ -404,6 +404,44 @@ h2.title {
 @media (prefers-reduced-motion: reduce) {
   .por.need, #chargeBtn, .bigstar.got svg, #banner.show { animation: none; }
 }
+/* ---------- Online play ---------- */
+#netPill { position: absolute; z-index: 45; top: calc(var(--sat) + 12px); left: calc(var(--sal) + 12px); display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-body); font-weight: 700; font-size: 14px; color: var(--ink); background: #fff; border: 3px solid var(--ink); border-radius: 99px;
+  padding: 6px 13px 6px 10px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; touch-action: manipulation; }
+#netPill i { width: 11px; height: 11px; border-radius: 50%; background: var(--mint); border: 2px solid var(--ink); }
+#netPill.away i { background: var(--sun); animation: netblink 1s steps(2) infinite; }
+@keyframes netblink { 50% { opacity: 0.35; } }
+#crewScreen.online .seg { display: none; }
+.netpanel { max-width: 600px; }
+.netbody { display: flex; flex-direction: column; gap: 12px; }
+.netbody p { text-align: center; }
+.netcode { align-self: center; font-family: var(--font-display); font-size: 66px; line-height: 1.1; letter-spacing: 16px; padding: 6px 8px 6px 24px;
+  background: #fff; border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink); }
+.netcodein { align-self: center; width: 230px; box-sizing: border-box; font-family: var(--font-display); font-size: 46px; letter-spacing: 14px; text-align: center;
+  text-transform: uppercase; color: var(--ink); background: #fff; border: 3px solid var(--ink); border-radius: 16px; padding: 6px 6px 6px 20px; box-shadow: 0 4px 0 var(--ink); }
+.netcodein:focus { outline: 3px solid var(--sky); outline-offset: 2px; }
+.netwait { color: var(--muted); font-weight: 600; }
+.neterr { color: #d23a2a; font-weight: 700; }
+.netsafe { font-size: 14px !important; color: var(--muted); }
+.netheroes { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; }
+.nh { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 4px 7px; background: #fff; color: var(--ink); border: 3px solid var(--ink);
+  border-radius: 16px; box-shadow: 0 4px 0 var(--ink); font-family: var(--font-body); cursor: pointer; touch-action: manipulation; }
+.nh canvas { width: 62px; height: 62px; }
+.nh b { font-size: 15px; } .nh small { font-size: 12px; font-weight: 700; color: var(--muted); min-height: 15px; }
+.nh.on { background: #ffe6c4; border-color: var(--p2); box-shadow: 0 4px 0 var(--p2); }
+.nh.on small { color: #c25d00; }
+.nh:disabled { opacity: 0.55; cursor: default; }
+.netconn { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; color: var(--muted); font-weight: 600; font-size: 14px !important; }
+.netconn span::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; border: 2px solid var(--ink); background: #d9d6ec; vertical-align: -1px; }
+.netconn[data-q="1"] span::before, .netconn[data-q="2"] span::before { background: var(--mint); }
+.netconn[data-q="3"] span::before { background: var(--sun); }
+.netconn[data-q="4"] span::before { background: var(--coral); }
+.netconn small { font-weight: 500; font-size: 13px; }
+.netthrowrow { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.netthrowrow > b { font-size: 15px; }
+.netthrows { display: grid; grid-template-columns: repeat(4, minmax(0, 76px)); gap: 6px; justify-content: center; }
+.netthrows .thr canvas { width: 40px; height: 40px; }
+@media (max-height: 560px) { .netcode { font-size: 52px; } .netcodein { font-size: 38px; } .nh canvas { width: 48px; height: 48px; } }
 </style>
 </head>
 <body>
@@ -430,6 +468,7 @@ h2.title {
   <div id="controls" hidden></div>
 
   <button class="iconbtn" id="soundBtn" aria-label="Sound on or off"></button>
+  <button id="netPill" hidden><i></i><span>Online with a friend</span></button>
 
   <section class="screen" id="s-title">
     <div class="inner">
@@ -438,6 +477,7 @@ h2.title {
       <div class="title-gap"></div>
       <div class="row">
         <button class="btn big go" id="playBtn">Play</button>
+        <button class="btn" id="onlineBtn">Play online</button>
         <button class="btn alt" id="howBtn">How to play</button>
       </div>
       <p class="tip" id="titleTip">Play upright or sideways.</p>
@@ -510,12 +550,15 @@ h2.title {
     <div class="inner">
       <div class="panel">
         <h2>Paused</h2>
+        <p class="sub" id="pauseWho" hidden></p>
+        <p class="netconn" id="pauseConn" hidden></p>
         <div class="row pausegrid">
           <button class="btn go" id="resumeBtn">Keep playing</button>
           <button class="btn alt" id="restartBtn">Restart level</button>
           <button class="btn alt" id="howBtn2">How to play</button>
           <button class="btn alt" id="pauseSound">Sound: on</button>
           <button class="btn alt" id="quitBtn">Level map</button>
+          <button class="btn alt" id="leaveBtn" hidden>Leave online game</button>
         </div>
       </div>
     </div>
@@ -532,11 +575,24 @@ h2.title {
             <div class="statgrid" id="doneStats"></div>
           </div>
         </div>
+        <p class="sub" id="doneWait" hidden>Your friend picks what to play next.</p>
         <div class="row">
           <button class="btn alt" id="againBtn">Play again</button>
           <button class="btn alt" id="mapBtn">Level map</button>
           <button class="btn go" id="nextBtn">Next level</button>
+          <button class="btn alt" id="doneLeave" hidden>Leave online game</button>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen dim" id="s-net" hidden>
+    <div class="inner">
+      <div class="panel netpanel">
+        <h2 id="netTitle">Play online</h2>
+        <p class="sub" id="netSub"></p>
+        <div class="netbody" id="netBody"></div>
+        <div class="row" id="netBtns"></div>
       </div>
     </div>
   </section>
@@ -556,6 +612,7 @@ h2.title {
           <li>If a grown-up catches you, they march a friend home. Win them back in a promise battle at the end of a level.</li>
           <li>Teachers can't be fought. Stand still in an open locker to hide, sneak behind them, or get Jaxxs to distract them.</li>
           <li>Bopping bots and teaming up fills the crew meter. When it's full, use Crew Charge!</li>
+          <li>To play with a friend on another device, tap Play online. One of you hosts and gets a 4-letter code, and the other joins with it. Only someone with your code can join. If the connection drops, your friend's game gets back in by itself. If they closed the game, they tap Play online, then Rejoin. Pause the game to see how good the connection is.</li>
         </ul>
         <div class="keys">
           <span><b>Touch</b></span><span>Slide your thumb on the left side to run, the up arrow to jump, the star for your special move, and the button above jump to throw</span>
@@ -2282,9 +2339,10 @@ const KEYS2 = [
 ];
 function readInput() {
   for (let i = 0; i < 2; i++) {
-    const c = Input.ctrl[i], map = STATE.players === 2 ? KEYS2[i] : KEYS1;
-    for (const k of ['left', 'right', 'jump', 'action', 'throw']) c[k] = map[k].some((code) => Input.keys.has(code)) || Input.held.has(i + ':' + k) || !!(Input.tapped && Input.tapped.has(i + ':' + k)) || !!(Input.pad && Input.pad[i][k]);
-    if (Input.joyDir) { if (Input.joyDir[i] < 0) c.left = true; if (Input.joyDir[i] > 0) c.right = true; }
+    const c = Input.ctrl[i], map = STATE.players === 2 && !NET.on ? KEYS2[i] : KEYS1, remote = NET.on && i === 1;
+    if (remote) netRemoteCtrl(c); // online: player 2 plays on the friend's device
+    else for (const k of ['left', 'right', 'jump', 'action', 'throw']) c[k] = map[k].some((code) => Input.keys.has(code)) || Input.held.has(i + ':' + k) || !!(Input.tapped && Input.tapped.has(i + ':' + k)) || !!(Input.pad && Input.pad[i][k]);
+    if (Input.joyDir && !remote) { if (Input.joyDir[i] < 0) c.left = true; if (Input.joyDir[i] > 0) c.right = true; }
     if (STATE.players === 1 && i === 1) { c.left = c.right = c.jump = c.action = c.throw = false; }
     c.jumpP = c.jump && !c.pj; c.actionP = c.action && !c.pa; c.throwP = c.throw && !c.pt; c.pj = c.jump; c.pa = c.action; c.pt = c.throw;
   }
@@ -2806,7 +2864,8 @@ function doRespawn() {
 
 function keepTogether() {
   const [a, b] = G.players;
-  if (Math.abs(cxOf(a) - cxOf(b)) > VIEW.w - 120 && !a.pull && !b.pull) {
+  const w = NET.on && NET.peerW ? Math.min(VIEW.w, NET.peerW) : VIEW.w; // online: both screens can see both heroes
+  if (Math.abs(cxOf(a) - cxOf(b)) > w - 120 && !a.pull && !b.pull) {
     const back = cxOf(a) < cxOf(b) ? a : b, front = back === a ? b : a;
     puff(cxOf(back), back.y + back.h / 2, 10, '#fff');
     back.x = front.x - front.face * 40; back.y = front.y + front.h - back.h; back.vx = back.vy = 0;
@@ -3001,6 +3060,7 @@ function botsOnScreen() { return G.bots.filter((b) => live(b) && onScreen(b)); }
 const bossActive = () => G.boss && G.boss.state !== 'ko' && G.boss.state !== 'intro';
 
 function callHelp(id) {
+  if (netGuest()) { netAsk('call', id); return; } // the host's game does it
   if (!G || STATE.screen !== 'play' || G.trans || G.freeze > 0 || G.over || G.duel || G.mini) return;
   if (G.cd[id] > 0) { portraitShake(id); SND.sfx('nope'); return; }
   const h = heroById(id), ld = leader();
@@ -3128,6 +3188,7 @@ function combo(name) {
   banner('COMBO!', name + ' (+5 coins)');
 }
 function crewCharge() {
+  if (netGuest()) { netAsk('charge'); return; }
   if (!G || G.meter < 100 || G.trans || G.freeze > 0 || G.over || G.duel || G.mini || STATE.screen !== 'play') return;
   G.meter = 0; G.chargeFlash = 0.7; G.shake = 0.5; SND.sfx('charge');
   banner('CREW CHARGE!', 'Everyone, all at once');
@@ -3515,7 +3576,7 @@ const THROWS = {
 };
 const THROW_IDS = Object.keys(THROWS);
 const THROW_DEFAULT = { naseer: 'plane', frankie: 'snowball', spencer: 'disc', jaxxs: 'balloon', james: 'star', ollie: 'chicken', ben: 'slime' };
-function heroThrow(id) { let k = SAVE.throws && SAVE.throws[id]; if (k === 'boomerang') k = 'soccer'; return THROWS[k] ? k : THROW_DEFAULT[id]; }
+function heroThrow(id) { let k = netGuest() && NET.throws ? NET.throws[id] : netHost() && NET.p2throw && id === STATE.picks[1] ? NET.p2throw : SAVE.throws && SAVE.throws[id]; if (k === 'boomerang') k = 'soccer'; return THROWS[k] ? k : THROW_DEFAULT[id]; }
 function throwSfx(kind) { return kind === 'chicken' ? 'squeak' : kind === 'soccer' ? 'kick' : 'throw'; }
 
 function doThrow(p) {
@@ -5468,13 +5529,14 @@ function sendHome() {
 }
 
 function updateSent(dt) {
-  for (const E of G.sent) {
-    E.t += dt;
-    if (E.t >= 0.4 && E.t < 1.5) { const P = sentPath(E); E.trail.push({ x: P.x, y: P.y, a: 0, s: P.s }); }
-    for (const q of E.trail) q.a += dt;
-    E.trail = E.trail.filter((q) => q.a < 0.5);
-  }
+  for (const E of G.sent) { E.t += dt; sentTrail(E, dt); }
   G.sent = G.sent.filter((E) => E.t < 2.4);
+}
+function sentTrail(E, dt) { // the sparkly trail behind a friend flying home (each device draws its own when playing online)
+  if (!E.trail) E.trail = [];
+  if (E.t >= 0.4 && E.t < 1.5) { const P = sentPath(E); E.trail.push({ x: P.x, y: P.y, a: 0, s: P.s }); }
+  for (const q of E.trail) q.a += dt;
+  E.trail = E.trail.filter((q) => q.a < 0.5);
 }
 function sentEnd() {
   const yTop = (hudBottom() - VIEW.offY) / VIEW.scale;
@@ -5510,7 +5572,7 @@ function drawSent(c, E, t) {
     c.font = '30px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
     c.lineWidth = 8; c.strokeStyle = INK; c.strokeText('BONK!', 0, 0); c.fillStyle = '#ff6150'; c.fillText('BONK!', 0, 0); c.restore();
   } else if (E.t < 1.5) { // flying home
-    const tr = E.trail; c.lineCap = 'round';
+    const tr = E.trail || []; c.lineCap = 'round';
     for (const [w, k0, cl] of [[18, 3, col], [6, 1, '#fff']]) { // a comet streak in their colour with a bright core
       c.strokeStyle = cl;
       for (let i = 1; i < tr.length; i++) {
@@ -6235,23 +6297,35 @@ let DUEL_LAY = null, DUEL_LAY_KEY = '';
 const duelStacked = () => VIEW.W < 600; // narrow screens put Crusher's bar under yours
 function duelPanelH() { return VIEW.H < 450 ? 46 : 62; }
 function duelHudH() { return duelStacked() ? duelPanelH() * 2 + 8 : duelPanelH() + 4; } // the cool bars along the top
+const DUEL_ABOVE = 118, DUEL_BELOW = 14; // room behind the court for the fence and the crew, and a little in front
 function duelLayout() {
-  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), on = !!(G && G.duel);
-  const key = [W, H, VIEW.portrait, touch, SAFE.top, SAFE.bottom, SAFE.left, SAFE.right, on].join();
+  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), D = G && G.duel, on = !!D;
+  const fixed = !!(NET.on && D && D.cw), watching = !!(NET.on && D && D.pl !== NET.me);
+  const key = [W, H, VIEW.portrait, touch, SAFE.top, SAFE.bottom, SAFE.left, SAFE.right, on, fixed && D.cw, fixed && D.cd, watching].join();
   if (DUEL_LAY && key === DUEL_LAY_KEY) return DUEL_LAY;
-  const top = SAFE.top + 8 + duelHudH() + 8;
-  let bottom = H - SAFE.bottom - 6;
-  if (touch && VIEW.portrait) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers()).top - 14);
-  else if (touch) bottom -= 22;
-  const left = SAFE.left + 6, aw = W - SAFE.right - 6 - left, ah = Math.max(160, bottom - top);
-  const ABOVE = 118, BELOW = 14; // room behind the court for the fence and the crew, and a little in front
-  const s = clamp(Math.min(aw / (VIEW.portrait ? 540 : 760), ah / (236 + ABOVE + BELOW)), 0.45, 1.4);
-  const w = clamp(aw / s - 40, 420, 1100), d = clamp(ah / s - ABOVE - BELOW, 200, VIEW.portrait ? 440 : 380);
-  const ox = left + (aw - w * s) / 2, oy = top + (ah - (d + ABOVE + BELOW) * s) / 2 + ABOVE * s;
+  const F = duelFit(watching ? null : 'duel');
+  let s, w, d;
+  if (fixed) { w = D.cw; d = D.cd; s = clamp(Math.min(F.aw / (w + 40), F.ah / (d + DUEL_ABOVE + DUEL_BELOW)), 0.3, 1.4); } // online: both devices show the same court
+  else ({ s, w, d } = duelCourt(F));
+  const ox = F.left + (F.aw - w * s) / 2, oy = F.top + (F.ah - (d + DUEL_ABOVE + DUEL_BELOW) * s) / 2 + DUEL_ABOVE * s;
   DUEL_LAY_KEY = key; DUEL_LAY = { s, w, d, ox, oy, vx0: -ox / s, vx1: (W - ox) / s, vy0: -oy / s, vy1: (H - oy) / s };
-  if (on) for (const f of [G.duel.me, G.duel.cr]) { f.x = clamp(f.x, f.r, w - f.r); f.y = clamp(f.y, 10, d - 4); } // the phone turned: keep everyone on the court
+  if (on && !fixed) for (const f of [D.me, D.cr]) { f.x = clamp(f.x, f.r, w - f.r); f.y = clamp(f.y, 10, d - 4); } // the phone turned: keep everyone on the court
   return DUEL_LAY;
 }
+function duelFit(as) { // the part of the screen the Annoy-Off can use (as = 'duel': leave room for its buttons)
+  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn() && !!as, top = SAFE.top + 8 + duelHudH() + 8;
+  let bottom = H - SAFE.bottom - 6;
+  if (touch && VIEW.portrait) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers(), as).top - 14);
+  else if (touch) bottom -= 22;
+  const left = SAFE.left + 6, aw = W - SAFE.right - 6 - left, ah = Math.max(160, bottom - top);
+  return { left, top, aw, ah };
+}
+function duelCourt(F) { // the court that fills this screen
+  const s = clamp(Math.min(F.aw / (VIEW.portrait ? 540 : 760), F.ah / (236 + DUEL_ABOVE + DUEL_BELOW)), 0.45, 1.4);
+  const w = clamp(F.aw / s - 40, 420, 1100), d = clamp(F.ah / s - DUEL_ABOVE - DUEL_BELOW, 200, VIEW.portrait ? 440 : 380);
+  return { s, w, d };
+}
+function duelPref() { const c = duelCourt(duelFit('duel')); return [Math.round(c.w), Math.round(c.d)]; } // the court this screen would like
 function duelBounds() { const L = duelLayout(); return { x0: 0, x1: L.w, y0: 0, y1: L.d, w: L.w, d: L.d }; }
 function duelK(y) { const A = duelBounds(); return 0.84 + 0.16 * clamp((y - A.y0) / A.d, 0, 1); } // further back looks smaller
 const DUEL_PROPS = { // near the edges, so the middle of the court stays clear
@@ -6285,7 +6359,8 @@ function openBullyChoice() {
   const two = G.players.length === 2;
   box.innerHTML = G.players.map((p, i) => {
     const n = HEROES[p.id].name;
-    return `<button class="choice go" data-duel="${i}"><canvas width="96" height="96" data-por="${p.id}"></canvas><span><b>${two ? `Annoy-Off: ${n}` : 'Annoy-Off!'}</b>` +
+    const who = NET.on ? (i === NET.me ? ' (you)' : ' (your friend)') : '';
+    return `<button class="choice go" data-duel="${i}"><canvas width="96" height="96" data-por="${p.id}"></canvas><span><b>${two ? `Annoy-Off: ${n}${who}` : 'Annoy-Off!'}</b>` +
       `<small>${n} vs Crusher, one on one. Annoy him until he loses his cool!</small></span><kbd>${i + 1}</kbd></button>`;
   }).join('') +
     `<button class="choice" data-duel="moves"><span class="ico">${ICON.action}</span><span><b>Special moves</b><small>Hit him ${BULLY_HP} times before a grown-up comes.</small></span><kbd>${G.players.length + 1}</kbd></button>`;
@@ -6293,7 +6368,7 @@ function openBullyChoice() {
   box.querySelectorAll('canvas[data-por]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.por), 0, 0, 96, 96));
   const face = $('bullyFace'); if (face) { const c = face.getContext('2d'); c.clearRect(0, 0, face.width, face.height); c.drawImage(bigPortrait('crusher'), 0, 0, face.width, face.height); }
   box.querySelectorAll('button').forEach((b) => { b.disabled = true; b.onclick = () => chooseBully(b.dataset.duel); });
-  showScreen('bully'); SND.sfx('alert');
+  showScreen('bully'); if (!netGuest()) SND.sfx('alert'); // the friend's device gets the host's sound
   setTimeout(() => { // a moment to read it, so a button you were already mashing doesn't choose for you
     box.querySelectorAll('button').forEach((b) => { b.disabled = false; });
     if (STATE.screen !== 'bully') return;
@@ -6301,6 +6376,10 @@ function openBullyChoice() {
   }, 700);
 }
 function chooseBully(k) {
+  if (netGuest()) { // the host's game decides: whoever taps first
+    if (STATE.screen === 'bully') { document.querySelectorAll('#bullyChoices button').forEach((b) => { b.disabled = true; }); netAsk('bully', String(k)); }
+    return;
+  }
   const B = G && G.bully;
   if (STATE.screen !== 'bully' || !B) return;
   showScreen('play');
@@ -6326,6 +6405,7 @@ function startDuel(pl) {
     me: duelFighter(p.id, 0, 0), cr: duelFighter('crusher', 0, 0),
     fans: G.crew.filter((e) => e !== p).map((e) => ({ id: e.id, x: 0, y: 0, say: '', sayT: 0, cheer: 0 })), won: false, loser: null, copy: 0
   };
+  if (NET.on) { const pref = D.pl === NET.me ? duelPref() : (NET.peerAreas && NET.peerAreas.duel) || duelPref(); D.cw = pref[0]; D.cd = pref[1]; } // online: the court suits the player's screen
   const A = duelBounds(); D.me.x = A.w * 0.2; D.me.y = A.d * 0.55; D.cr.x = A.w * 0.8; D.cr.y = A.d * 0.45;
   B.duel = true; G.parts = []; G.texts = []; G.callouts = [];
   try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) { /* ignore */ }
@@ -6336,7 +6416,8 @@ function startDuel(pl) {
 }
 function duelHelpToast() {
   const D = G.duel, N = padNames();
-  const keys = STATE.players === 2
+  if (NET.on && D.pl !== NET.me) { toast(D.me.id, `${HEROES[D.me.id].name} is in the Annoy-Off! Cheer them on.`, 5); return; }
+  const keys = STATE.players === 2 && !NET.on
     ? (D.pl === 0 ? 'Move with W A S D. Space annoys Crusher. F uses your Super when it glows.' : 'Move with the arrow keys. Enter annoys Crusher. / uses your Super when it glows.')
     : 'Move with the arrow keys or W A S D. Space annoys Crusher. X uses your Super when it glows.';
   const tip = ' ' + DUEL_MOVES[D.me.id].tip;
@@ -6433,8 +6514,9 @@ const DUEL_KEYS2 = [
   { up: ['KeyW'], down: ['KeyS'], left: ['KeyA'], right: ['KeyD'], annoy: ['Space', 'KeyQ'], sup: ['KeyF', 'KeyE'] },
   { up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'], annoy: ['Enter', 'ShiftRight'], sup: ['Slash', 'Period'] }
 ];
-function duelInput(pl) {
-  const map = STATE.players === 2 ? DUEL_KEYS2[pl] || DUEL_KEYS1 : DUEL_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
+function duelInput(pl) { return NET.on && NET.role === 'host' && pl === 1 ? netRemoteDuel() : duelRaw(pl); }
+function duelRaw(pl) { // this device's keys, touch buttons, stick and controller
+  const map = STATE.players === 2 && !NET.on ? DUEL_KEYS2[pl] || DUEL_KEYS1 : DUEL_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
   let mx = (has('right') ? 1 : 0) - (has('left') ? 1 : 0), my = (has('down') ? 1 : 0) - (has('up') ? 1 : 0);
   const J = JOY[pl];
   if (J) { const dx = J.x - J.ox, dy = J.y - J.oy; if (Math.hypot(dx, dy) > 8) { mx = dx / JOY_R; my = dy / JOY_R; } }
@@ -6912,7 +6994,7 @@ function heatCol(p) { return p < 0.45 ? '#4fc3f7' : p < 0.7 ? '#ffc83d' : p < 0.
 function drawDuelBar(c, f) { // Brawl-style bars over their heads
   const D = G.duel, k = duelK(f.y), w = 72, h = 10, x = f.x - w / 2, y = f.y - (f.cr ? 154 : 118) * k, p = f.heat / 100;
   c.font = '700 12px Fredoka, sans-serif'; c.textAlign = 'center'; c.lineWidth = 4; c.strokeStyle = INK;
-  const tag = f.cr ? 'CRUSHER' : G.players.length === 2 ? 'P' + (D.pl + 1) : 'YOU';
+  const tag = f.cr ? 'CRUSHER' : NET.on ? (D.pl === NET.me ? 'YOU' : 'FRIEND') : G.players.length === 2 ? 'P' + (D.pl + 1) : 'YOU';
   c.strokeText(tag, f.x, y - 5); c.fillStyle = f.cr ? '#ff8a8a' : '#8cc4ff'; c.fillText(tag, f.x, y - 5);
   rrect(c, x, y, w, h, 4); blob(c, 'rgba(29,27,58,0.6)', 2);
   if (p > 0) { rrect(c, x + 2, y + 2, (w - 4) * p, h - 4, 3); c.fillStyle = heatCol(p); c.fill(); }
@@ -7137,7 +7219,13 @@ function startMini(retry) {
   if (!game) { G.miniDone = true; return false; }
   const tries = retry && G.mini ? G.mini.tries + 1 : 0, kids = G.players.map((p, i) => ({ pl: i, id: p.id }));
   G.mini = { kind, kids }; // for a moment, so the screen layout knows which buttons this game has
-  const area = miniArea(), size = game.size(area.w, area.h);
+  const area = miniArea();
+  let size = game.size(area.w, area.h);
+  const pa = NET.on && NET.peerAreas && NET.peerAreas.mini && NET.peerAreas.mini[kind];
+  if (pa) { // online: the size that shows biggest on the smaller of the two screens
+    const other = game.size(pa[0], pa[1]), fit = (z) => Math.min(area.w / z.w, area.h / z.h, pa[0] / z.w, pa[1] / z.h, 1.6);
+    if (fit(other) > fit(size) + 0.01) size = other;
+  }
   const M = G.mini = {
     kind, phase: retry ? 'count' : 'intro', t: 0, T: 0, count: -1, tries, diff: miniDiff(tries), w: size.w, h: size.h, vert: !!size.vert,
     kids, fans: followers().map((e) => e.id), prev: [{}, {}], flash: 0, coins: 0
@@ -7173,8 +7261,8 @@ function finishMini() {
 }
 function miniHelpToast() {
   const M = G.mini, h = MINI_GAMES[M.kind].help, N = padNames();
-  const keys = STATE.players === 2 ? `Player 1: ${h.keys2[0]} Player 2: ${h.keys2[1]}` : h.keys;
-  toast(M.kids[0].id, touchOrKey(h.touch, keys, h.pad(N)), 6);
+  const keys = STATE.players === 2 && !NET.on ? `Player 1: ${h.keys2[0]} Player 2: ${h.keys2[1]}` : h.keys;
+  toast((M.kids[NET.on ? NET.me : 0] || M.kids[0]).id, touchOrKey(h.touch, keys, h.pad(N)), 6);
 }
 
 /* ---------- every frame ---------- */
@@ -7202,7 +7290,13 @@ const MINI_KEYS2 = [
 ];
 // one call per player per frame: moves (-1 to 1), buttons held, and buttons just pressed
 function miniInput(pl) {
-  const M = G.mini, map = STATE.players === 2 ? MINI_KEYS2[pl] || MINI_KEYS1 : MINI_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
+  const M = G.mini, r = NET.on && NET.role === 'host' && pl === 1 ? netRemoteMini() : miniRaw(pl), { mx, my, a, b, c } = r;
+  const pv = M.prev[pl] || {};
+  M.prev[pl] = { a, b, c, my };
+  return { mx, my, a, b, c, aP: a && !pv.a, bP: b && !pv.b, cP: c && !pv.c, upP: my < -0.5 && !(pv.my < -0.5) };
+}
+function miniRaw(pl) { // this device's keys, touch buttons, stick and controller
+  const map = STATE.players === 2 && !NET.on ? MINI_KEYS2[pl] || MINI_KEYS1 : MINI_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
   let mx = (has('right') ? 1 : 0) - (has('left') ? 1 : 0), my = (has('down') ? 1 : 0) - (has('up') ? 1 : 0);
   const J = JOY[pl];
   if (J) { const dx = J.x - J.ox, dy = J.y - J.oy; if (Math.hypot(dx, dy) > 8) { mx = dx / JOY_R; my = dy / JOY_R; } }
@@ -7214,16 +7308,14 @@ function miniInput(pl) {
   const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
   const tb = (k) => Input.held.has(pl + ':' + k) || Input.tapped.has(pl + ':' + k);
   const a = has('a') || tb('throw') || !!(P && (P.ba || P.rt)), b = has('b') || tb('action') || !!(P && P.bx), c = has('c') || tb('jump') || !!(P && (P.bb || P.by));
-  const pv = M.prev[pl] || {};
-  M.prev[pl] = { a, b, c, my };
-  return { mx, my, a, b, c, aP: a && !pv.a, bP: b && !pv.b, cP: c && !pv.c, upP: my < -0.5 && !(pv.my < -0.5) };
+  return { mx, my, a, b, c };
 }
 
 /* ---------- fitting the game on the screen ---------- */
-function miniArea() { // the part of the screen a boss game can use, in CSS pixels
+function miniArea(kind) { // the part of the screen a boss game can use, in CSS pixels (kind: for a game that hasn't started yet)
   const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), top = SAFE.top + 8 + MINI_HUD_H + 8;
   let bottom = H - SAFE.bottom - 6;
-  if (touch && (VIEW.portrait || twoPlayers())) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers()).top - 12); // keep the game clear of the buttons
+  if (touch && (VIEW.portrait || twoPlayers())) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers(), kind).top - 12); // keep the game clear of the buttons
   else if (touch) bottom -= 8;
   const left = SAFE.left + 6, right = W - SAFE.right - 6;
   return { left, top, w: right - left, h: Math.max(160, bottom - top) };
@@ -7231,7 +7323,7 @@ function miniArea() { // the part of the screen a boss game can use, in CSS pixe
 let MINI_LAY = null, MINI_LAY_KEY = '';
 function miniLayout() {
   const M = G.mini, W = VIEW.W, H = VIEW.H;
-  const key = [W, H, VIEW.portrait, touchControlsOn(), SAFE.top, SAFE.bottom, SAFE.left, SAFE.right, M.kind, M.w, M.h, G.players.length].join();
+  const key = [W, H, VIEW.portrait, touchControlsOn(), SAFE.top, SAFE.bottom, SAFE.left, SAFE.right, M.kind, M.w, M.h, G.players.length, twoPlayers()].join(); // a friend leaving an online game brings back player 2's buttons
   if (MINI_LAY && key === MINI_LAY_KEY) return MINI_LAY;
   const A = miniArea(), s = Math.min(A.w / M.w, A.h / M.h, 1.6);
   const ox = A.left + (A.w - M.w * s) / 2, oy = A.top + (A.h - M.h * s) / 2;
@@ -7719,6 +7811,7 @@ MINI_GAMES.maze = {
   reset(M, first) { // everyone back to where they started
     M.kids.forEach((k, i) => Object.assign(k, { c: M.kstart.c + (M.kids.length === 2 ? (i ? 1 : -1) : 0), r: M.kstart.r, dx: 0, dy: 0, p: 0, want: null, face: 1, walk: 0, hurtT: first ? 0 : 1.5 }));
     M.bullies.forEach((b, i) => { const s = M.pen[i % M.pen.length]; Object.assign(b, { c: s.c, r: s.r, dx: 0, dy: 0, p: 0, wait: 1.5 + i * 2.2, scared: false }); });
+    for (const e of M.kids.concat(M.bullies)) { const p = this.pos(e); e.x = p.x; e.y = p.y; }
   },
   open(M, c2, r, bully) { const ch = M.grid[r] && M.grid[r][c2]; return ch !== undefined && ch !== '#' && ((ch !== '-' && ch !== 'B') || bully); },
   pos(e) { return { x: (e.c + e.dx * e.p + 0.5) * MAZE_T, y: (e.r + e.dy * e.p + 0.5) * MAZE_T }; },
@@ -7736,6 +7829,7 @@ MINI_GAMES.maze = {
     if (M.freezeT > 0) { M.freezeT -= dt; if (M.freezeT <= 0) this.reset(M, false); return; }
     for (const k of M.kids) this.moveKid(M, k, dt);
     for (const b of M.bullies) this.moveBully(M, b, dt);
+    for (const e of M.kids.concat(M.bullies)) { const p = this.pos(e); e.x = p.x; e.y = p.y; } // where to draw them (online, the friend's device glides these)
     if (M.powerT <= 0) M.bullies.forEach((b) => { b.scared = false; });
     // bumping into each other
     for (const k of M.kids) {
@@ -7836,11 +7930,11 @@ MINI_GAMES.maze = {
     }));
     const flash = M.powerT > 0 && M.powerT < 1.6 && Math.floor(t * 8) % 2;
     for (const b of M.bullies) {
-      const p = this.pos(b), still = b.wait > 0;
+      const p = b.x != null ? b : this.pos(b), still = b.wait > 0;
       drawMiniBully(c, p.x, p.y + MAZE_T * 0.42, 0.5, { col: b.col, scared: b.scared && !flash, frame: still ? 0 : Math.floor(b.walk) % 2, face: b.face, alpha: still ? 0.75 : 1 });
     }
     M.kids.forEach((k2, i) => {
-      const p = this.pos(k2), blink = k2.hurtT > 0 && Math.floor(t * 12) % 2 ? 0.35 : 1, moving = !!(k2.dx || k2.dy);
+      const p = k2.x != null ? k2 : this.pos(k2), blink = k2.hurtT > 0 && Math.floor(t * 12) % 2 ? 0.35 : 1, moving = !!(k2.dx || k2.dy);
       drawHero(c, k2.id, p.x, p.y + MAZE_T * 0.42, { t, pose: M.freezeT > 0 ? 'flail' : moving ? 'run' : 'idle', face: k2.face, phase: k2.walk, scale: 0.56, alpha: blink, drone: k2.id === 'spencer' });
       if (M.kids.length === 2) { c.fillStyle = i ? '#ff8a1f' : '#2f8cff'; c.beginPath(); const my = p.y - 34; c.moveTo(p.x - 6, my - 7); c.lineTo(p.x + 6, my - 7); c.lineTo(p.x, my); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); }
     });
@@ -8088,6 +8182,1075 @@ MINI_GAMES.fighter = {
     miniLabel(c, String(Math.ceil(M.clock)), H.M.x + H.M.w / 2, y + 43, 26, M.clock < 10 ? '#ff4d4d' : INK, 'center');
   }
 };
+
+/* ===================== Online play: two devices, one game ===================== */
+// The host's device runs the game. The friend's device (the guest) sends its buttons to the host and draws
+// what the host sends back, about 20 times a second. The devices find each other with a 4-letter code
+// through PeerJS's free matchmaking service, then talk directly over WebRTC.
+const NET_BUILD = '1de509969c38'; // the build puts a fingerprint of the game here: both devices must run the same version
+const NET_PREFIX = 'naseer-crew-v1-';
+const NET_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ'; // no vowels, so a code can't spell a word
+const NET_LIB = ['https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js', 'https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js'];
+const NET_LIB_SRI = 'sha384-x0YgkOr/3UOZP2CRDxGW9e0Q+2Qjyr3uJrm4xU32Y7ZCNAo7Cc7bjhrZMi/dwczu';
+const NET_SNAP = 1 / 30;     // the host sends the game 30 times a second
+const NET_CHUNK = 14000;     // big messages go in pieces under 16 KB
+const NET_LOST_AFTER = 10000; // no word from the other device for this long: the connection has dropped
+const NET_REJOIN_FOR = 120000; // after a dropout, the friend's device keeps trying to get back in for 2 minutes
+const NET_SAVE = 'naseer-crew-online', NET_SAVE_FOR = 30 * 60 * 1000; // the friend's device remembers the game for 30 minutes, so it can rejoin after a reload
+const NET_PLAY = ['story', 'play', 'pause', 'done', 'bully'];
+const NET = {
+  role: null, on: false, me: 0, peer: null, conn: null, pend: null, code: '', ui: '', note: '',
+  tok: '', away: false, rejoin: null, reachT: 0, lagT: 0, rtt: 0, rttN: 0, link: null, pingI: 0,
+  rin: { k: 0, p: 0, x: 0, y: 0, q: -1 }, iq: [], ack: -1, peerW: 0, peerAreas: null, areasKey: '', hostScr: '', crew: null, throws: null, pausedBy: '',
+  lastRx: 0, lastTx: 0, buf: null, chunkId: 0, sendT: 0, sentScr: '', key: false,
+  ev: [], ctx: 0, cap: 0, mirror: 0, timer: 0, beat: 0, libP: null, wantPlay: false, stats: { tx: 0, rx: 0, snaps: 0 }
+};
+const netNow = () => performance.now();
+const netGuest = () => NET.on && NET.role === 'guest';
+const netHost = () => NET.on && NET.role === 'host';
+
+/* ---------- Loading PeerJS when it's first needed ---------- */
+function netLoadLib() {
+  if (window.peerjs && window.peerjs.Peer) return Promise.resolve();
+  if (NET.libP) return NET.libP;
+  const urls = window.__netLib || NET_LIB;
+  NET.libP = new Promise((res, rej) => {
+    let i = 0;
+    const next = () => {
+      if (i >= urls.length) { NET.libP = null; rej(new Error('lib')); return; }
+      const s = document.createElement('script');
+      s.src = urls[i++]; s.async = true;
+      if (!window.__netLib) { s.crossOrigin = 'anonymous'; s.integrity = NET_LIB_SRI; }
+      s.onload = () => (window.peerjs && window.peerjs.Peer ? res() : next());
+      s.onerror = () => { s.remove(); next(); };
+      document.head.appendChild(s);
+    };
+    next();
+  });
+  return NET.libP;
+}
+function netPeerOpts() { return Object.assign({ debug: 0 }, window.__netPeerOpts || {}); }
+function netMakeCode() {
+  const r = new Uint32Array(4); crypto.getRandomValues(r);
+  return Array.from(r, (v) => NET_LETTERS[v % NET_LETTERS.length]).join('');
+}
+
+/* ---------- Messages ---------- */
+function netSend(m, conn) {
+  const c = conn || NET.conn;
+  if (!c || !c.open) return false;
+  const s = JSON.stringify(m).replace(/[\u007f-\uffff]/g, (ch) => '\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0')); // plain ASCII, so length = bytes
+  try {
+    if (s.length <= NET_CHUNK) netRaw(c, s);
+    else {
+      const id = ++NET.chunkId, n = Math.ceil(s.length / NET_CHUNK);
+      for (let i = 0; i < n; i++) netRaw(c, `~${id},${i},${n},` + s.slice(i * NET_CHUNK, (i + 1) * NET_CHUNK));
+    }
+  } catch (e) { return false; }
+  NET.lastTx = netNow(); NET.stats.tx += s.length;
+  return true;
+}
+const NET_LAGQ = [];
+function netRaw(c, s) { // tests can slow the line down (__netLag ms, __netJitter ms) or cut it (__netCut)
+  if (window.__netCut) return;
+  const lag = window.__netLag || 0;
+  if (!lag) { c.send(s); return; }
+  const last = NET_LAGQ.length ? NET_LAGQ[NET_LAGQ.length - 1].due : 0;
+  NET_LAGQ.push({ c, s, due: Math.max(last, netNow() + lag + Math.random() * (window.__netJitter || 0)) });
+  if (!NET.lagT) NET.lagT = setInterval(() => {
+    const now = netNow();
+    while (NET_LAGQ.length && NET_LAGQ[0].due <= now) { const q = NET_LAGQ.shift(); try { if (q.c.open) q.c.send(q.s); } catch (e) { /* closed */ } }
+    if (!NET_LAGQ.length) { clearInterval(NET.lagT); NET.lagT = 0; }
+  }, 4);
+}
+function netRecv(conn, d) {
+  if (window.__netCut || (conn !== NET.conn && conn !== NET.pend)) return;
+  NET.lastRx = netNow();
+  if (typeof d !== 'string') return;
+  NET.stats.rx += d.length;
+  let s = d;
+  if (s.charCodeAt(0) === 126) { // ~ : one piece of a big message
+    const a = s.indexOf(','), b = s.indexOf(',', a + 1), c = s.indexOf(',', b + 1);
+    const id = s.slice(1, a), i = +s.slice(a + 1, b), n = +s.slice(b + 1, c);
+    if (!NET.buf || NET.buf.id !== id) NET.buf = { id, parts: [], got: 0 };
+    if (NET.buf.parts[i] == null) NET.buf.got++;
+    NET.buf.parts[i] = s.slice(c + 1);
+    if (NET.buf.got < n) return;
+    s = NET.buf.parts.join(''); NET.buf = null;
+  }
+  let m;
+  try { m = JSON.parse(s); } catch (e) { return; }
+  if (!m || typeof m.t !== 'string') return;
+  if (conn === NET.conn && m.t === 'pi') { netSend({ t: 'po', i: m.i, s: m.s }); return; } // a ping from the other device: answer it straight away
+  if (conn === NET.conn && m.t === 'po') { netPong(m); return; }
+  try {
+    if (conn === NET.pend) netPendMsg(m);
+    else if (NET.role === 'host') netHostMsg(m);
+    else netGuestMsg(m);
+  } catch (e) { console.error(e); }
+}
+function netWire(conn) {
+  conn.on('data', (d) => netRecv(conn, d));
+  conn.on('close', () => netClosed(conn));
+  conn.on('error', () => netClosed(conn));
+  conn.on('open', () => { // a connection that has failed for good closes straight away
+    const pc = conn.peerConnection;
+    if (pc) pc.addEventListener('iceconnectionstatechange', () => { if (['failed', 'closed'].includes(pc.iceConnectionState)) netClosed(conn); });
+  });
+}
+// closing the game (not just switching apps) tells the other device straight away. A friend's device can come back and rejoin;
+// a host's game is gone, so the friend is told it has ended.
+window.addEventListener('pagehide', (e) => { if (NET.on && !e.persisted) netSend({ t: 'bye', why: 'gone' }); });
+function netClosed(conn) {
+  if (conn === NET.pend) {
+    NET.pend = null;
+    if (NET.role === 'host' && NET.ui === 'ask') netUi('code');
+    else if (NET.role === 'guest' && !NET.on) netFail('lost'); // (while rejoining, the next try comes along by itself)
+  } else if (conn === NET.conn && NET.on) netDropped('lost');
+}
+
+/* ---------- Starting, joining and stopping ---------- */
+function netOpen() {
+  firstGesture();
+  showScreen('net');
+  if (NET.on) netUi(NET.role === 'host' ? 'status' : NET.away ? 'rejoin' : 'lobby');
+  else if (NET.role === 'host' && NET.code) netUi('code');
+  else netUi('menu');
+}
+function netHostStart() {
+  netStop(); NET.role = 'host';
+  netUi('wait', { txt: 'Getting a code…' });
+  netLoadLib().then(() => netHostOpen(0), () => netFail('lib'));
+}
+function netHostOpen(tries) {
+  if (NET.role !== 'host' || NET.on) return;
+  const code = netMakeCode();
+  let peer;
+  try { peer = new window.peerjs.Peer(NET_PREFIX + code, netPeerOpts()); } catch (e) { netFail('browser'); return; }
+  NET.peer = peer;
+  peer.on('open', () => { if (NET.peer !== peer || NET.on) return; NET.code = code; NET.note = ''; netUi('code'); });
+  peer.on('connection', (conn) => { if (NET.peer === peer) netIncoming(conn); });
+  peer.on('disconnected', () => netKeepReachable(peer)); // the code keeps working all game, so a friend who drops out can get back in
+  peer.on('error', (err) => {
+    if (NET.peer !== peer) return;
+    if (NET.on) { netKeepReachable(peer); return; } // playing already: just stay reachable
+    if (err.type === 'unavailable-id' && tries < 4) { peer.destroy(); netHostOpen(tries + 1); return; }
+    netFail(err.type);
+  });
+}
+function netKeepReachable(peer) { // lost touch with the matchmaking service: get back on it, so the code still works
+  if (NET.peer !== peer || NET.role !== 'host' || peer.destroyed || NET.reachT) return;
+  NET.reachT = setTimeout(() => {
+    NET.reachT = 0;
+    if (NET.peer === peer && peer.disconnected && !peer.destroyed) { try { peer.reconnect(); } catch (e) { /* the next 'disconnected' tries again */ } }
+  }, 2000);
+}
+function netIncoming(conn) {
+  if (NET.pend && NET.ui === 'ask') { // someone is already asking to join
+    conn.on('open', () => { netSend({ t: 'bye', why: 'busy' }, conn); setTimeout(() => { try { conn.close(); } catch (e) { /* ignore */ } }, 400); });
+    return;
+  }
+  if (NET.pend) { const old = NET.pend; NET.pend = null; try { old.close(); } catch (e) { /* ignore */ } } // a newer try replaces one that never said hello
+  NET.pend = conn; netWire(conn); // a new friend, or your friend getting back in: the hello says which
+  setTimeout(() => { if (NET.pend === conn && NET.ui !== 'ask') { NET.pend = null; try { conn.close(); } catch (e) { /* ignore */ } } }, 8000);
+}
+function netPendMsg(m) {
+  if (NET.role === 'host') {
+    if (m.t !== 'hello') return;
+    const c = NET.pend, drop = (why) => { netSend({ t: 'bye', why }, c); NET.pend = null; setTimeout(() => { try { c.close(); } catch (e) { /* ignore */ } }, 400); };
+    if (m.b !== NET_BUILD) {
+      drop('version');
+      if (!NET.on) { NET.note = 'A friend tried to join, but their game is a different version. Ask them to close the game and open it again.'; netUi('code'); }
+      return;
+    }
+    if (NET.on && NET.tok && m.tok === NET.tok) { netWelcomeBack(c); return; } // your friend, getting back in after a dropout
+    if (NET.on) { drop('busy'); return; } // this game already has a friend
+    NET.peerW = +m.w || 0;
+    netUi('ask'); SND.sfx('alert');
+  } else {
+    if (m.t === 'welcome') {
+      const back = !!m.back;
+      NET.conn = NET.pend; NET.pend = null; NET.on = true; NET.away = false; NET.me = 1; NET.lastRx = netNow();
+      if (NET.rejoin) { clearTimeout(NET.rejoin.timer); NET.rejoin = null; }
+      if (m.tok) NET.tok = m.tok;
+      netSaveSession();
+      STATE.players = 2; netInputReset(); NET.areasKey = ''; netTimingReset();
+      if (back) { G = null; netGuestReset(); NETG.mode = null; } // the host sends the whole game again
+      clearTimeout(NET.timer); netBeat();
+      SND.sfx('help');
+      if (STATE.screen !== 'net') showScreen('net');
+      netUi('lobby', back ? { txt: 'You\'re back in!' } : {}); netRoleUi();
+    } else if (m.t === 'bye') {
+      if (!NET.away) netFail(m.why);
+      else if (m.why === 'version' || m.why === 'left' || m.why === 'gone') netRejoinGiveUp(m.why);
+      else { const c = NET.pend; NET.pend = null; if (c) { try { c.close(); } catch (e) { /* ignore */ } } } // not right now: the next try comes along soon
+    }
+  }
+}
+function netLetIn() {
+  const c = NET.pend; if (!c) return;
+  NET.conn = c; NET.pend = null; NET.on = true; NET.away = false; NET.me = 0; NET.lastRx = netNow();
+  NET.tok = netMakeToken(); // a secret only your friend's device knows: with it, they can get back in after a dropout
+  netInputReset(); NET.peerAreas = null; NET.sentScr = ''; NET.ev = [];
+  STATE.players = 2; repReset();
+  netSend({ t: 'welcome', tok: NET.tok });
+  netBeat(); SND.sfx('help');
+  G = null; showScreen('adv'); // the host picks an adventure, the friend waits for it
+}
+function netWelcomeBack(c) { // your friend got back in after dropping out
+  const old = NET.conn;
+  NET.conn = c; NET.pend = null; NET.away = false; NET.lastRx = netNow();
+  if (old && old !== c) { try { old.close(); } catch (e) { /* ignore */ } }
+  netInputReset(); NET.sentScr = ''; NET.ev = []; repReset(); // the whole game goes again
+  netSend({ t: 'welcome', tok: NET.tok, back: 1 });
+  netBeat(); SND.sfx('help');
+  if (STATE.screen === 'pause' && NET.pausedBy === 'away') { NET.pausedBy = 'back'; $('pauseWho').textContent = 'Your friend is back! Tap Keep playing.'; $('pauseWho').hidden = false; }
+  netRoleUi(); if (STATE.screen === 'net' && NET.ui === 'status') netUi('status');
+}
+function netMakeToken() { const r = new Uint32Array(4); crypto.getRandomValues(r); return Array.from(r, (v) => v.toString(36)).join(''); }
+function netDeny() {
+  const c = NET.pend; if (!c) return;
+  netSend({ t: 'bye', why: 'no' }, c); NET.pend = null;
+  setTimeout(() => { try { c.close(); } catch (e) { /* ignore */ } }, 400);
+  netUi('code');
+}
+function netJoinGo() {
+  const inp = $('netCodeIn'), code = (inp ? inp.value : '').toUpperCase().replace(/[^A-Z]/g, '');
+  if (code.length !== 4) { netUi('join', { err: 'The code has 4 letters.', val: code }); return; }
+  netStop(); NET.role = 'guest'; NET.code = code;
+  netUi('wait', { txt: 'Connecting…' });
+  netLoadLib().then(() => {
+    if (NET.role !== 'guest' || NET.peer) return;
+    let peer;
+    try { peer = new window.peerjs.Peer(netPeerOpts()); } catch (e) { netFail('browser'); return; }
+    NET.peer = peer;
+    peer.on('open', () => {
+      if (NET.peer !== peer || NET.pend) return;
+      const conn = peer.connect(NET_PREFIX + code, { reliable: true, serialization: 'raw' });
+      NET.pend = conn; netWire(conn);
+      conn.on('open', () => {
+        if (NET.pend !== conn) return;
+        netSend({ t: 'hello', b: NET_BUILD, w: Math.round(VIEW.w) }, conn);
+        netUi('wait', { txt: 'Waiting for your friend to let you in…' });
+      });
+    });
+    peer.on('error', (err) => { if (NET.peer !== peer || NET.on) return; netFail(err.type === 'peer-unavailable' ? 'nocode' : err.type); });
+  }, () => netFail('lib'));
+  clearTimeout(NET.timer);
+  NET.timer = setTimeout(() => { if (NET.role === 'guest' && !NET.on && !(NET.pend && NET.pend.open)) netFail('slow'); }, 20000);
+}
+function netStop() { // closes everything, without changing the screen
+  clearTimeout(NET.timer); clearInterval(NET.beat); NET.beat = 0; clearTimeout(NET.reachT); NET.reachT = 0;
+  if (NET.rejoin) clearTimeout(NET.rejoin.timer);
+  const conns = [NET.conn, NET.pend], peer = NET.peer;
+  NET.conn = NET.pend = NET.peer = null; NET.on = false; NET.away = false; // first, so closing them below isn't taken for a dropout
+  for (const c of conns) if (c) { try { c.close(); } catch (e) { /* ignore */ } }
+  if (peer) { try { peer.destroy(); } catch (e) { /* ignore */ } }
+  Object.assign(NET, { role: null, on: false, me: 0, peer: null, conn: null, pend: null, code: '', note: '', crew: null, throws: null, p2throw: null, buf: null, hostScr: '', sentScr: '', wantPlay: false, ev: [], pausedBy: '',
+    tok: '', away: false, rejoin: null });
+  NET.peerAreas = null; netInputReset();
+  repReset(); netGuestReset(); netTimingReset();
+  netRoleUi();
+}
+function netLeave() { // you chose to stop playing online
+  const wasGuest = NET.role === 'guest', c = NET.conn;
+  if (wasGuest) netClearSave();
+  if (c) { netSend({ t: 'bye', why: 'left' }); NET.conn = null; setTimeout(() => { try { c.close(); } catch (e) { /* ignore */ } }, 300); }
+  netStop();
+  if (wasGuest) { G = null; showScreen('title'); return; }
+  if (['net', 'title'].includes(STATE.screen)) showScreen('title');
+  else if (G) { buildHUD(); resize(); } // player 2's buttons come back on this device
+}
+function netDropped(why) { // the other device went away
+  if (NET.role === 'host') {
+    if (why !== 'left') { netHostAway(); return; } // a dropout: wait for your friend to get back in
+    netStop(); // your friend chose to leave
+    if (G && NET_PLAY.includes(STATE.screen)) { buildHUD(); resize(); banner('Your friend left', 'Player 2 can play on this device now'); }
+    else { showScreen('net'); netUi('fail', { title: 'Your friend left', txt: NET_FAIL.left }); }
+    return;
+  }
+  if (why === 'left' || why === 'gone') { netClearSave(); G = null; netFail(why); return; } // the host stopped the online game, or closed it
+  netGuestRejoin();
+}
+function netHostAway() { // keep the game and the code, so your friend can get back in
+  const c = NET.conn; NET.conn = null;
+  if (c) { try { c.close(); } catch (e) { /* ignore */ } }
+  if (NET.away) return;
+  NET.away = true; netHostInputClear(); SND.sfx('nope');
+  if (G && STATE.screen === 'play') showScreen('pause');
+  if (STATE.screen === 'pause') { NET.pausedBy = 'away'; $('pauseWho').textContent = 'Your friend dropped out. Waiting for them to get back in…'; $('pauseWho').hidden = false; }
+  netRoleUi(); if (STATE.screen === 'net' && NET.ui === 'status') netUi('status');
+}
+function netGuestRejoin() { // the connection dropped: keep trying to get back into your friend's game
+  const c = NET.conn; NET.conn = null;
+  if (c) { try { c.close(); } catch (e) { /* ignore */ } }
+  if (NET.away) return;
+  NET.away = true; NET.rejoin = { t0: netNow(), tries: 0, timer: 0 };
+  netInputReset(); joyEnd(); Input.held.clear(); Input.tapped.clear();
+  G = null; netGuestReset(); NETG.mode = null;
+  if (STATE.screen !== 'net') showScreen('net');
+  netUi('rejoin'); netRejoinTry();
+}
+function netRejoinSaved() { // after a reload: get back into the game this device was playing
+  const S = netLoadSession(); if (!S) { netUi('menu'); return; }
+  netStop();
+  Object.assign(NET, { role: 'guest', code: S.code, tok: S.tok, on: true, me: 1, away: true, rejoin: { t0: netNow(), tries: 0, timer: 0, saved: true } });
+  STATE.players = 2; G = null;
+  if (STATE.screen !== 'net') showScreen('net');
+  netUi('rejoin'); netRejoinTry();
+}
+function netRejoinTry() {
+  const R = NET.rejoin;
+  if (!R || NET.role !== 'guest' || !NET.away) return;
+  if (netNow() - R.t0 > NET_REJOIN_FOR) { netRejoinGiveUp('slow'); return; }
+  clearTimeout(R.timer); R.timer = setTimeout(netRejoinTry, 5000);
+  if (NET.pend && NET.pend.open && !R.grace) { R.grace = true; return; } // nearly there: give it one moment longer
+  R.grace = false;
+  R.tries++; if (NET.ui === 'rejoin' && STATE.screen === 'net') netUi('rejoin');
+  const oldC = NET.pend, oldP = NET.peer; NET.pend = NET.peer = null;
+  if (oldC) { try { oldC.close(); } catch (e) { /* ignore */ } }
+  if (oldP) { try { oldP.destroy(); } catch (e) { /* ignore */ } }
+  netLoadLib().then(() => {
+    if (NET.rejoin !== R || !NET.away) return;
+    let peer;
+    try { peer = new window.peerjs.Peer(netPeerOpts()); } catch (e) { return; }
+    NET.peer = peer;
+    peer.on('open', () => {
+      if (NET.peer !== peer || NET.rejoin !== R) return;
+      const conn = peer.connect(NET_PREFIX + NET.code, { reliable: true, serialization: 'raw' });
+      NET.pend = conn; netWire(conn);
+      conn.on('open', () => { if (NET.pend === conn) netSend({ t: 'hello', b: NET_BUILD, w: Math.round(VIEW.w), tok: NET.tok }, conn); });
+    });
+    peer.on('error', () => { /* not there yet: the next try comes along soon */ });
+  }, () => { /* offline: the next try comes along soon */ });
+}
+function netRejoinGiveUp(why) {
+  const over = ['version', 'left', 'gone'].includes(why); // the game has ended, or can't be joined: don't offer to rejoin it
+  if (over) netClearSave();
+  netStop(); G = null;
+  if (STATE.screen !== 'net') showScreen('net');
+  netUi('fail', { title: why === 'left' || why === 'gone' ? 'Your friend left' : 'Couldn\'t get back in', rejoin: !over && !!netLoadSession(),
+    txt: over ? NET_FAIL[why] : 'Your friend\'s game may have ended, or one of you is offline. Check with your friend, then tap Rejoin, or ask them for a new code.' });
+}
+function netSaveSession() { try { localStorage.setItem(NET_SAVE, JSON.stringify({ code: NET.code, tok: NET.tok, at: Date.now() })); } catch (e) { /* private browsing */ } }
+function netLoadSession() {
+  try { const S = JSON.parse(localStorage.getItem(NET_SAVE) || 'null'); if (S && S.code && S.tok && Date.now() - S.at < NET_SAVE_FOR) return S; } catch (e) { /* none */ }
+  return null;
+}
+function netClearSave() { try { localStorage.removeItem(NET_SAVE); } catch (e) { /* ignore */ } }
+const NET_FAIL = {
+  lib: 'Online play couldn\'t load. Check you\'re connected to the internet, then try again.',
+  nocode: 'There\'s no game with that code. Check the code on your friend\'s screen and try again.',
+  slow: 'Couldn\'t connect to your friend. Check you\'re both online, then try again.',
+  network: 'Couldn\'t reach the online game service. Check you\'re connected to the internet, then try again.',
+  no: 'Your friend said not this time.',
+  busy: 'That game already has a friend in it.',
+  version: 'Your games are different versions. Close the game on both devices, open it again, then try again.',
+  left: 'Your friend left the online game.',
+  gone: 'Your friend closed the game, so the online game has ended. Ask them for a new code to play again.',
+  lost: 'Lost the connection to your friend. Check you\'re both online, then start again.',
+  browser: 'This browser can\'t play online. Try Safari or Chrome.'
+};
+function netFail(why) {
+  const txt = NET_FAIL[why] || (['server-error', 'socket-error', 'socket-closed', 'disconnected'].includes(why) ? NET_FAIL.network : ['browser-incompatible', 'webrtc'].includes(why) ? NET_FAIL.browser : 'Something went wrong. Try again.');
+  netStop();
+  if (STATE.screen !== 'net') showScreen('net');
+  if (why === 'nocode' || why === 'version') netClearSave();
+  netUi('fail', { title: why === 'left' || why === 'gone' ? 'Your friend left' : why === 'no' ? 'Not this time' : why === 'lost' ? 'Connection lost' : 'Couldn\'t connect', txt });
+}
+function netBeat() { // every second: a small hello so each side knows the other is still there, and a check on the connection
+  clearInterval(NET.beat);
+  let n = 0;
+  NET.rtt = 0; NET.rttN = 0; NET.link = null;
+  NET.beat = setInterval(() => {
+    if (!NET.on || !NET.conn) return;
+    const now = netNow(); n++;
+    if (n % 2 === 1) netSend({ t: 'pi', i: ++NET.pingI, s: Math.round(now) }); // a ping every 2 seconds
+    else if (now - NET.lastTx > 1000) netSend({ t: 'p' });
+    if (now - NET.lastRx > NET_LOST_AFTER) { netDropped('lost'); return; }
+    if (n % 4 === 1) netReadLink();
+    if (NET.role === 'guest' && n % 30 === 0) netSaveSession(); // still playing: remember it a while longer
+    netConnUi();
+  }, 1000);
+}
+/* ---------- How good the connection is ---------- */
+function netPong(m) { // a ping came back: how long the trip there and back took
+  const r = netNow() - (+m.s || 0);
+  if (!(r >= 0 && r < 10000)) return;
+  NET.rtt = NET.rttN ? NET.rtt * 0.6 + r * 0.4 : r; NET.rttN++;
+}
+function netReadLink() { // are the devices on the same Wi-Fi, linked directly over the internet, or going through a relay?
+  const pc = NET.conn && NET.conn.peerConnection;
+  if (!pc || !pc.getStats) return;
+  pc.getStats().then((st) => {
+    const by = new Map(); let pair = null;
+    st.forEach((r) => by.set(r.id, r));
+    st.forEach((r) => { if (r.type === 'transport' && r.selectedCandidatePairId) pair = by.get(r.selectedCandidatePairId) || pair; });
+    if (!pair) st.forEach((r) => { if (!pair && r.type === 'candidate-pair' && r.state === 'succeeded' && (r.nominated || r.selected)) pair = r; });
+    if (!pair) return;
+    const ends = [by.get(pair.localCandidateId), by.get(pair.remoteCandidateId)], types = ends.map((c) => c && c.candidateType);
+    const home = (c) => { const a = (c && (c.address || c.ip)) || ''; return !a || /\.local$|^(10|127)\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\.|^169\.254\.|^f[c-e]/i.test(a); }; // an address on a home network
+    NET.link = { relay: types.includes('relay'), local: types[0] === 'host' && types[1] === 'host' && home(ends[1]) };
+  }).catch(() => { /* not available on this browser */ });
+}
+function netConnText() {
+  if (!NET.on || NET.away || !NET.conn) return null;
+  if (!NET.rttN) return { q: 0, txt: 'Checking the connection…', tip: '' };
+  const ms = Math.round(NET.rtt), q = ms < 60 ? 1 : ms < 120 ? 2 : ms < 200 ? 3 : 4;
+  const how = !NET.link ? '' : NET.link.relay ? ', through a relay' : NET.link.local ? ', same Wi-Fi' : ', direct';
+  const tip = NET.link && NET.link.relay ? 'The devices can\'t link directly, so the game goes through a relay overseas. Wi-Fi on both devices often fixes this.'
+    : q === 4 ? 'Try Wi-Fi instead of mobile data, close to the router.' : '';
+  return { q, txt: `Connection: ${['', 'Great', 'Good', 'OK', 'Slow'][q]} (${ms} ms${how})`, tip };
+}
+function netConnUi() { // the connection line in the pause menu and the online screens
+  const C = netConnText();
+  document.querySelectorAll('.netconn').forEach((el) => {
+    if (!C) { el.hidden = true; return; }
+    const html = `<span>${C.txt}</span>${C.tip ? `<small>${C.tip}</small>` : ''}`;
+    if (el.innerHTML !== html) el.innerHTML = html;
+    el.dataset.q = C.q; el.hidden = false;
+  });
+}
+
+/* ---------- The online screen ---------- */
+const NET_WHAT = { title: 'Your friend is on the title screen.', adv: 'Your friend is picking an adventure.', levels: 'Your friend is picking a level.', help: 'Your friend is reading how to play.', net: 'Your friend is on the online screen.' };
+function netUi(state, o = {}) {
+  NET.ui = state;
+  const btn = (k, label, cls = 'alt') => `<button class="btn ${cls}" data-net="${k}">${label}</button>`;
+  let title = 'Play online', sub = '', body = '', btns = '';
+  if (state === 'menu') {
+    sub = 'Play together on two devices, even from different houses.';
+    body = '<p>One of you hosts a game and gets a code. The other joins with that code.</p>' +
+      '<p class="netsafe">Only someone with your code can join. There\'s no chat, so talk on a phone or FaceTime call while you play.</p>';
+    btns = btn('host', 'Host a game', 'go') + btn('join', 'Join a game', '') + btn('back', 'Back');
+    const S = netLoadSession();
+    if (S) { // this device was in a game a moment ago: offer to get straight back in
+      body = `<p class="netwait">You were just playing online with code <b>${S.code}</b>.</p>` + body;
+      btns = btn('rejoin', `Rejoin ${S.code}`, 'go') + btn('host', 'Host a game', '') + btn('join', 'Join a game', '') + btn('back', 'Back');
+    }
+  } else if (state === 'rejoin') {
+    const R = NET.rejoin;
+    title = 'Getting back in…';
+    body = `<p>${R && R.saved ? 'Joining your friend\'s game again' : 'The connection to your friend dropped. Getting back in'}${R && R.tries > 1 ? ` (try ${R.tries})` : ''}…</p>` +
+      '<p class="netwait">Keep this screen open. You\'ll go straight back into the game.</p>';
+    btns = btn('leave', 'Leave online game');
+  } else if (state === 'wait') {
+    body = `<p class="netwait">${o.txt}</p>`; btns = btn('cancel', 'Cancel');
+  } else if (state === 'code') {
+    title = 'Your game code';
+    body = `<div class="netcode" aria-label="Code ${NET.code.split('').join(' ')}">${NET.code}</div>` +
+      '<p>Ask your friend to open the game, tap <b>Play online</b>, then <b>Join a game</b> and type this code.</p>' +
+      (NET.note ? `<p class="neterr">${NET.note}</p>` : '') + '<p class="netwait">Waiting for your friend…</p>';
+    btns = btn('cancel', 'Cancel');
+  } else if (state === 'ask') {
+    title = 'A friend wants to join!';
+    body = '<p>Let them in? They play as player 2 on their own device.</p>';
+    btns = btn('letin', 'Let them in', 'go') + btn('deny', 'No thanks');
+  } else if (state === 'join') {
+    title = 'Join a game';
+    body = '<p>Type the 4-letter code from your friend\'s screen.</p>' +
+      `<input id="netCodeIn" class="netcodein" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" aria-label="Game code" value="${o.val || ''}">` +
+      (o.err ? `<p class="neterr">${o.err}</p>` : '');
+    btns = btn('go', 'Join', 'go') + btn('menu', 'Back');
+  } else if (state === 'lobby') {
+    title = 'You\'re in!';
+    body = `<p>${o.txt || NET_WHAT[NET.hostScr] || 'Your friend is picking a level.'}</p><p class="netwait">The game starts on your screen when your friend starts it.</p><p class="netconn" hidden></p>`;
+    btns = btn('leave', 'Leave online game');
+  } else if (state === 'pick') {
+    const C = NET.crew || { p: ['naseer', 'frankie'], g: [] }, mine = C.p[1];
+    title = 'Pick your hero';
+    body = `<div class="netheroes">${HERO_IDS.map((id) => {
+      const taken = id === C.p[0], home = (C.g || []).includes(id), on = id === mine;
+      return `<button class="nh ${on ? 'on' : ''}" data-pick="${id}" ${taken || home ? 'disabled' : ''}><canvas width="96" height="96" data-por="${id}"></canvas><b>${HEROES[id].name}</b><small>${on ? 'You' : taken ? 'Your friend' : home ? 'At home' : ''}</small></button>`;
+    }).join('')}</div>` +
+      `<p class="netwait">${C.msg || (C.step === 'friends' ? `You're ${HEROES[mine].name}. Your friend is picking who else comes along.` : 'Tap your hero. Your friend picks theirs.')}</p><p class="netconn" hidden></p>` +
+      `<div class="netthrowrow"><b>${HEROES[mine].name} throws</b><div class="netthrows">${THROW_IDS.map((k) => `<button class="thr ${k === heroThrow(mine) ? 'on' : ''}" data-throw="${k}" aria-label="${THROWS[k].name}"><canvas width="88" height="88"></canvas><b>${THROWS[k].name}</b></button>`).join('')}</div></div>`;
+    btns = btn('leave', 'Leave online game');
+  } else if (state === 'status') {
+    title = 'Playing online';
+    body = NET.away
+      ? `<p>Your friend dropped out. Their game keeps trying to get back in for 2 minutes. If they closed the game, they can open it, tap <b>Play online</b>, then <b>Rejoin</b>.</p><p class="netwait">Your code is <b>${NET.code}</b>.</p>`
+      : '<p>Your friend is connected and plays as player 2 on their own device.</p><p class="netconn" hidden></p>';
+    btns = btn('keep', 'Keep playing', 'go') + btn('leave', 'Stop online game');
+  } else if (state === 'fail') {
+    title = o.title || 'Couldn\'t connect';
+    body = `<p>${o.txt}</p>`;
+    btns = o.rejoin ? btn('rejoin', 'Rejoin', 'go') + btn('menu', 'OK') : btn('menu', 'OK', 'go');
+  }
+  $('netTitle').textContent = title;
+  $('netSub').textContent = sub; $('netSub').hidden = !sub;
+  $('netBody').innerHTML = body;
+  $('netBtns').innerHTML = btns;
+  $('netBtns').querySelectorAll('[data-net]').forEach((b) => { b.onclick = () => netButton(b.dataset.net); });
+  $('netBody').querySelectorAll('canvas[data-por]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.por), 0, 0, cv.width, cv.height));
+  $('netBody').querySelectorAll('[data-pick]').forEach((b) => { b.onclick = () => netGuestPick(b.dataset.pick); });
+  $('netBody').querySelectorAll('[data-throw]').forEach((b) => {
+    drawThrowable(b.querySelector('canvas').getContext('2d'), b.dataset.throw, 44, 44, 0.6, 2.2);
+    b.onclick = () => netGuestThrow(b.dataset.throw);
+  });
+  const inp = $('netCodeIn');
+  if (inp) {
+    inp.addEventListener('input', () => { const v = inp.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); if (v !== inp.value) inp.value = v; });
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); netJoinGo(); } });
+    setTimeout(() => { try { inp.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }, 60);
+  }
+  if (STATE.pad && STATE.screen === 'net') setTimeout(() => focusPrimary(), 30);
+  netConnUi();
+}
+function netButton(k) {
+  firstGesture();
+  if (k === 'host') netHostStart();
+  else if (k === 'join') netUi('join');
+  else if (k === 'go') netJoinGo();
+  else if (k === 'back') { netStop(); showScreen('title'); }
+  else if (k === 'cancel') { netStop(); netUi('menu'); }
+  else if (k === 'menu') { if (!NET.on) netStop(); netUi('menu'); }
+  else if (k === 'letin') netLetIn();
+  else if (k === 'deny') netDeny();
+  else if (k === 'leave') netLeave();
+  else if (k === 'keep') showScreen(NET.back && NET.back !== 'net' ? NET.back : 'title');
+  else if (k === 'rejoin') netRejoinSaved();
+}
+function netGuestPick(id) {
+  if (!netGuest() || !HEROES[id] || !NET.crew) return;
+  SND.sfx('help');
+  const th = netMyThrow(id); // what you usually throw with this hero on your own device
+  NET.crew.p[1] = id; NET.crew.msg = ''; NET.throws = Object.assign({}, NET.throws, { [id]: th });
+  netSend({ t: 'pick', id, th });
+  netUi('pick');
+}
+function netMyThrow(id) { const k = SAVE.throws && SAVE.throws[id]; return THROWS[k] ? k : THROW_DEFAULT[id]; }
+function netGuestThrow(k) {
+  if (!netGuest() || !THROWS[k] || !NET.crew) return;
+  const id = NET.crew.p[1];
+  SAVE.throws[id] = k; writeSave(); SND.sfx(throwSfx(k));
+  NET.throws = Object.assign({}, NET.throws, { [id]: k });
+  netSend({ t: 'throw', k });
+  netUi('pick');
+}
+/* buttons and labels that change while you play online */
+function netRoleUi() {
+  const guest = netGuest(), host = netHost();
+  netConnUi();
+  ['againBtn', 'mapBtn'].forEach((id) => { $(id).hidden = guest; });
+  if (guest) $('nextBtn').hidden = true;
+  $('doneWait').hidden = !guest; $('doneLeave').hidden = !guest;
+  $('restartBtn').hidden = guest; $('quitBtn').hidden = guest;
+  $('leaveBtn').hidden = !NET.on; $('leaveBtn').textContent = host ? 'Stop online game' : 'Leave online game';
+  if (!NET.on) $('pauseWho').hidden = true;
+  $('netPill').hidden = !(host && ['title', 'adv', 'levels', 'crew', 'help'].includes(STATE.screen));
+  $('netPill').classList.toggle('away', !!(host && NET.away)); $('netPill').querySelector('span').textContent = host && NET.away ? 'Waiting for your friend…' : 'Online with a friend';
+  $('onlineBtn').textContent = host ? 'Online: friend joined' : 'Play online';
+  $('crewScreen').classList.toggle('online', host);
+}
+
+/* ---------- Host: send the game, take the friend's buttons ---------- */
+function netHostMsg(m) {
+  if (m.t === 'i') { // the friend's buttons for one 1/60 s step
+    NET.iq.push({ q: m.q | 0, k: m.k | 0, p: m.p | 0, x: clamp(+m.x || 0, -100, 100) / 100, y: clamp(+m.y || 0, -100, 100) / 100 });
+  } else if (m.t === 'act') netHostAct(m);
+  else if (m.t === 'pick') netHostPick(m.id, m.th);
+  else if (m.t === 'throw' && THROWS[m.k]) { NET.p2throw = m.k; netSendCrew(); }
+  else if (m.t === 'view') { NET.peerW = +m.w || 0; if (m.a) NET.peerAreas = netCleanAreas(m.a); }
+  else if (m.t === 'bye') netDropped(m.why === 'gone' ? 'gone' : 'left');
+}
+// Player 2's buttons come from the friend's device, one set per 1/60 s step, numbered so the friend's device knows which ones
+// the game has used. Bits: 1 left, 2 right, 4 jump (boss games: C), 8 special (B, Super), 16 throw (A, Annoy).
+// p holds what was pressed in that step (32: a flick up), so a quick tap always counts.
+// Buttons arrive a little unevenly over the internet, so the host keeps a few steps in hand (NET_IQ) before using them.
+// Running out would make the game repeat a step the friend's device doesn't know about, so its hero would need correcting.
+const NET_IQ = 3;
+function netStepInput() { // once per game step on the host: the friend's next buttons, or the same again while waiting for more
+  const q = NET.iq;
+  if (!NET.iqOn && q.length >= NET_IQ) NET.iqOn = true; // enough in hand: start using them
+  if (NET.iqOn && q.length) {
+    while (q.length > NET_IQ + 4) { const a = q.shift(); q[0].p |= a.p; NET.stats.drop = (NET.stats.drop || 0) + 1; } // far behind: catch up, but keep every press
+    const st = q.shift(); NET.rin = st; NET.ack = st.q;
+    if (!q.length) NET.iqOn = false; // ran out: wait for a few again
+    return;
+  }
+  NET.stats.wait = (NET.stats.wait || 0) + 1;
+  if (NET.rin.p) NET.rin = Object.assign({}, NET.rin, { p: 0 });
+}
+function netHostInputClear() { NET.iq = []; NET.iqOn = false; NET.rin = { k: 0, p: 0, x: 0, y: 0, q: NET.ack }; }
+function netInputReset() { // a fresh start for the friend's buttons (joining, getting back in)
+  NET.iq = []; NET.iqOn = false; NET.ack = -1; NET.rin = { k: 0, p: 0, x: 0, y: 0, q: -1 };
+  Object.assign(NETP, { acc: 0, seq: 0, hist: [], prevK: 0, up: false, body: null, on: false, auth: null, hero: null, off: { x: 0, y: 0 } });
+}
+function netRemoteCtrl(c) { // in a level
+  const { k, p } = NET.rin, kp = k | p;
+  c.left = !!(k & 1); c.right = !!(k & 2); c.jump = !!(kp & 4); c.action = !!(kp & 8); c.throw = !!(kp & 16);
+}
+function netRemoteMini() { // in a boss game
+  const r = NET.rin, kp = r.k | r.p;
+  return { mx: r.x, my: r.p & 32 ? -1 : r.y, a: !!(kp & 16), b: !!(kp & 8), c: !!(kp & 4) };
+}
+function netRemoteDuel() { // in the Annoy-Off
+  const r = NET.rin, kp = r.k | r.p;
+  return { mx: r.x, my: r.y, annoy: !!(kp & 16), sup: !!(kp & 8) };
+}
+function netCleanAreas(a) { // the friend's screen space for each boss game and the Annoy-Off
+  const num = (v, lo, hi) => clamp(+v || lo, lo, hi), out = { mini: {} };
+  if (a.mini) for (const k of MINI_KINDS) { const v = a.mini[k]; if (Array.isArray(v)) out.mini[k] = [num(v[0], 120, 5000), num(v[1], 120, 5000)]; }
+  if (Array.isArray(a.duel)) out.duel = [num(a.duel[0], 420, 1100), num(a.duel[1], 200, 440)];
+  return out;
+}
+function netAreas() { // this device's space for each boss game and the Annoy-Off, so the host can pick sizes that suit both screens
+  const mini = {};
+  for (const k of MINI_KINDS) { const A = miniArea(k); mini[k] = [Math.round(A.w), Math.round(A.h)]; }
+  return { mini, duel: duelPref() };
+}
+function netHostAct(m) {
+  const a = m.a;
+  NET.mirror++;
+  try {
+    if (a === 'call' && HEROES[m.id]) callHelp(m.id);
+    else if (a === 'charge') crewCharge();
+    else if (a === 'go' && STATE.screen === 'story') enterPlay();
+    else if (a === 'pause' && STATE.screen === 'play') { NET.pausedBy = 'guest'; showScreen('pause'); $('pauseWho').textContent = 'Your friend paused the game.'; $('pauseWho').hidden = false; }
+    else if (a === 'resume' && (STATE.screen === 'pause' || (STATE.screen === 'help' && helpReturn === 'pause'))) showScreen('play');
+    else if (a === 'bully' && STATE.screen === 'bully' && ['moves', '0', '1'].includes(String(m.id))) chooseBully(String(m.id));
+  } finally { NET.mirror--; }
+}
+function netCrewState() { return { p: STATE.picks.slice(0, 2), g: grounded().map((x) => x.id), step: STATE.crewStep, lvl: STATE.level, th: Object.assign({}, SAVE.throws, NET.p2throw ? { [STATE.picks[1]]: NET.p2throw } : {}) }; }
+function netSendCrew(msg) { if (netHost()) netSend({ t: 'crew', crew: Object.assign(netCrewState(), msg ? { msg } : {}) }); }
+function netHostPick(id, th) {
+  if (!HEROES[id] || STATE.screen !== 'crew') return;
+  if (THROWS[th]) NET.p2throw = th;
+  if (id === STATE.picks[0]) { netSendCrew(`${HEROES[id].name} is taken. Pick someone else.`); return; }
+  if (isGrounded(id)) { netSendCrew(`${HEROES[id].name} is at home. Pick someone else.`); return; }
+  STATE.picks[1] = id;
+  STATE.crewMsg = `Your friend picked ${HEROES[id].name}.`;
+  refreshCrewSelect();
+}
+function netHostTick(dt, ht) {
+  const playing = !!G && (NET_PLAY.includes(STATE.screen) || (STATE.screen === 'help' && helpReturn === 'pause'));
+  const scrChanged = STATE.screen !== NET.sentScr;
+  if (scrChanged) netSendScreen(); // first, so messages from the game land on the right screen
+  if (playing) {
+    if (G !== REP.root) { repReset(); REP.root = G; NET.key = true; }
+    NET.sendT += dt;
+    if (NET.sendT >= NET_SNAP - dt / 2 || scrChanged || NET.key) { // on the frame closest to each 1/30 s, so updates go out evenly
+      NET.sendT = scrChanged || NET.key ? 0 : clamp(NET.sendT - NET_SNAP, -NET_SNAP / 2, NET_SNAP / 2);
+      netSendSnap(ht);
+    }
+  } else if (REP.root) repReset();
+}
+function netSendSnap(ht) { // ht: the moment of the game this update shows, on the host's clock
+  const s = repSnap(G), m = { t: 's', o: s.o, g: s.g, r: s.r, a: NET.ack, ht: Math.round(ht || netNow()) }; // a: the friend's last buttons this state includes
+  if (NET.key) { m.k = 1; NET.key = false; }
+  const sp = repSpawns(); if (sp) m.sp = sp;
+  if (NET.ev.length) { m.ev = NET.ev; NET.ev = []; }
+  if (!m.k && !m.o.length && !m.g.length && !m.sp && !m.ev) return;
+  netSend(m); NET.stats.snaps++;
+}
+function netSendScreen() {
+  const s = STATE.screen; NET.sentScr = s;
+  netHostInputClear(); // buttons from the screen before don't carry over
+  const m = { t: 'scr', s };
+  if (G && s === 'help') m.s = 'pause';
+  else if (!G || !NET_PLAY.includes(s)) m.s = s === 'crew' ? 'crew' : 'menu';
+  if (m.s === 'menu') m.what = s;
+  if (m.s === 'crew') m.crew = netCrewState();
+  if (m.s === 'story') m.story = [$('storyTitle').textContent, $('storySub').textContent, $('storyBody').innerHTML];
+  if (m.s === 'done') m.done = [$('doneTitle').textContent, $('doneStars').innerHTML, $('doneStats').innerHTML];
+  if (m.s === 'pause') m.by = NET.pausedBy;
+  netSend(m);
+}
+/* sounds, messages and the HUD: the friend's device repeats what the game does on the host */
+function netHook(obj, name, key) {
+  const orig = obj[name];
+  obj[name] = function (...a) {
+    if (NET.cap === 0 && NET.ctx > 0 && NET.on && NET.role === 'host') NET.ev.push([key, netArgs(a)]);
+    NET.cap++;
+    try { return orig.apply(this, a); } finally { NET.cap--; }
+  };
+}
+function netCtxHook(name) { // things the game does while these run are sent to the friend
+  const orig = window[name];
+  window[name] = function (...a) { NET.ctx++; try { return orig.apply(this, a); } finally { NET.ctx--; } };
+}
+function netArgs(a) {
+  return a.map((v) => {
+    if (v === null || typeof v !== 'object') return typeof v === 'function' ? null : v;
+    const o = {}; for (const k in v) { const x = v[k]; if (x === null || ['number', 'string', 'boolean'].includes(typeof x)) o[k] = x; } return o;
+  });
+}
+const NET_EV = {
+  sfx: (a) => SND.sfx(...a), tone: (a) => SND.tone(...a), track: (a) => SND.setTrack(...a),
+  toast: (a) => toast(...a), banner: (a) => banner(...a), hint: (a) => showHint(a[0]), shake: (a) => portraitShake(a[0]),
+  crewbar: () => buildCrewBar(), hud: () => buildHUD(),
+  minihelp: () => { if (G && G.mini) miniHelpToast(); }, duelhelp: () => { if (G && G.duel) duelHelpToast(); }
+};
+function netInstall() {
+  netHook(SND, 'sfx', 'sfx'); netHook(SND, 'tone', 'tone'); netHook(SND, 'setTrack', 'track');
+  netHook(window, 'toast', 'toast'); netHook(window, 'banner', 'banner'); netHook(window, 'showHint', 'hint');
+  netHook(window, 'portraitShake', 'shake'); netHook(window, 'buildCrewBar', 'crewbar'); netHook(window, 'buildHUD', 'hud');
+  netHook(window, 'miniHelpToast', 'minihelp'); netHook(window, 'duelHelpToast', 'duelhelp');
+  const upd = window.update; // every game step on the host takes the friend's next buttons
+  window.update = function (...a) { if (NET.on && NET.role === 'host') netStepInput(); NET.ctx++; try { return upd.apply(this, a); } finally { NET.ctx--; } };
+  ['callHelp', 'crewCharge'].forEach(netCtxHook);
+}
+
+/* ---------- Copying the game state: the host sends only what changed ---------- */
+const REP_LOCAL = ['cam', 'trail', 'parts', 'texts', 'callouts']; // each device keeps these itself
+const REP_SPAWN = ['parts', 'texts', 'callouts'];                  // little effects: sent once, then each device moves them
+const REP_SKIP = new Set(['sayCd', 'aiCd', 'trickCd', 'warpCd', 'lastX', 'stuckT', 'actCd', 'throwCd', 'dropCheck', 'hitWall', 'wallS', 'autoT',
+  'prev', 'cache', 'trail']); // only the host's game needs these (trails and the maze picture: each device makes its own)
+const REP_POS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v']);
+const REP_DOWN = new Set(['sayT', 'punchT', 'kickT', 'cheer', 'armT', 'coyote', 'jumpBuf']); // count down past zero: anything below zero means off
+const REP = { ids: new WeakMap(), next: 1, last: new Map(), alive: new Set(), spawned: new WeakSet(), root: null, statics: null };
+function repReset() { REP.ids = new WeakMap(); REP.next = 1; REP.last = new Map(); REP.alive = new Set(); REP.spawned = new WeakSet(); REP.root = null; }
+function repStatics() { // the game's fixed tables stay on each device: only their names are sent
+  if (REP.statics) return REP.statics;
+  const fwd = new Map(), back = new Map();
+  const add = (name, tbl) => {
+    fwd.set(tbl, name); back.set(name, tbl);
+    for (const k of Object.keys(tbl)) { const v = tbl[k]; if (v && typeof v === 'object') { fwd.set(v, name + '.' + k); back.set(name + '.' + k, v); } }
+  };
+  add('HEROES', HEROES); add('ENEMY', ENEMY); add('THEMES', THEMES); add('THROWS', THROWS);
+  return (REP.statics = { fwd, back });
+}
+const repNum = (v) => (Number.isInteger(v) ? v : Math.round(v * 100) / 100);
+function repVal(v, stack, k) {
+  if (v === null) return null;
+  const ty = typeof v;
+  if (ty === 'number' && v < 0 && REP_DOWN.has(k)) return 0;
+  if (k === 'idleT' && v > 2) return 2; // only 'idle for a while' matters for drawing
+  if (ty === 'number') return Number.isFinite(v) ? (Number.isInteger(v) ? v : REP_POS.has(k) ? Math.round(v * 10) / 10 : k === 'vx' || k === 'vy' ? Math.round(v) : Math.round(v * 100) / 100) : { n: v > 0 ? 1 : v < 0 ? -1 : 0 };
+  if (ty === 'string' || ty === 'boolean') return v;
+  if (ty !== 'object') return undefined; // functions stay on the host
+  const st = REP.statics.fwd.get(v); if (st) return { s: st };
+  const pr = Object.getPrototypeOf(v);
+  if (pr !== Object.prototype && pr !== Array.prototype && pr !== Set.prototype && pr !== null) return undefined; // canvases and the like
+  let id = REP.ids.get(v);
+  if (!id) { id = REP.next++; REP.ids.set(v, id); }
+  stack.push(v);
+  return [id];
+}
+const repSame = (a, b) => a === b || (a !== null && b !== null && typeof a === 'object' && typeof b === 'object' &&
+  (Array.isArray(a) ? Array.isArray(b) && a[0] === b[0] : !Array.isArray(b) && a.s === b.s && a.n === b.n));
+function repSnap(root) {
+  repStatics();
+  const out = [], seen = new Set(), stack = [root];
+  if (!REP.ids.get(root)) REP.ids.set(root, REP.next++);
+  const L = root.L, clocks = new Set(L ? [].concat(L.coins || [], L.powerups || [], L.checkpoints || []) : []); // their spin timers run on each device
+  while (stack.length) {
+    const o = stack.pop(), id = REP.ids.get(o);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const ty = Array.isArray(o) ? 1 : o instanceof Set ? 2 : 0, cur = {};
+    if (ty === 1) { for (let i = 0; i < o.length; i++) { const e = repVal(o[i], stack); cur[i] = e === undefined ? null : e; } cur.length = o.length; }
+    else if (ty === 2) { let i = 0; for (const v of o) { const e = repVal(v, stack); if (e !== undefined) cur[i++] = e; } cur.length = i; }
+    const prev = REP.last.get(id);
+    if (ty === 0) for (const k in o) {
+      if (REP_SKIP.has(k) || (k.length > 2 && k.endsWith('Cd')) || (o === root && REP_LOCAL.includes(k))) continue; // cooldowns only matter to the host's game
+      if (k === 't' && prev && clocks.has(o)) { cur.t = prev.t; continue; }
+      const v = o[k];
+      if (Array.isArray(v) && prev && Array.isArray(prev[k]) && !REP.ids.has(v) && !seen.has(prev[k][0]) && REP.alive.has(prev[k][0])) REP.ids.set(v, prev[k][0]); // a filtered copy of a list keeps the list's number, so only the changes are sent
+      const e = repVal(v, stack, k); if (e !== undefined) cur[k] = e;
+    }
+    let ch = 0, del = 0;
+    for (const k in cur) if (!prev || !(k in prev) || !repSame(prev[k], cur[k])) (ch || (ch = {}))[k] = cur[k];
+    if (prev && ty === 0) for (const k in prev) if (!(k in cur)) (del || (del = [])).push(k);
+    if (!prev || ch || del) out.push([id, ty, ch, del]);
+    REP.last.set(id, cur);
+  }
+  const gone = [];
+  for (const id of REP.alive) if (!seen.has(id)) { gone.push(id); REP.last.delete(id); }
+  REP.alive = seen;
+  return { o: out, g: gone, r: REP.ids.get(root) };
+}
+function repSpawns() {
+  let sp = null;
+  for (const k of REP_SPAWN) {
+    const arr = G[k]; if (!arr || !arr.length) continue;
+    for (const q of arr) {
+      if (REP.spawned.has(q)) continue;
+      REP.spawned.add(q);
+      const L = (sp || (sp = {}))[k] || (sp[k] = { f: [], r: [] }), row = [];
+      for (const f in q) {
+        const v = q[f], t = typeof v;
+        if (!(t === 'number' ? Number.isFinite(v) : t === 'string' || t === 'boolean' || v === null)) continue;
+        let i = L.f.indexOf(f); if (i < 0) { i = L.f.length; L.f.push(f); }
+        row[i] = t === 'number' ? (REP_POS.has(f) || f === 'vx' || f === 'vy' ? Math.round(v * (REP_POS.has(f) ? 10 : 1)) / (REP_POS.has(f) ? 10 : 1) : repNum(v)) : v;
+      }
+      L.r.push(row);
+    }
+  }
+  return sp;
+}
+
+/* ---------- Guest: draw the host's game smoothly ----------
+   Updates arrive unevenly. So this device shows the host's game a moment in the past: just far enough back that the next update is
+   nearly always here in time. Things that move glide between updates, timed by the host's clock. */
+const NETG = { map: new Map(), shadow: new Map(), ip: new Map(), dq: [], mode: null, prevHT: 0, lastHT: 0, qw: [], X: null, S: null, R: 0 };
+const NETP = { acc: 0, seq: 0, hist: [], prevK: 0, up: false, body: null, on: false, auth: null, hero: null, off: { x: 0, y: 0 } }; // the friend's own hero, moved on their device
+const IP_KEYS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v', 'phase', 'walk', 'spin', 'rot', 't', 'wt', 'time']); // these glide between updates
+const IP_POS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v']);
+const DQ_KEYS = new Set(['pose', 'face', 'dir']); // what characters are doing and which way they face: changes when their moves show
+const IP_EXTRA = 60; // an update is late: keep things moving the same way for up to this long (ms)
+function netGuestReset() { NETG.map.clear(); NETG.shadow.clear(); NETG.ip.clear(); NETG.dq.length = 0; NETG.prevHT = NETG.lastHT = 0; }
+function netTimingReset() { NETG.qw.length = 0; NETG.X = NETG.S = null; NETG.R = 0; }
+function netTiming(m) { // how far behind to show the game, from how late updates arrive
+  const now = netNow(), ht = +m.ht || 0;
+  if (NETG.lastHT && !m.k && ht > NETG.lastHT && ht - NETG.lastHT < 250) {
+    const w = NETG.qw; w.push(NETG.lastHT - now); if (w.length > 90) w.shift(); // the last 3 seconds
+    const s = w.slice().sort((a, b) => a - b);
+    NETG.X = s[Math.floor((s.length - 1) * 0.05)] - 4; // so 19 updates in 20 arrive before they're needed
+  }
+  NETG.prevHT = NETG.lastHT || ht; NETG.lastHT = ht;
+}
+function netShowTime(dt, now) { // the moment of the host's game to show now
+  if (NETG.X == null) return (NETG.R = NETG.lastHT);
+  if (NETG.S == null || Math.abs(NETG.X - NETG.S) > 200) NETG.S = NETG.X;
+  else { const r = dt * 50; NETG.S += clamp(NETG.X - NETG.S, -r, r); } // changes gently, by 5% at most, so nobody sees it
+  return (NETG.R = now + NETG.S);
+}
+function ipAdd(o, k, v) { // a new value for something that glides: add it to its timeline
+  const ht = NETG.lastHT, pt = NETG.prevHT;
+  let rec = NETG.ip.get(o); if (!rec) NETG.ip.set(o, (rec = {}));
+  let h = rec[k];
+  if (!h) h = rec[k] = [[Math.min(pt, ht - 1), o[k], 0]]; // it stayed put until the update before this one
+  else {
+    while (h.length > 1 && h[h.length - 1][0] >= ht) h.pop();
+    const l = h[h.length - 1]; if (l[0] < pt && pt < ht) h.push([pt, l[1], 0]);
+  }
+  const l = h[h.length - 1];
+  h.push([ht, v, Math.abs(v - l[1]) > (IP_POS.has(k) ? 260 : 6) || ht - pt > 250 ? 1 : 0]); // 1: a jump (back to a checkpoint, a new round): no glide
+  if (h.length > 40) h.splice(0, h.length - 24); // (this device stopped drawing for a while: only the last second matters)
+}
+function repDec(e) {
+  if (e === null || typeof e !== 'object') return e;
+  if (Array.isArray(e)) return NETG.map.get(e[0]);
+  if (e.s) return repStatics().back.get(e.s);
+  if ('n' in e) return e.n > 0 ? Infinity : e.n < 0 ? -Infinity : NaN;
+  return undefined;
+}
+function repApply(m) {
+  const M = NETG.map;
+  for (const [id, ty] of m.o) if (!M.has(id)) M.set(id, ty === 1 ? [] : ty === 2 ? new Set() : {});
+  for (const [id, ty, ch, del] of m.o) {
+    const o = M.get(id);
+    if (ty === 2) {
+      const sh = NETG.shadow.get(id) || [];
+      if (ch) for (const k in ch) { if (k === 'length') sh.length = ch.length; else sh[k] = repDec(ch[k]); }
+      NETG.shadow.set(id, sh); o.clear(); for (const v of sh) o.add(v);
+      continue;
+    }
+    if (ch) for (const k in ch) {
+      if (ty === 1 && k === 'length') continue;
+      if (k === 'shownAt') { o[k] = netNow() / 1000; continue; } // a time on the host's clock: use this device's clock
+      const v = repDec(ch[k]);
+      if (o === NETP.hero && NETP.auth && PRED_KEYS.has(k)) { NETP.auth[k] = v; if (NETP.on) continue; } // your own hero: this device moves it while it can
+      if (ty === 0 && IP_KEYS.has(k) && typeof v === 'number' && Number.isFinite(v) && typeof o[k] === 'number' && Number.isFinite(o[k])) ipAdd(o, k, v);
+      else if (ty === 0 && DQ_KEYS.has(k) && k in o && NETG.S != null && !(o === NETP.hero && NETP.on)) NETG.dq.push([NETG.lastHT, o, k, v]);
+      else { o[k] = v; const rec = NETG.ip.get(o); if (rec && rec[k]) delete rec[k]; }
+    }
+    if (ty === 1 && ch && 'length' in ch) o.length = ch.length;
+    if (del) for (const k of del) { delete o[k]; const rec = NETG.ip.get(o); if (rec) delete rec[k]; }
+  }
+  for (const id of m.g) { const o = M.get(id); if (o) NETG.ip.delete(o); NETG.shadow.delete(id); M.delete(id); }
+  const root = M.get(m.r);
+  if (root && root !== G) {
+    root.cam = { x: 0 }; root.parts = []; root.texts = []; root.callouts = []; root.trail = [];
+    G = root;
+    try { G.cam.x = camTarget(); } catch (e) { /* not ready */ }
+    buildHUD(); layoutControls(); placeOverlays();
+  }
+}
+function repEffects(m) { // after the state: new sparkles, sounds and messages
+  if (G && m.sp) for (const k in m.sp) { // new sparkles and messages: each row is one, in the order of the field names
+    const L = m.sp[k]; if (!Array.isArray(G[k]) || !L || !Array.isArray(L.r)) continue;
+    for (const row of L.r) { const q = {}; L.f.forEach((f, i) => { if (row[i] !== undefined && row[i] !== null) q[f] = row[i]; else if (row[i] === null) q[f] = null; }); G[k].push(q); }
+  }
+  if (m.ev) for (const [name, a] of m.ev) { const f = NET_EV[name]; if (f) { try { f((a || []).map((v) => (v === null ? undefined : v))); } catch (e) { console.error(e); } } }
+}
+function repInterp(R) { // show everything as it was at moment R of the host's game
+  const q = NETG.dq; let n = 0;
+  while (n < q.length && q[n][0] <= R) { const e = q[n++]; if (!(e[1] === NETP.hero && NETP.on)) e[1][e[2]] = e[3]; }
+  if (n) q.splice(0, n);
+  const last = NETG.lastHT;
+  for (const [o, rec] of NETG.ip) {
+    let any = false;
+    for (const k in rec) {
+      const h = rec[k];
+      let i = 0; while (i + 2 < h.length && h[i + 1][0] <= R) i++;
+      if (i) h.splice(0, i);
+      const a = h[0], b = h[1];
+      let v, keep = true;
+      if (!b) { v = a[1]; keep = a[0] >= last; }
+      else if (R < a[0]) v = a[1];
+      else if (R < b[0]) v = b[2] & 1 ? a[1] : a[1] + (b[1] - a[1]) * (R - a[0]) / (b[0] - a[0]);
+      else if (!b[2] && b[0] >= last) v = b[1] + (b[1] - a[1]) / (b[0] - a[0]) * Math.min(R - b[0], IP_EXTRA); // the next update is late
+      else { v = b[1]; keep = b[0] >= last; } // it stays put now
+      o[k] = v;
+      if (keep) any = true; else delete rec[k];
+    }
+    if (!any) NETG.ip.delete(o);
+  }
+}
+function netGuestMsg(m) {
+  if (m.t === 's') {
+    if (m.k) { netGuestReset(); G = null; }
+    netTiming(m);
+    repApply(m);
+    const q = NETG.dq; if (q.length > 1500) { const n = q.length - 500; for (let i = 0; i < n; i++) q[i][1][q[i][2]] = q[i][3]; q.splice(0, n); } // (this device stopped drawing for a while)
+    if (NET.wantPlay && G) netGuestEnterPlay();
+    netReconcile(m.a);
+    netModeCheck();
+    repEffects(m);
+  } else if (m.t === 'scr') netGuestScreen(m);
+  else if (m.t === 'crew') { NET.crew = m.crew; NET.throws = m.crew && m.crew.th; if (NET.ui === 'pick' && STATE.screen === 'net') netUi('pick'); }
+  else if (m.t === 'bye') netDropped(m.why === 'left' || m.why === 'gone' ? m.why : 'lost');
+}
+function netGuestScreen(m) {
+  NET.hostScr = m.s === 'menu' ? m.what : m.s;
+  if (m.s !== 'play') NETP.hist.length = 0; // the host clears buttons from before, so this device forgets them too
+  NET.mirror++;
+  try {
+    if (m.s === 'menu' || m.s === 'crew') {
+      G = null; netGuestReset(); NET.wantPlay = false;
+      if (m.s === 'crew') { NET.crew = m.crew; NET.throws = m.crew && m.crew.th; netUi('pick'); } else netUi('lobby');
+      if (STATE.screen !== 'net') showScreen('net');
+    } else if (m.s === 'story') {
+      $('storyTitle').textContent = m.story[0]; $('storySub').textContent = m.story[1]; $('storyBody').innerHTML = m.story[2];
+      showScreen('story');
+    } else if (m.s === 'play') {
+      if (G) netGuestEnterPlay(); else NET.wantPlay = true;
+    } else if (m.s === 'bully') {
+      if (G) openBullyChoice(); // Crusher is here: special moves or an Annoy-Off? Whoever taps first decides
+    } else if (m.s === 'pause') {
+      const pw = $('pauseWho'); pw.textContent = m.by === 'back' ? 'You\'re back in! Tap Keep playing.' : 'Your friend paused the game.'; pw.hidden = m.by === 'guest';
+      showScreen('pause');
+    } else if (m.s === 'done') {
+      $('doneTitle').textContent = m.done[0]; $('doneStars').innerHTML = m.done[1]; $('doneStats').innerHTML = m.done[2];
+      showScreen('done');
+    }
+  } finally { NET.mirror--; }
+}
+function netGuestEnterPlay() {
+  NET.wantPlay = false;
+  if (STATE.screen === 'play') return;
+  if (['pause', 'help', 'bully'].includes(STATE.screen)) showScreen('play');
+  else enterPlay();
+}
+function netModeCheck() { // the Annoy-Off or a boss game started or ended on the host: set this device up for it
+  const cur = G ? G.duel || G.mini || null : null;
+  if (cur === NETG.mode) return;
+  const entering = !!cur && !NETG.mode;
+  NETG.mode = cur;
+  joyEnd(); Input.held.clear(); Input.tapped.clear(); pointers.clear();
+  if (G) { G.parts = []; G.texts = []; G.callouts = []; if (G.mini) G.mini.trail = []; }
+  $('hud').classList.toggle('duel', !!cur);
+  $('toast').hidden = true; if (entering) $('banner').hidden = true;
+  layoutControls(); placeOverlays();
+}
+/* ---------- Your own hero, straight away ----------
+   Your buttons take a moment to reach the host's game and come back. So in a level, this device moves your hero itself as you press,
+   using the same running and jumping as the game. When the host's game says where your hero really is, it starts from there,
+   replays the buttons the host hasn't used yet, and smooths out any difference. Special moves, ropes and bubbles stay with the host. */
+const NET_PREDICT = true;
+const PRED_KEYS = new Set(['x', 'y', 'vx', 'vy', 'onGround', 'face', 'pose', 'phase', 'idleT', 'jumps', 'boost', 'coyote', 'jumpBuf', 'bonkT']);
+function netGuestInput(dt) { // 60 steps a second: read your buttons, send them, and move your own hero
+  NETP.acc = Math.min(NETP.acc + dt, STEP * 6);
+  while (NETP.acc >= STEP) { NETP.acc -= STEP; netGuestStep(); }
+}
+function netGuestStep() {
+  let k = 0, mx = 0, my = 0, c = null;
+  if (G && G.duel) { const r = duelRaw(0); mx = r.mx; my = r.my; k = (r.annoy ? 16 : 0) | (r.sup ? 8 : 0); Input.tapped.clear(); }
+  else if (G && G.mini) { const r = miniRaw(0); mx = r.mx; my = r.my; k = (r.a ? 16 : 0) | (r.b ? 8 : 0) | (r.c ? 4 : 0); Input.tapped.clear(); }
+  else { readInput(); c = Input.ctrl[0]; k = (c.left ? 1 : 0) | (c.right ? 2 : 0) | (c.jump ? 4 : 0) | (c.action ? 8 : 0) | (c.throw ? 16 : 0); mx = (c.right ? 1 : 0) - (c.left ? 1 : 0); }
+  const up = my < -0.5, p = (k & ~NETP.prevK) | (up && !NETP.up ? 32 : 0); // pressed in this step (32: a flick up, the Showdown's jump)
+  NETP.prevK = k; NETP.up = up;
+  const q = ++NETP.seq;
+  netSend({ t: 'i', q, k, p, x: Math.round(mx * 100), y: Math.round(my * 100) });
+  if (!c) { NETP.hist.length = 0; return; }
+  const st = { q, c: { left: c.left, right: c.right, jump: c.jump, jumpP: c.jumpP } };
+  NETP.hist.push(st); if (NETP.hist.length > 240) NETP.hist.shift();
+  if (NETP.on && NETP.body) netPredStep(NETP.body, st.c);
+}
+function netPredStep(B, c) { // one step of running and jumping, the same as updatePlayer
+  const dt = STEP;
+  if (B.onGround) { B.coyote = 0.1; B.jumps = B.id === 'naseer' ? 1 : 0; } else B.coyote -= dt;
+  B.jumpBuf = c.jumpP ? 0.13 : B.jumpBuf - dt;
+  const dir = (c.right ? 1 : 0) - (c.left ? 1 : 0), sticky = onGoop(B) || B.inGoo;
+  const slip = !!(G.slip && G.slip.k > 0.5 && B.onGround && B.y + B.h >= GROUND - 2 && cxOf(B) > G.slip.x0 && cxOf(B) < G.slip.x1);
+  const speed = B.H.speed * (B.power === 'speed' ? 1.4 : 1) * (sticky ? 0.45 : 1);
+  B.bonkT = Math.max(0, (B.bonkT || 0) - dt);
+  if (B.bonkT <= 0.2) B.vx = approach(B.vx, dir * speed * (slip ? 1.15 : 1), (slip ? 380 : B.onGround ? 2800 : 1800) * dt); // (bumped: knocked back for a moment)
+  if (dir) B.face = dir;
+  if (B.jumpBuf > 0 && B.coyote > 0) { B.vy = -B.H.jump * (sticky ? 0.78 : 1); B.coyote = 0; B.jumpBuf = 0; B.boost = false; }
+  else if (B.jumpBuf > 0 && B.jumps > 0 && !B.onGround) { B.vy = -620; B.jumps--; B.jumpBuf = 0; B.boost = false; }
+  if (!c.jump && B.vy < -320 && !B.boost) B.vy = -320;
+  if (B.id === 'ben' && c.jump && !B.onGround && B.vy > 140) B.vy = 140;
+  if (B.vy >= 0) B.boost = false;
+  if (B.onGround && B.ground && B.ground.mover) { B.x += B.ground.dx || 0; B.y += B.ground.dy || 0; } // riding a moving platform
+  const solids = solidsFor(B, false);
+  movePhys(B, dt, solids, false);
+  if (G.wind) { const dx = G.wind * (B.onGround ? 0.85 : 1.1) * dt; B.x += dx; if (solids.some((q) => !q.shutter && overlap(B, q))) B.x -= dx; }
+  if (G.belts) beltPush(B, dt);
+  for (const sp of G.L.springs) if (B.vy >= 0 && B.x + B.w > sp.x + 4 && B.x < sp.x + sp.w - 4 && B.y + B.h >= sp.y - 2 && B.y + B.h <= sp.y + 16) { B.vy = -1250; B.boost = true; B.y = sp.y - B.h - 1; }
+  for (const b of G.bots) if (live(b) && B.vy > 40 && overlap(B, b) && B.y + B.h - b.y < 24) { B.vy = -560; B.boost = true; break; } // bouncing off a bot you stomp
+  if (B.y > 1000) { B.y = 1000; B.vy = 0; } // fell out of the level: the host's game puts the hero back
+}
+function netPredictable(P) { // can this device move its own hero itself right now?
+  if (!NET_PREDICT || window.__netNoPredict || !G || STATE.screen !== 'play' || G.duel || G.mini || G.over || G.lose || G.trans || G.freeze > 0 || G.party || G.scene || G.battleNext) return false;
+  if (G.bully && G.bully.state === 'trouble') return false;
+  return !!(P && P.H && P.ctrl === NET.me && !P.pull && !P.bubble && !(P.dashT > 0) && !(P.chargeT > 0) && !P.pound && !P.climbing && !P.hacking);
+}
+function netAuthOf(P) { const A = {}; for (const k of PRED_KEYS) A[k] = P[k]; return A; }
+function netReconcile(ack) { // line your own hero up with the host's game, then replay the buttons it hasn't used yet
+  const P = G && G.players[NET.me];
+  if (P !== NETP.hero) { NETP.hero = P || null; NETP.on = false; NETP.body = null; NETP.auth = P ? netAuthOf(P) : null; }
+  if (!P || !NETP.auth) return;
+  if (typeof ack === 'number' && ack >= 0) { const h = NETP.hist; let i = 0; while (i < h.length && h[i].q <= ack) i++; if (i) h.splice(0, i); }
+  if (!netPredictable(P)) { if (NETP.on) netPredictOff(P); return; }
+  const A = NETP.auth;
+  const B = { id: P.id, H: P.H, w: P.w, h: P.h, x: A.x, y: A.y, vx: A.vx || 0, vy: A.vy || 0, onGround: !!A.onGround, face: A.face || 1, jumps: A.jumps || 0, boost: !!A.boost,
+    power: P.power, inGoo: P.inGoo, coyote: A.onGround ? 0.1 : A.coyote || 0, jumpBuf: A.jumpBuf || 0, bonkT: A.bonkT || 0, ctrl: -1, ground: null };
+  for (const st of NETP.hist) netPredStep(B, st.c);
+  NETP.off = { x: P.x - B.x, y: P.y - B.y }; NETP.raw = Math.hypot(NETP.off.x, NETP.off.y);
+  if (NETP.raw > 300) NETP.off = { x: 0, y: 0 }; // moved a long way (back to a checkpoint, pulled along to your friend): no glide
+  NETP.body = B;
+  if (!NETP.on) { NETP.on = true; const rec = NETG.ip.get(P); if (rec) for (const k of PRED_KEYS) delete rec[k]; }
+}
+function netPredictOff(P) { // the host's game takes over (a special move, a rope, a bubble...): glide to where it says
+  NETP.on = false; NETP.body = null;
+  const A = NETP.auth; if (!A) return;
+  for (const k of PRED_KEYS) if (k !== 'x' && k !== 'y') P[k] = A[k];
+  let rec = NETG.ip.get(P); if (!rec) NETG.ip.set(P, (rec = {}));
+  const t0 = NETG.R || NETG.lastHT, t1 = Math.max(NETG.lastHT, t0 + 60); // from where it shows now to where the host has it (2: don't run on past it)
+  rec.x = [[t0, P.x, 0], [t1, A.x, 2]]; rec.y = [[t0, P.y, 0], [t1, A.y, 2]];
+}
+function netPredictShow(dt) { // where your own hero shows: the prediction, with any correction smoothed away
+  const P = NETP.hero, B = NETP.body;
+  if (!NETP.on || !B || !P || !G || P !== G.players[NET.me]) return;
+  if (!netPredictable(P)) { netPredictOff(P); return; }
+  const k = Math.exp(-dt * 10); NETP.off.x *= k; NETP.off.y *= k;
+  P.x = B.x + NETP.off.x; P.y = B.y + NETP.off.y; P.vx = B.vx; P.vy = B.vy; P.onGround = B.onGround; P.face = B.face;
+  setPose(P, dt);
+}
+function netGuestTick(dt, now) {
+  if (STATE.screen === 'play' && NET.conn) netGuestInput(dt); else NETP.acc = 0;
+  const ak = [VIEW.W, VIEW.H, VIEW.w, STATE.touch, STATE.pad, SAFE.top, SAFE.bottom, SAFE.left, SAFE.right].join();
+  if (ak !== NET.areasKey) { NET.areasKey = ak; netSend({ t: 'view', w: Math.round(VIEW.w), a: netAreas() }); } // the host keeps both heroes on your screen and sizes games for it
+  if (!G) return;
+  repInterp(netShowTime(dt, now || netNow())); netPredictShow(dt);
+  if (STATE.screen === 'play') {
+    updateFx(dt); updateCamera(dt); updateHUD();
+    const L = G.L; if (L) { for (const c of L.coins || []) if (!c.got) c.t += dt; for (const u of L.powerups || []) if (!u.got) u.t += dt; } // spinning coins
+    for (const E of G.sent || []) sentTrail(E, dt);
+    const M = G.mini; if (M && M.ball && M.ball.u != null) { const T = M.trail || (M.trail = []), q = T[T.length - 1]; if (q && Math.hypot(q.u - M.ball.u, q.v - M.ball.v) > 200) T.length = 0; T.push({ u: M.ball.u, v: M.ball.v }); if (T.length > 8) T.shift(); }
+  }
+  else if (NET_PLAY.includes(STATE.screen)) updateCamera(dt);
+}
+function netTick(dt, ht) {
+  if (!NET.on) return;
+  if (NET.role === 'host') netHostTick(dt, ht);
+}
+/* the friend's device asks the host to do these */
+function netAsk(a, id) { netSend({ t: 'act', a, id }); }
 
 /* ===================== Backgrounds & platforms ===================== */
 const ZONE_SKY = { yard: ['#6fd0ff', '#d8f3ff'], court: ['#7bd4ff', '#ffe9c2'] };
@@ -8708,8 +9871,8 @@ function joyZone(i) {
 }
 function joyStart(e) {
   if (STATE.screen !== 'play' || !STATE.touch || STATE.pad || !G) return false;
-  for (let i = 0; i < G.players.length; i++) {
-    if (G.duel && i !== G.duel.pl) continue;
+  for (let i = 0; i < (NET.on ? 1 : G.players.length); i++) {
+    if (G.duel && (NET.on ? G.duel.pl !== NET.me : i !== G.duel.pl)) continue; // online, only the player in the Annoy-Off steers
     const z = joyZone(i);
     if (!JOY[i] && e.clientX >= z.x0 && e.clientX < z.x1 && e.clientY >= z.y0 && e.clientY < z.y1) {
       JOY[i] = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY };
@@ -8874,9 +10037,16 @@ function readSafe() {
     d.remove();
   } catch (e) { /* defaults */ }
 }
-const SCREENS = ['title', 'adv', 'levels', 'crew', 'story', 'pause', 'done', 'help', 'bully'];
+const SCREENS = ['title', 'adv', 'levels', 'crew', 'story', 'pause', 'done', 'help', 'bully', 'net'];
 let helpReturn = 'title';
 function showScreen(name) {
+  if (NET.on && !NET.mirror) { // playing online: pausing and resuming happen on both devices
+    if (NET.role === 'guest') {
+      if (name === 'pause' && STATE.screen === 'play') { netAsk('pause'); $('pauseWho').hidden = true; }
+      else if (name === 'play' && STATE.screen === 'pause') netAsk('resume');
+    } else if (name === 'pause' && STATE.screen !== 'pause') { NET.pausedBy = 'host'; $('pauseWho').hidden = true; }
+  }
+  if (name === 'net' && STATE.screen !== 'net') NET.back = STATE.screen;
   SCREENS.forEach((s) => { $('s-' + s).hidden = s !== name; });
   if (name !== STATE.screen && $('s-' + name)) $('s-' + name).scrollTop = 0;
   STATE.screen = name;
@@ -8888,6 +10058,7 @@ function showScreen(name) {
   if (name === 'adv') buildAdventures();
   if (name === 'levels') buildLevels();
   if (name !== 'play') { Input.keys.clear(); Input.held.clear(); pointers.clear(); joyEnd(); }
+  netRoleUi();
 }
 const touchOrKey = (a, b, c) => (STATE.pad && c ? c : STATE.touch ? a : b);
 function levelTrack() {
@@ -8955,6 +10126,11 @@ function crewPicks() { return STATE.picks.slice(0, STATE.players); }
 function pickHero(id) {
   if (isGrounded(id)) { SND.sfx('nope'); STATE.crewMsg = `${HEROES[id].name} is at home. Finish a level and win the battle to get ${HEROES[id].name} back.`; refreshCrewSelect(); return; }
   STATE.focus = id; SND.sfx('help');
+  if (netHost()) { // online: your friend picks player 2 on their own device
+    if (STATE.picks[1] === id) STATE.crewMsg = `${HEROES[id].name} is your friend's hero. Pick someone else.`;
+    else STATE.picks[0] = id;
+    refreshCrewSelect(); return;
+  }
   if (STATE.players === 1) STATE.picks[0] = id;
   else {
     const other = 1 - pickTurn;
@@ -8994,7 +10170,7 @@ function refreshCrewSelect() {
     el.classList.toggle('sel1', p1); el.classList.toggle('sel2', p2); el.classList.toggle('friend', fr); el.classList.toggle('home', home);
     el.classList.toggle('dim', step === 'friends' && !fr && !p1 && !p2 && !home);
     el.querySelectorAll('.badge, .homebadge').forEach((b) => b.remove());
-    if (p1 || p2) el.insertAdjacentHTML('afterbegin', `<span class="badge ${p1 ? 'b1' : 'b2'}">${STATE.players === 1 ? 'YOU' : p1 ? 'P1' : 'P2'}</span>`);
+    if (p1 || p2) el.insertAdjacentHTML('afterbegin', `<span class="badge ${p1 ? 'b1' : 'b2'}">${STATE.players === 1 || (netHost() && p1) ? 'YOU' : netHost() ? 'FRIEND' : p1 ? 'P1' : 'P2'}</span>`);
     else if (fr) el.insertAdjacentHTML('afterbegin', '<span class="badge bf">FRIEND</span>');
     else if (step === 'friends' && nd && !home) el.insertAdjacentHTML('afterbegin', '<span class="badge bn">HANDY</span>');
     if (home) el.insertAdjacentHTML('beforeend', `<span class="homebadge">${HOUSE_SVG}At home</span>`);
@@ -9006,7 +10182,7 @@ function refreshCrewSelect() {
   $('crewJobs').querySelectorAll('canvas[data-por]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.por), 0, 0, 48, 48));
   const msg = STATE.crewMsg; STATE.crewMsg = '';
   $('crewHint').textContent = msg || (step === 'hero'
-    ? (STATE.players === 1 ? 'Tap a hero to play as them.' : `Player ${pickTurn + 1}, tap your hero.`)
+    ? (STATE.players === 1 ? 'Tap a hero to play as them.' : netHost() ? 'Tap your hero. Your friend picks theirs on their own device.' : `Player ${pickTurn + 1}, tap your hero.`)
     : `Tap friends to bring them. ${friends.length === 1 ? '1 friend' : friends.length + ' friends'} picked. Any number works!`);
   const free = HERO_IDS.filter((h) => !picks.includes(h) && !isGrounded(h)).length;
   $('allBtn').textContent = friends.length >= free && free > 0 ? 'Clear all' : 'Bring everyone';
@@ -9025,6 +10201,7 @@ function refreshCrewSelect() {
     const c = b.querySelector('canvas').getContext('2d'); drawThrowable(c, b.dataset.throw, 44, 44, 0.6, 2.2);
     b.addEventListener('click', () => { SAVE.throws[id] = b.dataset.throw; writeSave(); SND.sfx(throwSfx(b.dataset.throw)); refreshCrewSelect(); if (STATE.pad) focusPad($('crewDetail').querySelector('.thr.on')); });
   });
+  netSendCrew();
 }
 function animateCrewCards(t) {
   for (const id of HERO_IDS) {
@@ -9053,7 +10230,7 @@ function buildCrewBar() {
   $('portraits').classList.toggle('many', barIds().length > 5); // smaller faces for a big crew
   $('portraits').innerHTML = barIds().map((id, i) => {
     const pl = G.players.findIndex((p) => p.id === id);
-    const tag = pl < 0 ? '' : `<span class="you ${pl ? 'p2' : ''}">${G.players.length === 1 ? 'YOU' : 'P' + (pl + 1)}</span>`;
+    const tag = pl < 0 ? '' : `<span class="you ${pl ? 'p2' : ''}">${G.players.length === 1 || (NET.on && pl === NET.me) ? 'YOU' : NET.on ? 'FRIEND' : 'P' + (pl + 1)}</span>`;
     return `<button class="por" data-por="${id}" aria-label="Call ${HEROES[id].name}"><canvas width="96" height="96"></canvas><span class="cd"></span>${tag}${STATE.touch || STATE.pad ? '' : `<span class="k">${i + 1}</span>`}<span class="padk">${padNames().call}</span>${HOUSE_SVG}</button>`;
   }).join('');
   $('portraits').querySelectorAll('.por').forEach((el) => {
@@ -9162,7 +10339,7 @@ function callTip(id) {
   return touchOrKey(`tap ${HEROES[id].name}'s face up top`, `press ${n} to call ${HEROES[id].name}`, `press ${N.call} to call ${HEROES[id].name}`);
 }
 function showHint(h) {
-  const me = G.players[0], one = G.players.length === 1, H = me.H, L = G.L, n = THEMES[L.theme].n;
+  const me = G.players[NET.on ? NET.me : 0] || G.players[0], one = G.players.length === 1 || NET.on, H = me.H, L = G.L, n = THEMES[L.theme].n;
   const N = padNames(), moveKey = touchOrKey('Tap the star', one ? 'Press ↓, S or X' : 'Player 1 presses S, Player 2 presses ↓', `Press ${N.move}`);
   const T = h.t != null ? (G.teachers[h.t] || L.teachers[h.t]) : null, low = (x) => x.charAt(0).toLowerCase() + x.slice(1);
   let id = null, text = '';
@@ -9220,22 +10397,23 @@ const ICON = {
   jump: '<svg viewBox="0 0 24 24"><path d="M12 3 L21 13 H15 V21 H9 V13 H3 Z" fill="#1d1b3a"/></svg>',
   action: '<svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="#1d1b3a"/></svg>'
 };
-function twoPlayers() { return !!(STATE.players === 2 && G && G.players.length === 2); }
+function twoPlayers() { return !!(STATE.players === 2 && G && G.players.length === 2 && !NET.on); } // two players on this device
 function touchControlsOn() { return !!(STATE.touch && !STATE.pad); }
-function ctlButtons(W, H, two) {
+function ctlButtons(W, H, two, as) { // as: lay out a boss game ('maze'...) or the Annoy-Off ('duel') before it starts
   const m = 14, r = SAFE.right + m, b = SAFE.bottom + m;
   const btns = [], add = (pl, k, x, y, s) => btns.push({ pl, k, x, y, s });
   let joyX;  // the first player's joystick area ends at joyX[0], the second player's starts at joyX[1]
-  const miniKeys = G && G.mini ? MINI_GAMES[G.mini.kind].buttons.map((q) => q.k) : null;
+  const miniKeys = as ? (MINI_GAMES[as] ? MINI_GAMES[as].buttons.map((q) => q.k) : null) : G && G.mini ? MINI_GAMES[G.mini.kind].buttons.map((q) => q.k) : null;
+  const duelOn = as ? as === 'duel' : !!(G && G.duel);
   if (miniKeys && !two) { // a boss game for one player: the main button bottom right, the others beside and above it
     const s = clamp(Math.min(W, H) * 0.22, 72, 120), ss = s * 0.78;
     if (miniKeys[0]) add(0, miniKeys[0], W - r - s, H - b - s, s);
     if (miniKeys[1]) add(0, miniKeys[1], W - r - s - ss - 14, H - b - ss * 0.92, ss);
     if (miniKeys[2]) add(0, miniKeys[2], W - r - s + (s - ss) / 2, H - b - s - ss - 24, ss);
     joyX = [miniKeys.length ? Math.min(W * 0.55, W - r - s - (miniKeys[1] ? ss + 34 : 24)) : W * 0.75, W];
-  } else if (G && G.duel) {
-    const pl = G.duel.pl, s = clamp(Math.min(W, H) * 0.24, 76, 128), ss = s * 0.74;
-    add(pl, 'throw', W - r - s, H - b - s, s); add(pl, 'action', W - r - s - ss - 16, H - b - ss * 0.92, ss);
+  } else if (duelOn) {
+    const D = !as && G && G.duel, pl = NET.on || !D ? 0 : D.pl, s = clamp(Math.min(W, H) * 0.24, 76, 128), ss = s * 0.74; // online, each device's own buttons are player 0
+    if (!(NET.on && D && D.pl !== NET.me)) { add(pl, 'throw', W - r - s, H - b - s, s); add(pl, 'action', W - r - s - ss - 16, H - b - ss * 0.92, ss); } // the friend who isn't playing watches
     joyX = [Math.min(W * 0.5, W - r - s - ss - 36), W];
   } else if (!two) {
     const s = clamp(Math.min(W, H) * 0.2, 64, 112), sj = s * 1.12, ax = W - r - sj - s - 12;
@@ -9261,13 +10439,14 @@ function layoutControls() {
   const W = VIEW.W, H = VIEW.H, two = twoPlayers();
   const { btns, joyX } = ctlButtons(W, H, two);
   const duel = G && G.duel, mini = G && G.mini, mb = (q) => MINI_GAMES[mini.kind].buttons.find((x) => x.k === q.k) || { label: '' };
-  const label = (q) => !G ? '' : mini ? mb(q).sub || '' : duel ? (q.k === 'throw' ? DUEL_MOVES[duel.me.id].annoy : DUEL_MOVES[duel.me.id].sup) : q.k === 'action' ? G.players[q.pl].H.move : q.k === 'throw' ? THROWS[heroThrow(G.players[q.pl].id)].name : '';
+  const gp = (q) => G.players[NET.on ? NET.me : q.pl] || G.players[0]; // online, this device's hero
+  const label = (q) => !G ? '' : mini ? mb(q).sub || '' : duel ? (q.k === 'throw' ? DUEL_MOVES[duel.me.id].annoy : DUEL_MOVES[duel.me.id].sup) : q.k === 'action' ? gp(q).H.move : q.k === 'throw' ? THROWS[heroThrow(gp(q).id)].name : '';
   btns.forEach((q) => { q.label = label(q); });
   VIEW.joyX = joyX;
   VIEW.ctlSide = Math.max(two ? 0 : 170, ...btns.map((q) => Math.min(q.x + q.s, W - q.x))) + 4;
   VIEW.toastTop = two && !duel;
-  const joys = duel ? [duel.pl] : two ? [0, 1] : [0];
-  const face = (q) => mini ? `<span class="big">${mb(q).label}<small>${q.label}</small></span>` : duel ? `<span class="big">${q.k === 'throw' ? 'ANNOY' : 'SUPER'}<small>${q.label}</small></span>` : q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? G.players[q.pl].id : 'naseer')}"></canvas>` : ICON[q.k];
+  const joys = duel ? (NET.on ? (duel.pl === NET.me ? [0] : []) : [duel.pl]) : two ? [0, 1] : [0];
+  const face = (q) => mini ? `<span class="big">${mb(q).label}<small>${q.label}</small></span>` : duel ? `<span class="big">${q.k === 'throw' ? 'ANNOY' : 'SUPER'}<small>${q.label}</small></span>` : q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? gp(q).id : 'naseer')}"></canvas>` : ICON[q.k];
   box.innerHTML = btns.map((q) => `<div class="tb ${two && !duel ? 'p' + (q.pl + 1) : ''} ${duel ? (q.k === 'throw' ? 'duelann' : 'duelsup') : mini ? 'duelann' : ''}" data-b="${q.pl}:${q.k}" style="left:${q.x}px;top:${q.y}px;width:${q.s}px;height:${q.s}px">${face(q)}${q.label && !duel && !mini ? `<span class="lbl">${q.label}</span>` : ''}</div>`).join('') +
     joys.map((i) => `<div class="joy ghost ${two && !duel ? 'p' + (i + 1) : ''}" id="joy${i}"><i></i><span class="lbl">Move</span></div>`).join('');
   joys.forEach((i) => joyDraw(i));
@@ -9351,7 +10530,11 @@ function beginPlay() {
 }
 function enterPlay() { Input.ctrl.forEach((c) => { c.pj = c.pa = true; }); showScreen('play'); buildHUD(); toastT = 0; $('toast').hidden = true; $('banner').hidden = true; resize(); }
 function wireButtons() {
-  $('playBtn').onclick = () => showScreen('adv');
+  $('playBtn').onclick = () => { if (netGuest()) { netOpen(); return; } showScreen('adv'); };
+  $('onlineBtn').onclick = () => netOpen();
+  $('netPill').onclick = () => { showScreen('net'); netUi('status'); };
+  $('leaveBtn').onclick = () => netLeave();
+  $('doneLeave').onclick = () => netLeave();
   $('howBtn').onclick = () => { helpReturn = 'title'; showScreen('help'); };
   $('howBtn2').onclick = () => { helpReturn = 'pause'; showScreen('help'); };
   $('helpClose').onclick = () => showScreen(helpReturn);
@@ -9364,7 +10547,7 @@ function wireButtons() {
   };
   $('allBtn').onclick = () => toggleAllFriends();
   $('crewBack').onclick = () => { if (STATE.crewStep === 'friends') { STATE.crewStep = 'hero'; refreshCrewSelect(); } else showScreen('levels'); };
-  $('storyGo').onclick = () => enterPlay();
+  $('storyGo').onclick = () => (netGuest() ? netAsk('go') : enterPlay());
   $('pauseBtn').onclick = () => showScreen('pause');
   $('resumeBtn').onclick = () => showScreen('play');
   $('restartBtn').onclick = () => { startLevel(); enterPlay(); };
@@ -9384,12 +10567,14 @@ function frame(now) {
   const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
   try {
     pollPads();
-    if (STATE.screen === 'play' && G) {
+    if (netGuest()) netGuestTick(dt, now);
+    else if (STATE.screen === 'play' && G) {
       acc += dt; let n = 0;
       while (acc >= STEP && n < 6 && STATE.screen === 'play') { update(STEP); acc -= STEP; n++; }
       if (n >= 6) acc = 0;
       updateHUD();
     } else acc = 0;
+    if (NET.on) netTick(dt, now - acc * 1000); // (the moment the game has reached: the frame's time less what's still to run)
     render();
     if (STATE.screen === 'crew') animateCrewCards(now / 1000);
     if (STATE.screen === 'done') drawPhoto(now / 1000);
@@ -9397,7 +10582,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 function boot(data) {
-  loadSave(); readSafe(); TUTORIAL_HTML = $('storyBody').innerHTML;
+  loadSave(); readSafe(); TUTORIAL_HTML = $('storyBody').innerHTML; netInstall();
   if (Array.isArray(SAVE.friends)) STATE.friends = SAVE.friends.filter((h) => HEROES[h]);
   if (data && data.picks) { STATE.players = data.players || 1; STATE.picks = data.picks; STATE.focus = data.picks[0]; }
   if (data && data.adv && ADV.some((a) => a.id === data.adv)) STATE.adv = data.adv;
