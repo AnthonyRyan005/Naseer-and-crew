@@ -443,6 +443,110 @@ h2.title {
 .netthrows { display: grid; grid-template-columns: repeat(5, minmax(0, 76px)); gap: 6px; justify-content: center; }
 .netthrows .thr canvas { width: 40px; height: 40px; }
 @media (max-height: 560px) { .netcode { font-size: 52px; } .netcodein { font-size: 38px; } .nh canvas { width: 48px; height: 48px; } }
+
+/* ---------- Can you beat Paul at Poo Pong? ---------- */
+.pongbtn { /* top left, in the sky: clear of the school and the crew */
+  position: absolute; z-index: 3; top: calc(var(--sat) + 12px); left: calc(var(--sal) + 12px);
+  display: flex; align-items: center; gap: 3px; padding: 3px 11px 3px 3px; margin: 0;
+  border: 3px solid var(--ink); border-radius: 16px; background: #ff3d8b; color: #fff; cursor: pointer; touch-action: manipulation;
+  box-shadow: 0 4px 0 var(--ink); transform: rotate(-2deg); font-family: var(--font-body);
+  animation: pongGlow 1.8s ease-in-out infinite; transition: transform 0.12s;
+}
+.pongbtn:hover { transform: rotate(-2deg) scale(1.05); }
+.pongbtn:active { transform: rotate(-2deg) translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.pb-bg { position: absolute; inset: 0; border-radius: 13px; overflow: hidden; z-index: 0;
+  background: linear-gradient(110deg, #ff3d8b 0%, #ff7a2f 20%, #ffc83d 38%, #ff7a2f 56%, #ff3d8b 74%, #a64dff 88%, #ff3d8b 100%); background-size: 300% 100%; animation: pongFlow 6s linear infinite; }
+.pb-bg::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.24) 2.5px, transparent 3px); background-size: 15px 15px; }
+.pb-bg::after { content: ''; position: absolute; top: -30%; bottom: -30%; width: 38%; left: -60%; transform: skewX(-18deg);
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.7), transparent); animation: pongShine 3.4s ease-in-out infinite; }
+.pb-face { position: relative; z-index: 1; width: 48px; height: 48px; margin: -10px -1px -5px -3px; flex: none; filter: drop-shadow(0 2px 0 rgba(29, 27, 58, 0.55)); }
+.pb-text { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; line-height: 1; text-align: left; }
+.pb-text small { font-weight: 700; font-size: 11px; letter-spacing: 0.1px; color: #fff;
+  text-shadow: 0 1.5px 0 var(--ink), 1px 0 0 var(--ink), -1px 0 0 var(--ink), 0 -1px 0 var(--ink); }
+.pb-text b { font-family: var(--font-display); font-weight: 400; font-size: 21px; color: #ffe14d; letter-spacing: 0.5px; margin-top: 2px;
+  -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ink); white-space: nowrap; }
+.pb-new { position: absolute; z-index: 2; top: -10px; right: -12px; font-family: var(--font-display); font-size: 11px; color: var(--ink); background: #b8ff5a;
+  border: 2px solid var(--ink); border-radius: 8px; padding: 0 5px; transform: rotate(12deg); box-shadow: 0 2px 0 var(--ink); animation: pongNew 1.2s ease-in-out infinite; }
+@keyframes pongFlow { to { background-position: -300% 0; } }
+@keyframes pongShine { 0%, 50% { left: -60%; } 100% { left: 130%; } }
+@keyframes pongGlow { 50% { box-shadow: 0 4px 0 var(--ink), 0 0 0 4px rgba(255, 200, 61, 0.55), 0 0 16px 4px rgba(255, 61, 139, 0.55); } }
+@keyframes pongNew { 50% { transform: rotate(4deg) scale(1.12); } }
+.pongpanel { max-width: 620px; }
+.ponghead { display: flex; align-items: center; gap: 10px; }
+.ponghead canvas { width: 100px; height: 100px; flex: none; margin: -16px -4px -10px -8px; }
+.ponghead h2 { text-align: left; font-size: clamp(24px, 5.6vw, 32px); line-height: 1.05; }
+.ponghead .sub { text-align: left; margin-top: 4px; }
+#pongSetup { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pongsides { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.pongrow { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.pwho { font-family: var(--font-display); font-size: 17px; line-height: 1; color: #fff; padding: 5px 7px; border-radius: 10px; border: 2.5px solid var(--ink); flex: none; }
+.pwho.p1 { background: var(--p1); } .pwho.p2 { background: var(--p2); }
+.pchoice { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.pk, .pkp { border: 3px solid var(--ink); border-radius: 18px; background: #fff; box-shadow: 0 4px 0 var(--ink); }
+.pk { display: flex; align-items: center; gap: 2px; padding: 5px; }
+.pka { width: 32px; height: 50px; display: grid; place-items: center; padding: 0; border: 2.5px solid var(--ink); border-radius: 10px; background: var(--sun); cursor: pointer; touch-action: manipulation; }
+.pka svg { width: 20px; height: 20px; }
+.pka:active { transform: translateY(2px); }
+.pkh, .pkp { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ink); font-family: var(--font-body); cursor: pointer; touch-action: manipulation; }
+.pkh { padding: 2px 4px; background: none; border: 0; min-width: 76px; }
+.pkp { padding: 7px 12px 6px; min-width: 88px; }
+.pkh canvas, .pkp canvas { width: 62px; height: 62px; border-radius: 50%; border: 3px solid var(--ink); }
+.pkh b, .pkp b { font-family: var(--font-display); font-weight: 400; font-size: 18px; line-height: 1.1; }
+.pkp small { font-size: 12px; font-weight: 700; color: #c2185b; }
+.pk:not(.on), .pkp:not(.on) { opacity: 0.55; }
+.pk.on.p1, .pkp.on.p1 { background: #e3efff; outline: 4px solid var(--p1); outline-offset: 2px; }
+.pk.on.p2, .pkp.on.p2 { background: #ffeedd; outline: 4px solid var(--p2); outline-offset: 2px; }
+.pkp.cpu, .pkp.on.cpu { background: #ffe3ef; outline: 4px solid #ff4f9a; outline-offset: 2px; cursor: default; } /* Paul playing by himself */
+.pvs { font-family: var(--font-display); font-size: 30px; color: #ff4f9a; -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; }
+.por2 { font-weight: 700; color: var(--muted); }
+#pongEnd { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+#pongEnd .pongres { font-family: var(--font-display); font-size: clamp(34px, 8vw, 50px); color: #ff4f9a; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill;
+  text-shadow: 0 4px 0 var(--ink); line-height: 1.05; margin: 2px 0 0; }
+#pongEnd .pongscore { font-family: var(--font-display); font-size: 28px; line-height: 1.1; }
+#pongEnd .pongline { text-align: center; max-width: 440px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .pongbtn { top: calc(var(--sat) + 8px); padding: 2px 9px 2px 2px; }
+  .pb-face { width: 42px; height: 42px; margin: -8px -1px -4px -2px; }
+  .pb-text small { font-size: 10px; }
+  .pb-text b { font-size: 18px; }
+  .ponghead canvas { width: 70px; height: 70px; margin: -10px -2px -6px -4px; }
+  .ponghead h2 { font-size: 24px; }
+  .pongsides { flex-direction: row; justify-content: center; }
+  .pkh canvas, .pkp canvas { width: 48px; height: 48px; }
+  .pka { height: 42px; width: 28px; }
+  #pongEnd .pongres { font-size: 36px; }
+  #s-pong .row .btn { font-size: 19px; padding: 9px 18px; }
+}
+/* short phones held upright: the logo starts right at the top, so the button folds up into a badge beside it */
+@media (orientation: portrait) and (max-height: 650px) {
+  .pongbtn { flex-direction: column; gap: 0; padding: 2px 6px 3px; border-radius: 14px; }
+  .pb-bg { border-radius: 11px; }
+  .pb-face { width: 44px; height: 44px; margin: -10px 0 -3px; }
+  .pb-text { align-items: center; }
+  .pb-text small { display: none; }
+  .pb-text b { font-size: 12px; margin-top: 0; letter-spacing: 0; -webkit-text-stroke-width: 1.5px; text-shadow: 0 1.5px 0 var(--ink); }
+  .pb-new { top: -8px; right: -16px; }
+}
+@media (orientation: portrait) and (max-width: 340px) { .pongbtn { left: calc(var(--sal) + 6px); padding: 2px 4px 3px; } .pb-text b { font-size: 11px; } }
+/* small phones held upright: the Poo Pong screen packs in tighter */
+@media (max-width: 400px) {
+  .pongpanel { padding: 14px; }
+  .ponghead canvas { width: 64px; height: 64px; margin: -6px -4px -6px -6px; }
+  .ponghead h2 { font-size: 22px; }
+  .ponghead > div { padding-right: 30px; } /* clear of the sound button */
+  .pongrow { gap: 5px; }
+  .pwho { font-size: 15px; padding: 4px 5px; }
+  .pchoice { gap: 6px; }
+  .pka { width: 27px; height: 44px; }
+  .pka svg { width: 17px; height: 17px; }
+  .pkh { min-width: 62px; padding: 2px; }
+  .pkp { min-width: 68px; padding: 6px 7px 5px; }
+  .pkh canvas, .pkp canvas { width: 50px; height: 50px; }
+  .pkh b, .pkp b { font-size: 16px; }
+  .pvs { font-size: 24px; }
+  .pongsides { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .pongbtn, .pb-bg, .pb-bg::after, .pb-new { animation: none; } }
 </style>
 </head>
 <body>
@@ -472,6 +576,12 @@ h2.title {
   <button id="netPill" hidden><i></i><span>Online with a friend</span></button>
 
   <section class="screen" id="s-title">
+    <button class="pongbtn" id="pongBtn" aria-label="Can you beat Paul at Poo Pong?">
+      <span class="pb-bg" aria-hidden="true"></span>
+      <canvas class="pb-face" id="pongBtnFace" width="120" height="120" aria-hidden="true"></canvas>
+      <span class="pb-text" aria-hidden="true"><small>Can you beat Paul at</small><b>POO PONG?</b></span>
+      <span class="pb-new" aria-hidden="true">NEW!</span>
+    </button>
     <div class="inner">
       <h1 class="logo">Naseer<small>and the</small>Crew</h1>
       <p class="tag">Eight friends. One crew. Total school chaos.</p>
@@ -598,6 +708,33 @@ h2.title {
     </div>
   </section>
 
+  <section class="screen dim" id="s-pong" hidden>
+    <div class="inner">
+      <div class="panel pongpanel">
+        <div class="ponghead">
+          <canvas id="pongFace" width="200" height="200" aria-hidden="true"></canvas>
+          <div><h2 id="pongTitle">Can you beat Paul at Poo Pong?</h2><p class="sub" id="pongSub"></p></div>
+        </div>
+        <div id="pongSetup">
+          <div class="seg" role="group" aria-label="Number of players"><button id="pong1" class="on">1 Player</button><button id="pong2">2 Players</button></div>
+          <div class="pongsides" id="pongSides"></div>
+        </div>
+        <div id="pongEnd" hidden>
+          <p class="pongres" id="pongEndTitle"></p>
+          <p class="pongscore" id="pongEndScore"></p>
+          <p class="pongline" id="pongEndLine"></p>
+        </div>
+        <div class="row stick">
+          <button class="btn alt small" id="pongBack">Back</button>
+          <button class="btn big go" id="pongGo">Play!</button>
+          <button class="btn go" id="pongAgain" hidden>Play again</button>
+          <button class="btn alt" id="pongChange" hidden>Change players</button>
+          <button class="btn alt" id="pongMenu" hidden>Main menu</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="screen dim" id="s-help" hidden>
     <div class="inner">
       <div class="panel">
@@ -609,6 +746,7 @@ h2.title {
           <li>Before each level, pick your hero and up to 3 friends. Any mix works: if a job needs a friend who isn't in your crew, they pop in to help.</li>
           <li>If a baddie gets you, a friend is sent home and you lose a heart. Lose all 4 hearts and you start the level again.</li>
           <li>Every level ends with a boss battle: Bully Invaders, Bully Pong, Bully Maze or the Schoolyard Showdown. Lose one and you can try it again straight away.</li>
+          <li>Tap <b>Can you beat Paul at Poo Pong?</b> on the main menu to play Poo Pong on its own. Play against Paul by yourself, or with 2 players each play your hero or Paul. Beat Paul and he goes up a level.</li>
           <li>Watch out for Crusher the bully! Stop him with special moves before a grown-up comes, or take him on one on one in an Annoy-Off. Annoy him until his keeping cool bar hits 100%. If yours gets there first, everyone gets sent home.</li>
           <li>If a grown-up catches you, they march a friend home. Win them back in a promise battle at the end of a level.</li>
           <li>Teachers can't be fought. Stand still in an open locker to hide, sneak behind them, or get Jaxxs to distract them.</li>
@@ -800,6 +938,10 @@ const SND = {
       case 'tick': this.tone(880, 0.12, 'square', 0.08); break;
       case 'go': [659, 988, 1319].forEach((f, i) => this.tone(f, 0.16, 'square', 0.09, 0, i * 0.05)); break;
       case 'vs': this.noise(0.5, 0.2, 1500); this.tone(140, 0.6, 'sawtooth', 0.15, 260); break;
+      // Poo Pong with Paul
+      case 'bonk': this.tone(520, 0.11, 'sine', 0.24, -270); this.tone(1040, 0.05, 'triangle', 0.07); this.noise(0.04, 0.14, 2600); break; // the poo off Paul's head
+      case 'haha': [0, 0.13, 0.26].forEach((d, i) => { this.tone(440 - i * 34, 0.09, 'square', 0.06, -50, d); this.noise(0.06, 0.05, 1800, d); }); break; // Paul laughs
+      case 'shine': [2637, 3520, 4186].forEach((f, i) => this.tone(f, 0.26 - i * 0.04, 'sine', 0.09 - i * 0.02, 0, i * 0.07)); break; // the glint off his head
     }
   },
   /* Looping tunes: bass, melody and sometimes drums. Each adventure and the bosses have their own. */
@@ -882,6 +1024,9 @@ TRACKS.disco = { beat: 0.13, lead: 'square', vol: 0.05, drums: { k: [0, 4, 8, 12
   bass: [45, 0, 57, 0, 45, 57, 0, 45, 43, 0, 55, 0, 43, 55, 0, 43, 41, 0, 53, 0, 41, 53, 0, 41, 40, 0, 52, 0, 44, 0, 47, 0],
   mel: [81, 0, 79, 81, 0, 76, 0, 0, 79, 0, 76, 79, 0, 74, 0, 0, 77, 0, 76, 77, 0, 72, 0, 0, 76, 0, 74, 72, 0, 71, 0, 68] };
 TRACKS.chase = Object.assign({}, TRACKS.park, { beat: 0.115, drums: DRUMS.rock });
+TRACKS.pong = { beat: 0.13, lead: 'square', vol: 0.05, drums: DRUMS.light, // ping... pong... ping... pong
+  bass: [48, 0, 55, 0, 48, 0, 55, 0, 53, 0, 60, 0, 53, 0, 60, 0, 55, 0, 62, 0, 55, 0, 62, 0, 48, 0, 55, 0, 52, 0, 55, 0],
+  mel: [84, 0, 72, 0, 84, 0, 72, 0, 81, 0, 77, 0, 84, 0, 0, 0, 83, 0, 79, 0, 86, 0, 79, 0, 84, 83, 81, 79, 76, 0, 72, 0] };
 TRACKS.survive = Object.assign({}, TRACKS.zombie, { beat: 0.14, drums: DRUMS.rock });
 
 /* ===================== The crew ===================== */
@@ -7262,7 +7407,7 @@ const BIG_POR = {};
 function bigPortrait(id) {
   if (BIG_POR[id]) return BIG_POR[id];
   const p = document.createElement('canvas'); p.width = p.height = 256;
-  if (id === 'crusher') paintCrusherPortrait(p); else paintPortrait(p, id);
+  if (id === 'crusher') paintCrusherPortrait(p); else if (id === 'paul') paintPaulPortrait(p); else paintPortrait(p, id);
   return (BIG_POR[id] = p);
 }
 function paintCrusherPortrait(p) {
@@ -7393,10 +7538,11 @@ function miniPending() {
 
 /* ---------- starting, winning, losing ---------- */
 function startMini(retry) {
-  const kind = miniFor(G.L), game = kind && MINI_GAMES[kind];
+  const kind = G.arcade ? G.arcade.kind : miniFor(G.L), game = kind && MINI_GAMES[kind]; // (or Poo Pong with Paul, played from the menu)
   G.miniStarting = false;
   if (!game) { G.miniDone = true; return false; }
-  const tries = retry && G.mini ? G.mini.tries + 1 : 0, kids = G.players.map((p, i) => ({ pl: i, id: p.id }));
+  const tries = retry && G.mini ? G.mini.tries + 1 : 0;
+  const kids = G.arcade ? G.arcade.sides.filter((s) => s.pl >= 0).map((s) => ({ pl: s.pl, id: s.who })) : G.players.map((p, i) => ({ pl: i, id: p.id }));
   G.mini = { kind, kids }; // for a moment, so the screen layout knows which buttons this game has
   const area = miniArea();
   let size = game.size(area.w, area.h);
@@ -7438,10 +7584,11 @@ function finishMini() {
   G.coins += M.coins;
   levelComplete();
 }
+function miniTwo() { return G && G.arcade ? G.players.length === 2 : STATE.players === 2 && !NET.on; } // two players on this device
 function miniHelpToast() {
-  const M = G.mini, h = MINI_GAMES[M.kind].help, N = padNames();
-  const keys = STATE.players === 2 && !NET.on ? `Player 1: ${h.keys2[0]} Player 2: ${h.keys2[1]}` : h.keys;
-  toast((M.kids[NET.on ? NET.me : 0] || M.kids[0]).id, touchOrKey(h.touch, keys, h.pad(N)), 6);
+  const M = G.mini, h = MINI_GAMES[M.kind].help, N = padNames(), two = miniTwo();
+  const keys = two ? `Player 1: ${h.keys2[0]} Player 2: ${h.keys2[1]}` : h.keys;
+  toast((M.kids[NET.on ? NET.me : 0] || M.kids[0]).id, touchOrKey(two && h.touch2 ? h.touch2 : h.touch, keys, h.pad(N)), 6);
 }
 
 /* ---------- every frame ---------- */
@@ -7455,6 +7602,7 @@ function updateMini(dt) {
     if (M.t > 2.4) { M.phase = 'play'; M.t = 0; }
   } else if (M.phase === 'won' && M.t > 2.8) { finishMini(); return; }
   else if (M.phase === 'lost' && M.t > 2.8) { startMini(true); return; }
+  else if (M.phase === 'over' && M.t > 3.2) { paulPongOver(); return; } // Poo Pong with Paul: who won, and what next
   if (M.phase === 'play') M.T += dt;
   MINI_GAMES[M.kind].update(M, dt);
   Input.tapped.clear();
@@ -7469,13 +7617,13 @@ const MINI_KEYS2 = [
 ];
 // one call per player per frame: moves (-1 to 1), buttons held, and buttons just pressed
 function miniInput(pl) {
-  const M = G.mini, r = NET.on && NET.role === 'host' && pl === 1 ? netRemoteMini() : miniRaw(pl), { mx, my, a, b, c } = r;
+  const M = G.mini, r = NET.on && NET.role === 'host' && pl === 1 && !G.arcade ? netRemoteMini() : miniRaw(pl), { mx, my, a, b, c } = r;
   const pv = M.prev[pl] || {};
   M.prev[pl] = { a, b, c, my };
   return { mx, my, a, b, c, aP: a && !pv.a, bP: b && !pv.b, cP: c && !pv.c, upP: my < -0.5 && !(pv.my < -0.5) };
 }
 function miniRaw(pl) { // this device's keys, touch buttons, stick and controller
-  const map = STATE.players === 2 && !NET.on ? MINI_KEYS2[pl] || MINI_KEYS1 : MINI_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
+  const map = miniTwo() ? MINI_KEYS2[pl] || MINI_KEYS1 : MINI_KEYS1, has = (k) => map[k].some((code) => Input.keys.has(code));
   let mx = (has('right') ? 1 : 0) - (has('left') ? 1 : 0), my = (has('down') ? 1 : 0) - (has('up') ? 1 : 0);
   const J = JOY[pl];
   if (J) { const dx = J.x - J.ox, dy = J.y - J.oy; if (Math.hypot(dx, dy) > 8) { mx = dx / JOY_R; my = dy / JOY_R; } }
@@ -7492,9 +7640,11 @@ function miniRaw(pl) { // this device's keys, touch buttons, stick and controlle
 
 /* ---------- fitting the game on the screen ---------- */
 function miniArea(kind) { // the part of the screen a boss game can use, in CSS pixels (kind: for a game that hasn't started yet)
-  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), top = SAFE.top + 8 + MINI_HUD_H + 8;
-  let bottom = H - SAFE.bottom - 6;
-  if (touch && (VIEW.portrait || twoPlayers())) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers(), kind).top - 12); // keep the game clear of the buttons
+  const W = VIEW.W, H = VIEW.H, touch = touchControlsOn(), game = MINI_GAMES[kind || (G && G.mini && G.mini.kind)];
+  let top = SAFE.top + 8 + MINI_HUD_H + 8, bottom = H - SAFE.bottom - 6;
+  if (touch && game && game.follow) { // no buttons, just fingers: on an upright screen, a strip to slide your finger along
+    if (VIEW.portrait) { bottom -= 96; if (twoPlayers()) top += 70; }
+  } else if (touch && (VIEW.portrait || twoPlayers())) bottom = Math.min(bottom, ctlButtons(W, H, twoPlayers(), kind).top - 12); // keep the game clear of the buttons
   else if (touch) bottom -= 8;
   const left = SAFE.left + 6, right = W - SAFE.right - 6;
   return { left, top, w: right - left, h: Math.max(160, bottom - top) };
@@ -7558,23 +7708,25 @@ function miniTitle(c, t, M) {
   c.restore();
   const S = Math.min(W * 0.26, H * 0.24), cy = H * 0.5;
   c.save(); c.translate(W / 2, cy); c.scale(e, e);
-  // your hero, a poo, and a bully
-  const kx = -Math.min(W * 0.28, S * 1.3), bx = Math.min(W * 0.28, S * 1.3);
-  c.save(); c.beginPath(); c.arc(kx, 0, S / 2, 0, 7); c.clip(); c.drawImage(bigPortrait(M.kids[0].id), kx - S / 2, -S / 2, S, S); c.restore();
+  // your hero, a poo, and a bully (or whoever this game has)
+  const kx = -Math.min(W * 0.28, S * 1.3), bx = Math.min(W * 0.28, S * 1.3), game = MINI_GAMES[M.kind], pair = game.faces ? game.faces(M) : null;
+  c.save(); c.beginPath(); c.arc(kx, 0, S / 2, 0, 7); c.clip(); c.drawImage(bigPortrait(pair ? pair[0] : M.kids[0].id), kx - S / 2, -S / 2, S, S); c.restore();
   c.beginPath(); c.arc(kx, 0, S / 2, 0, 7); c.lineWidth = 6; c.strokeStyle = '#fff'; c.stroke();
-  c.save(); c.beginPath(); c.arc(bx, 0, S / 2, 0, 7); c.clip(); c.fillStyle = '#b3261e'; c.fillRect(bx - S / 2, -S / 2, S, S);
-  drawMiniBully(c, bx, S * 0.62, S / 64, { col: '#4b5160' }); c.restore();
+  c.save(); c.beginPath(); c.arc(bx, 0, S / 2, 0, 7); c.clip();
+  if (pair) c.drawImage(bigPortrait(pair[1]), bx - S / 2, -S / 2, S, S);
+  else { c.fillStyle = '#b3261e'; c.fillRect(bx - S / 2, -S / 2, S, S); drawMiniBully(c, bx, S * 0.62, S / 64, { col: '#4b5160' }); }
+  c.restore();
   c.beginPath(); c.arc(bx, 0, S / 2, 0, 7); c.lineWidth = 6; c.strokeStyle = '#fff'; c.stroke();
   drawPoo(c, 0, Math.sin(t * 6) * 6, S / 46, { face: true, rot: Math.sin(t * 4) * 0.2 });
   c.restore();
   const ty = Math.max(SAFE.top + 50, cy - S / 2 - Math.min(W * 0.13, 84));
   c.font = `700 ${Math.round(Math.min(W * 0.04, 18))}px Fredoka, sans-serif`; c.textAlign = 'center'; c.fillStyle = '#ffd23d';
-  c.fillText(M.tries ? 'BOSS BATTLE: TRY AGAIN' : 'BOSS BATTLE', W / 2, ty - Math.min(W * 0.09, 50));
+  c.fillText(game.kicker ? game.kicker(M) : M.tries ? 'BOSS BATTLE: TRY AGAIN' : 'BOSS BATTLE', W / 2, ty - Math.min(W * 0.09, 50), W - 24);
   c.font = `${Math.round(Math.min(W * 0.085, 54))}px "Lilita One", sans-serif`; c.lineWidth = 9; c.strokeStyle = INK;
   c.strokeText(info.title, W / 2, ty, W - 24); c.fillStyle = '#fff'; c.fillText(info.title, W / 2, ty, W - 24);
   c.font = `600 ${Math.round(Math.min(W * 0.04, 20))}px Fredoka, sans-serif`; c.lineWidth = 5;
   const gy = cy + S / 2 + Math.min(H * 0.08, 56);
-  miniWrap(c, info.goal, W / 2, gy, Math.min(W - 40, 560), Math.round(Math.min(W * 0.04, 20)) + 6);
+  miniWrap(c, M.goalText || info.goal, W / 2, gy, Math.min(W - 40, 560), Math.round(Math.min(W * 0.04, 20)) + 6);
   c.restore();
 }
 function miniWrap(c, txt, x, y, maxW, lh) { // centred text over more than one line if it needs to be
@@ -8362,11 +8514,551 @@ MINI_GAMES.fighter = {
   }
 };
 
+/* ===================== Can you beat Paul at Poo Pong? ===================== */
+// Poo Pong as a game of its own, from the main menu. Paul's bat is his own face.
+// One player plays their hero against Paul. Two players each play their hero or Paul.
+
+/* ---------- Paul's face, drawn from shapes ---------- */
+const PAUL = { skin: '#f6c1a6', shade: 'rgba(206,128,100,0.32)', cheek: 'rgba(255,104,96,0.30)', brow: '#b98c5c', stub: 'rgba(120,84,56,0.34)', shirt: '#24252d', shirt2: '#33343e' };
+const PAUL_HEAD = { rx: 42.5, ry: 53, cy: -2 }; // the oval his head fits in (for hitting the poo)
+function paulHeadPath(c) {
+  c.beginPath(); c.moveTo(0, -55);
+  c.bezierCurveTo(24, -55, 39, -41, 40, -20);
+  c.bezierCurveTo(42, -2, 44, 16, 38, 31);
+  c.bezierCurveTo(31, 44, 16, 51, 0, 51);
+  c.bezierCurveTo(-16, 51, -31, 44, -38, 31);
+  c.bezierCurveTo(-44, 16, -42, -2, -40, -20);
+  c.bezierCurveTo(-39, -41, -24, -55, 0, -55);
+  c.closePath();
+}
+const PAUL_STUBBLE = (() => { // dots of short stubble on his chin, along his jaw and over his top lip, the same every time
+  const out = []; let seed = 7, tries = 0;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  let c2 = null;
+  try { c2 = document.createElement('canvas').getContext('2d'); paulHeadPath(c2); } catch (e) { return out; }
+  const inside = (x, y) => c2.isPointInPath(x, y) && c2.isPointInPath(x + 3, y + 3) && c2.isPointInPath(x - 3, y + 3);
+  while (out.length < 110 && tries++ < 5000) {
+    const x = (rnd() * 2 - 1) * 40, y = 17 + rnd() * 34;
+    if (!inside(x, y)) continue;
+    const lip = y < 21.5 && Math.abs(x) < 12;
+    const jaw = y > 22 && y < 33 && Math.abs(x) > 23;
+    const chin = y >= 33 && !(y < 41 && Math.abs(x) < 15);
+    if (lip || jaw || chin) out.push([x, y]);
+  }
+  return out;
+})();
+/* o: mood ('idle', 'happy', 'laugh', 'hit', 'sad', 'smash', 'cheeky'), look {x, y} (-1 to 1), sqx, sqy (squash), t, blink, shine (0-1), collar */
+function drawPaulFace(c, x, y, s, o) {
+  o = o || {};
+  const mood = o.mood || 'idle', t = o.t || 0, lx = clamp((o.look && o.look.x) || 0, -1, 1), ly = clamp((o.look && o.look.y) || 0, -1, 1);
+  const sqx = o.sqx || 0, sqy = o.sqy || 0;
+  c.save(); c.translate(x, y); c.scale(s * (1 - sqx * 0.16 + sqy * 0.08), s * (1 - sqy * 0.16 + sqx * 0.08));
+  if (o.rot) c.rotate(o.rot);
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  // his black polo shirt, the open collar and his neck
+  if (o.collar !== false) {
+    c.beginPath(); c.moveTo(-40, 68); c.quadraticCurveTo(-39, 52, -24, 47); c.lineTo(24, 47); c.quadraticCurveTo(39, 52, 40, 68); c.closePath(); blob(c, PAUL.shirt, 2.5);
+    c.beginPath(); c.moveTo(-14, 40); c.lineTo(14, 40); c.lineTo(9, 52); c.lineTo(0, 62); c.lineTo(-9, 52); c.closePath(); blob(c, PAUL.skin, 2.2);
+    c.beginPath(); c.moveTo(-23, 45); c.lineTo(-2, 61); c.lineTo(-13, 64); c.lineTo(-29, 53); c.closePath(); blob(c, PAUL.shirt2, 2.2);
+    c.beginPath(); c.moveTo(23, 45); c.lineTo(2, 61); c.lineTo(13, 64); c.lineTo(29, 53); c.closePath(); blob(c, PAUL.shirt2, 2.2);
+    rrect(c, 20, 56, 6, 7, 1.5); blob(c, '#7cc34a', 1.4); c.fillStyle = '#ffd23d'; c.fillRect(21.5, 60.5, 3, 1.6); // the little badge on his shirt
+  } else { // just his neck
+    c.beginPath(); c.moveTo(-15, 38); c.lineTo(15, 38); c.lineTo(13, 53); c.lineTo(-13, 53); c.closePath(); blob(c, PAUL.skin, 2.2);
+  }
+  // ears, sticking out a little
+  for (const sd of [-1, 1]) {
+    ell(c, sd * 42.5, 3, 7.5, 12.5, sd * 0.18); blob(c, PAUL.skin, 2.4);
+    c.strokeStyle = 'rgba(160,80,70,0.55)'; c.lineWidth = 1.8; c.beginPath(); c.arc(sd * 43, 3, 5.2, sd > 0 ? -1.3 : Math.PI - 1.8, sd > 0 ? 1.8 : Math.PI + 1.3); c.stroke();
+  }
+  // the head: bald, round and smooth
+  paulHeadPath(c); c.fillStyle = PAUL.skin; c.fill();
+  c.save(); paulHeadPath(c); c.clip();
+  c.fillStyle = PAUL.shade; ell(c, 47, 16, 22, 56); c.fill(); // a little shadow down one side
+  c.fillStyle = 'rgba(176,132,104,0.16)'; ell(c, -37, -14, 7, 15); c.fill(); ell(c, 37, -14, 7, 15); c.fill(); // the shaved bit above his ears
+  c.fillStyle = 'rgba(150,104,70,0.12)'; ell(c, 0, 42, 34, 15); c.fill(); // stubble shadow round the jaw
+  c.restore();
+  paulHeadPath(c); c.lineWidth = 2.8; c.strokeStyle = INK; c.stroke();
+  // the shine on top of his head
+  c.save(); c.globalAlpha = 0.78; c.fillStyle = '#fff'; ell(c, -15, -39, 12, 6, -0.55); c.fill(); c.globalAlpha = 0.6; c.beginPath(); c.arc(-1, -47, 2.4, 0, 7); c.fill(); c.restore();
+  if (o.shine > 0) { // a sparkle off his head: his Shiny Smash
+    const k = o.shine, sx = -16, sy = -42;
+    c.save(); c.translate(sx, sy); c.rotate(t * 3); c.fillStyle = '#fff'; c.shadowColor = '#fff7b0'; c.shadowBlur = 12 * k;
+    c.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 4 * k : 15 * k, a = (i / 8) * Math.PI * 2; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); } c.closePath(); c.fill(); c.restore();
+  }
+  // rosy cheeks
+  c.fillStyle = PAUL.cheek; ell(c, -24, 13, 8.5, 5.5); c.fill(); ell(c, 24, 13, 8.5, 5.5); c.fill();
+  // stubble
+  c.fillStyle = PAUL.stub; c.beginPath();
+  for (const [sx, sy] of PAUL_STUBBLE) { c.moveTo(sx + 0.7, sy); c.arc(sx, sy, 0.7, 0, 7); }
+  c.fill();
+  // eyebrows: light and sandy
+  c.strokeStyle = PAUL.brow; c.lineWidth = 3.4;
+  const brow = (sd, inner, outer, mid) => { c.beginPath(); c.moveTo(sd * 6, inner); c.quadraticCurveTo(sd * 14, mid, sd * 22, outer); c.stroke(); };
+  if (mood === 'sad') { brow(-1, -17, -11, -16); brow(1, -17, -11, -16); }
+  else if (mood === 'smash' || mood === 'hit') { brow(-1, -9, -15, -13); brow(1, -9, -15, -13); }
+  else if (mood === 'cheeky') { brow(-1, -12, -12, -15); brow(1, -15, -16, -19); }
+  else { brow(-1, -12, -12, -16); brow(1, -12, -12, -16); }
+  // eyes
+  const blink = o.blink || (mood === 'idle' && (t % 4.3) < 0.12);
+  c.strokeStyle = INK; c.lineWidth = 2.4;
+  for (const sd of [-1, 1]) {
+    const ex = sd * 14, ey = -2;
+    if (mood === 'laugh' || mood === 'happy') { // happy, crinkly, closed
+      c.beginPath(); c.arc(ex, ey + 2.5, 5.5, Math.PI + 0.35, Math.PI * 2 - 0.35); c.stroke();
+    } else if (mood === 'hit') { // screwed up tight
+      c.beginPath(); c.moveTo(ex - sd * 5, ey - 3.5); c.lineTo(ex + sd * 3, ey); c.lineTo(ex - sd * 5, ey + 3.5); c.stroke();
+    } else if (blink) {
+      c.beginPath(); c.moveTo(ex - 5, ey + 1); c.quadraticCurveTo(ex, ey + 3, ex + 5, ey + 1); c.stroke();
+    } else {
+      const open = mood === 'sad' ? 4.6 : mood === 'smash' ? 2.6 : 3.5;
+      ell(c, ex, ey, 5.6, open); blob(c, '#fff', 2);
+      c.save(); ell(c, ex, ey, 5.6, open); c.clip();
+      c.fillStyle = INK; c.beginPath(); c.arc(ex + lx * 2.2, ey + ly * 1.3, 2.8, 0, 7); c.fill();
+      c.restore();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(ex + lx * 2.2 + 1, ey + ly * 1.3 - 1.1, 0.8, 0, 7); c.fill();
+      if (mood !== 'sad') { c.strokeStyle = 'rgba(160,80,70,0.6)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(ex - 5, ey + 5); c.quadraticCurveTo(ex, ey + 7, ex + 5, ey + 5); c.stroke(); c.strokeStyle = INK; c.lineWidth = 2.4; } // smiley cheeks push up
+    }
+    if (mood !== 'sad') { // laughter lines
+      c.strokeStyle = 'rgba(160,80,70,0.55)'; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(sd * 21, ey - 2); c.lineTo(sd * 25, ey - 4); c.moveTo(sd * 21, ey + 1); c.lineTo(sd * 25.5, ey + 1.5); c.stroke();
+      c.strokeStyle = INK; c.lineWidth = 2.4;
+    }
+  }
+  if (mood === 'sad') { // a worried sweat drop
+    c.fillStyle = '#9fdcff'; c.beginPath(); c.moveTo(30, -26); c.quadraticCurveTo(35, -18, 30, -15); c.quadraticCurveTo(25, -18, 30, -26); c.fill(); c.strokeStyle = INK; c.lineWidth = 1.6; c.stroke();
+  }
+  // nose: round at the end
+  c.fillStyle = 'rgba(214,132,104,0.35)'; ell(c, 0, 11, 7.5, 5.2); c.fill();
+  c.strokeStyle = INK; c.lineWidth = 2.3;
+  c.beginPath(); c.moveTo(-6, 6); c.quadraticCurveTo(-10.5, 13, -4.5, 15); c.quadraticCurveTo(0, 17.2, 4.5, 15); c.quadraticCurveTo(10.5, 13, 6, 6); c.stroke();
+  c.fillStyle = 'rgba(80,30,30,0.55)'; ell(c, -3.4, 13.4, 1.7, 1.1); c.fill(); ell(c, 3.4, 13.4, 1.7, 1.1); c.fill();
+  c.strokeStyle = 'rgba(160,80,70,0.45)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(4.5, -4); c.quadraticCurveTo(6.5, 1, 6, 5); c.stroke();
+  // mouth
+  c.strokeStyle = INK; c.lineWidth = 2.3;
+  const my = 24;
+  if (mood === 'sad') {
+    c.beginPath(); c.moveTo(-11, my + 6); c.quadraticCurveTo(0, my - 2, 11, my + 6); c.stroke();
+  } else if (mood === 'hit') { // "Ewww!": a wide, wobbly grimace with his teeth together
+    c.beginPath(); c.moveTo(-16, my + 1); c.quadraticCurveTo(-8, my - 3, 0, my + 1); c.quadraticCurveTo(8, my - 3, 16, my + 1); c.quadraticCurveTo(8, my + 10, 0, my + 8); c.quadraticCurveTo(-8, my + 10, -16, my + 1); c.closePath(); blob(c, '#fff', 2.2);
+    c.strokeStyle = 'rgba(29,27,58,0.55)'; c.lineWidth = 1.4; c.beginPath(); c.moveTo(-14, my + 3.5); c.lineTo(14, my + 3.5); for (const tx of [-9, -3, 3, 9]) { c.moveTo(tx, my - 1); c.lineTo(tx, my + 8); } c.stroke();
+  } else {
+    const big = mood === 'laugh' || mood === 'smash', mw = big ? 17 : mood === 'cheeky' ? 13 : 15, md = big ? 19 : mood === 'cheeky' ? 10 : 14, mx = mood === 'cheeky' ? 3 : 0;
+    const mouth = () => { c.beginPath(); c.moveTo(mx - mw, my - 2); c.quadraticCurveTo(mx, my + 2, mx + mw, my - 2 - (mood === 'cheeky' ? 3 : 0)); c.quadraticCurveTo(mx + mw - 2, my + md, mx, my + md + 1); c.quadraticCurveTo(mx - mw + 2, my + md, mx - mw, my - 2); c.closePath(); };
+    mouth(); c.fillStyle = '#7a2335'; c.fill();
+    c.save(); mouth(); c.clip();
+    if (mood === 'smash') { // teeth gritted, giving it everything
+      c.fillStyle = '#fff'; c.fillRect(mx - mw, my - 6, mw * 2, 30);
+      c.strokeStyle = 'rgba(29,27,58,0.5)'; c.lineWidth = 1.3; c.beginPath(); c.moveTo(mx - mw, my + 7); c.lineTo(mx + mw, my + 7);
+      for (const tx of [-10, -4, 2, 8]) { c.moveTo(mx + tx, my - 2); c.lineTo(mx + tx, my + 18); } c.stroke();
+    } else {
+      c.fillStyle = '#fff'; c.fillRect(mx - mw, my - 6, mw * 2, 9.5); // his top teeth
+      c.fillStyle = '#e8737f'; ell(c, mx, my + md + 2, mw * 0.55, 6); c.fill(); // tongue
+    }
+    c.restore();
+    mouth(); c.strokeStyle = INK; c.lineWidth = 2.3; c.stroke();
+    c.strokeStyle = 'rgba(160,80,70,0.5)'; c.lineWidth = 1.6; // smile lines from his nose
+    c.beginPath(); c.moveTo(-10, 12); c.quadraticCurveTo(-mw - 4 + mx, my - 4, -mw - 2 + mx, my + 4); c.moveTo(10, 12); c.quadraticCurveTo(mw + 4 + mx, my - 4, mw + 2 + mx, my + 4); c.stroke();
+  }
+  // a hint of a double chin
+  c.strokeStyle = 'rgba(160,80,70,0.4)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(-9, 45.5); c.quadraticCurveTo(0, 48.5, 9, 45.5); c.stroke();
+  c.restore();
+}
+/* a round picture of Paul, the size of the heroes' portraits */
+function paintPaulPortrait(cv, mood) {
+  const size = cv.width, c = cv.getContext('2d');
+  c.clearRect(0, 0, size, size);
+  c.save(); c.beginPath(); c.arc(size / 2, size / 2, size / 2, 0, 7); c.clip();
+  const g = c.createLinearGradient(0, 0, 0, size); g.addColorStop(0, '#d4f27a'); g.addColorStop(1, '#7dbb2a'); // the colour of his lime green couch
+  c.fillStyle = g; c.fillRect(0, 0, size, size);
+  drawPaulFace(c, size / 2, size * 0.53, size / 118, { mood: mood || 'happy' });
+  c.restore();
+}
+
+/* ---------- the game: Poo Pong, with Paul ---------- */
+const PAUL_GOAL = 5, PAUL_LVLS = 8;
+const PAUL_COL = { p1: '#2f8cff', p2: '#ff8a1f', cpu: '#ff4f9a' };
+const PAUL_LINES = {
+  hello: ['Can you beat me?', 'Bring it on!', 'Righto, game on!'],
+  score: ['Too easy!', 'Ha ha ha!', 'Paul wins that one!', 'You\'re dreaming!', 'Have another go!', 'Get in!'],
+  miss: ['Oi!', 'Lucky shot!', 'Not fair!', 'Strewth!', 'How?!', 'Rematch!'],
+  hit: ['Eww!', 'Yuck!', 'Gross!', 'Bonk!', 'Ewww, poo!'],
+  win: ['Paul is the champ!', 'Too good!'],
+  lose: ['Best of three?', 'You got me!']
+};
+MINI_INFO.paul = { title: 'POO PONG!', goal: 'Bat the poo past Paul. First to 5 wins!', col: '#ff4f9a', music: 'pong' };
+const paulRGBA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+function paulWho(id) { return id === 'paul' ? 'Paul' : HEROES[id].name; }
+MINI_GAMES.paul = {
+  buttons: [], follow: true, // no buttons: your bat follows your finger
+  help: {
+    touch: 'Put your finger on the screen and slide it. Your bat follows your finger!',
+    touch2: 'Each player slides a finger on their own side of the screen. Your bat follows your finger!',
+    keys: 'Move your bat with the arrow keys or W S. Bat the poo past Paul!',
+    keys2: ['W S (or A D) move your bat.', 'The arrow keys move your bat.'],
+    pad: () => 'Move your bat with the stick. Bat the poo past Paul!'
+  },
+  size(aw, ah) { return MINI_GAMES.pong.size(aw, ah); },
+  zone(i, W, H) { // where each player's finger goes
+    const M = G.mini;
+    if (!M.two) return { x0: 0, x1: W, y0: 0, y1: H };
+    if (M.vert) return i === 0 ? { x0: 0, x1: W, y0: H / 2, y1: H } : { x0: 0, x1: W, y0: 0, y1: H / 2 };
+    return i === 0 ? { x0: 0, x1: W / 2, y0: 0, y1: H } : { x0: W / 2, x1: W, y0: 0, y1: H };
+  },
+  faces(M) { return M.sides.map((S) => S.who); },
+  kicker(M) { return M.two ? 'TWO PLAYERS' : `CAN YOU BEAT PAUL? LEVEL ${G.arcade.lvl}`; },
+  start(M) {
+    const A = G.arcade;
+    M.LEN = M.vert ? M.h : M.w; M.WID = M.vert ? M.w : M.h;
+    M.diff = A.diff; M.goal = PAUL_GOAL; M.two = A.two;
+    M.sides = A.sides.map((sd, i) => this.side(M, sd, i));
+    M.ball = { u: M.LEN / 2, v: M.WID / 2, vu: 0, vv: 0, r: 17, speed: 0, spin: 0, smash: 0 };
+    M.score = [0, 0]; M.serveT = 1.0; M.serveDir = Math.random() < 0.5 ? -1 : 1; M.rally = 0; M.longest = 0; M.trail = [];
+    M.kids = M.sides.filter((S) => S.pl >= 0).map((S) => ({ pl: S.pl, id: S.who }));
+    M.goalText = A.two ? 'Bat the poo past each other. First to 5 wins!' : 'Bat the poo past Paul. First to 5 wins!';
+    const P = M.sides.find((S) => S.paul); if (P) { P.say = A.two ? 'Bring it on!' : pick(PAUL_LINES.hello); P.sayT = 5.5; }
+  },
+  side(M, sd, i) { // one end of the table: a hero with a lunch tray, or Paul's face
+    const paul = sd.who === 'paul', dir = i === 0 ? 1 : -1;
+    const S = { who: sd.who, pl: sd.pl, i, dir, paul, v: M.WID / 2, vel: 0, hitT: 0, say: '', sayT: 0, mood: 'idle', moodT: 0, shineT: 0,
+      target: M.WID / 2, thinkT: 0, fumble: 0, aim: 0, col: sd.pl < 0 ? PAUL_COL.cpu : sd.pl ? PAUL_COL.p2 : PAUL_COL.p1 };
+    if (paul) { // his head is the bat: an oval as tall as a lunch tray is long
+      S.fs = M.vert ? 1.3 : 1.12;
+      S.A = (M.vert ? PAUL_HEAD.ry : PAUL_HEAD.rx) * S.fs; S.B = (M.vert ? PAUL_HEAD.rx : PAUL_HEAD.ry) * S.fs;
+      const front = 2 * S.A + (M.vert ? 8 : 6);
+      S.u = i === 0 ? front - S.A : M.LEN - front + S.A;
+    } else {
+      S.A = 8; S.B = M.two ? 56 : 60;
+      const ku = M.vert ? 112 : 74;
+      S.u = i === 0 ? ku : M.LEN - ku;
+    }
+    S.len = S.B * 2;
+    return S;
+  },
+  map(M, u, v) { return M.vert ? { x: v, y: M.LEN - u } : { x: u, y: v }; },
+  update(M, dt) {
+    const play = M.phase === 'play', b = M.ball;
+    for (const S of M.sides) {
+      S.hitT = Math.max(0, S.hitT - dt); S.sayT -= dt; S.moodT -= dt; S.shineT = Math.max(0, S.shineT - dt);
+      if (S.moodT <= 0) S.mood = 'idle';
+      if (!play) { S.vel = 0; continue; }
+      if (S.pl >= 0) this.steer(M, S, dt); else this.think(M, S, dt);
+    }
+    if (!play) return;
+    if (M.serveT > 0) {
+      M.serveT -= dt; b.u = M.LEN / 2; b.v = M.WID / 2; b.vu = b.vv = 0;
+      if (M.serveT <= 0) { const a = rand(-0.45, 0.45); b.speed = 360 + 120 * (M.two ? 0.3 : M.diff); b.vu = Math.cos(a) * b.speed * M.serveDir; b.vv = Math.sin(a) * b.speed; b.smash = 0; M.rally = 0; SND.sfx('whistle'); }
+      return;
+    }
+    b.u += b.vu * dt; b.v += b.vv * dt; b.spin += dt * sign(b.vu) * 9;
+    M.trail.push({ u: b.u, v: b.v }); if (M.trail.length > 8) M.trail.shift();
+    if (b.v < b.r) { b.v = b.r; b.vv = Math.abs(b.vv); SND.sfx('bounce'); }
+    if (b.v > M.WID - b.r) { b.v = M.WID - b.r; b.vv = -Math.abs(b.vv); SND.sfx('bounce'); }
+    for (const S of M.sides) if (b.vu * S.dir < 0 && this.touches(M, S)) { this.bat(M, S); break; }
+    if (b.u < -b.r) this.point(M, 1);
+    else if (b.u > M.LEN + b.r) this.point(M, 0);
+  },
+  steer(M, S, dt) { // a player: the bat follows your finger, or the keys, stick and D-pad move it
+    const inp = miniInput(S.pl), J = JOY[S.pl];
+    if (J && STATE.touch) {
+      const Ly = miniLayout(), want = clamp(M.vert ? (J.x - Ly.ox) / Ly.s : (J.y - Ly.oy) / Ly.s, S.B, M.WID - S.B);
+      S.vel = clamp((want - S.v) * 16, -1300, 1300);
+    } else S.vel = (M.vert ? inp.mx || inp.my : inp.my || inp.mx) * 600;
+    S.v = clamp(S.v + S.vel * dt, S.B, M.WID - S.B);
+  },
+  think(M, S, dt) { // Paul on his own: he guesses where the poo will arrive, and the closer it gets the better his guess
+    const b = M.ball, d = M.diff, coming = b.vu * S.dir < 0 && M.serveT <= 0;
+    if (coming && !S.coming) S.err0 = rand(-1, 1) * (80 - 70 * d) * (0.6 + b.speed / 1000); // fast poo is harder to judge
+    S.coming = coming;
+    S.thinkT -= dt;
+    if (S.thinkT <= 0) {
+      S.thinkT = 0.14 - 0.08 * d + rand(0, 0.06);
+      if (coming) {
+        const hitU = S.u + S.dir * (S.A + b.r), soon = clamp(Math.abs((hitU - b.u) / (b.vu || 1)) / 0.8, 0, 1);
+        S.target = this.predict(M, hitU) - S.aim + S.err0 * lerp(0.85 - 0.7 * d, 1, soon) + S.fumble;
+      } else S.target = M.WID / 2 + (b.v - M.WID / 2) * 0.3;
+    }
+    const maxV = 300 + 420 * d;
+    S.vel = clamp((S.target - S.v) * 9, -maxV, maxV); S.v = clamp(S.v + S.vel * dt, S.B, M.WID - S.B);
+  },
+  predict(M, atU) { return MINI_GAMES.pong.predict(M, atU); },
+  touches(M, S) {
+    const b = M.ball, du = b.u - S.u, dv = b.v - S.v;
+    if (!S.paul) return Math.abs(du) <= S.A + b.r && Math.abs(dv) <= S.B + b.r * 0.8;
+    if (du * S.dir < -S.A * 0.4) return false; // it's already gone past his face
+    const ea = S.A + b.r * 0.85, eb = S.B + b.r * 0.85;
+    return (du * du) / (ea * ea) + (dv * dv) / (eb * eb) <= 1;
+  },
+  bat(M, S) {
+    const b = M.ball, O = M.sides[1 - S.i], off = clamp((b.v - S.v) / S.B, -1, 1);
+    const ang = clamp(off * 0.95 + (S.vel / 600) * 0.3, -1.05, 1.05); // hitting it while you move sends it at an angle
+    b.speed = Math.min(b.speed * 1.08, 980); // every hit is a bit faster, so rallies always end
+    let sp = b.speed;
+    b.smash = 0; M.rally++; M.longest = Math.max(M.longest, M.rally);
+    if (M.rally >= 4 && Math.random() < (S.pl < 0 ? 0.2 + 0.45 * M.diff : 0.2)) { // a long rally can end in a smash: extra fast
+      M.rally = 0; b.smash = S.paul ? 2 : 1; sp *= 1.35;
+      S.say = S.paul ? 'SHINY SMASH!' : 'SUPER SMASH!'; S.sayT = 1.2; S.mood = 'smash'; S.moodT = 0.7;
+      if (S.paul) { S.shineT = 0.8; SND.sfx('shine'); } else SND.sfx('dash');
+    }
+    b.vu = Math.cos(ang) * sp * S.dir; b.vv = Math.sin(ang) * sp;
+    if (S.paul) { const k = clamp(Math.abs(b.v - S.v) / (S.B + b.r), 0, 1); b.u = S.u + S.dir * (S.A * Math.sqrt(1 - k * k) + b.r + 1); }
+    else b.u = S.u + S.dir * (S.A + b.r + 1);
+    S.hitT = 0.25;
+    if (S.paul) {
+      SND.sfx('bonk');
+      if (!b.smash) { S.mood = 'hit'; S.moodT = 0.45; if (Math.random() < 0.3) { S.say = pick(PAUL_LINES.hit); S.sayT = 1.0; } }
+    } else SND.sfx('kick');
+    if (O.pl < 0) { // Paul on his own now and then gets it wrong, and the better he gets, the more he aims away from you
+      O.fumble = Math.random() < Math.max(0.01, 0.16 - 0.2 * M.diff) ? pick([-1, 1]) * rand(75, 110) : 0;
+      O.aim = Math.random() < 0.1 + 0.75 * M.diff ? (S.v < M.WID / 2 ? 1 : -1) * rand(0.3, 0.55) * O.B : 0;
+    }
+    const m = this.map(M, b.u, b.v); sparks(m.x, m.y, 6, b.smash === 2 ? '#fff3a0' : S.col);
+    if (!S.paul && !b.smash && Math.random() < 0.3) floatText(m.x, m.y - 30, pick(['WHACK!', 'BOINK!', 'TAKE THAT!']), '#ffd23d');
+  },
+  point(M, w) { // w: the side that scored
+    const b = M.ball, W = M.sides[w], L = M.sides[1 - w], m = this.map(M, clamp(b.u, 0, M.LEN), b.v);
+    M.score[w]++;
+    puff(m.x, m.y, 16, '#8b5a2b', 220); G.shake = 0.3; SND.sfx('splat');
+    const good = M.two || w === 0;
+    G.callouts.push({ txt: good ? 'POINT!' : 'SPLAT!', col: M.two ? (w ? '#ffb46b' : '#8ec5ff') : good ? '#9bff8a' : '#ff8a8a', x: m.x, y: m.y - 30, t: 0, n: 3 });
+    if (W.paul) { W.mood = 'laugh'; W.moodT = 1.5; W.say = pick(PAUL_LINES.score); W.sayT = 1.5; SND.sfx('haha'); }
+    if (L.paul) { L.mood = 'sad'; L.moodT = 1.5; if (!W.paul) { L.say = pick(PAUL_LINES.miss); L.sayT = 1.5; } }
+    if (M.score[w] >= M.goal) { this.end(M, w); return; }
+    M.serveT = 1.1; M.serveDir = w === 0 ? 1 : -1; M.trail = []; M.rally = 0; // the next serve goes to whoever lost the point
+    for (const S of M.sides) { S.fumble = 0; S.aim = 0; } // a fresh start for the serve
+    b.smash = 0;
+  },
+  end(M, w) {
+    const W = M.sides[w], L = M.sides[1 - w];
+    M.phase = 'over'; M.t = 0; M.winner = w; M.flash = 0.3; G.shake = 0.3; M.ball.vu = M.ball.vv = 0; M.serveT = 0;
+    if (W.paul) { W.mood = 'laugh'; W.moodT = 99; W.say = pick(PAUL_LINES.win); W.sayT = 3.2; }
+    if (L.paul) { L.mood = 'sad'; L.moodT = 99; L.say = pick(PAUL_LINES.lose); L.sayT = 3.2; }
+    const sc = `${M.score[w]} to ${M.score[1 - w]}`;
+    if (!M.two && w === 0) { banner('YOU BEAT PAUL!', sc, { huge: true, dur: 3.1 }); SND.sfx('win'); confetti(M.w / 2, M.h * 0.4, 60); }
+    else if (!M.two) { banner('PAUL WINS!', `${sc}. Have another go!`, { huge: true, dur: 3.1 }); SND.sfx('sad'); }
+    else { banner(`${paulWinnerName(M, w).toUpperCase()} WINS!`, sc, { huge: true, dur: 3.1 }); SND.sfx('win'); confetti(M.w / 2, M.h * 0.4, 60); }
+    paulRecord(M);
+  },
+  draw(c, t, M, Ly) {
+    const x0 = Ly.vx0 - 10, y0 = Ly.vy0 - 10, x1 = Ly.vx1 + 10, y1 = Ly.vy1 + 10, W = M.w, H = M.h;
+    // the room: dark, with a spotlight on the table
+    const g = c.createRadialGradient(W / 2, H / 2, 30, W / 2, H / 2, Math.max(x1 - x0, y1 - y0) * 0.7);
+    g.addColorStop(0, '#463a8c'); g.addColorStop(1, '#16183a'); c.fillStyle = g; c.fillRect(x0, y0, x1 - x0, y1 - y0);
+    // a big blue table tennis table
+    rrect(c, -7, -7, W + 14, H + 14, 22); blob(c, '#173f8c', 3);
+    rrect(c, 0, 0, W, H, 16); c.fillStyle = '#2d6fd2'; c.fill();
+    c.save(); rrect(c, 0, 0, W, H, 16); c.clip();
+    c.fillStyle = 'rgba(255,255,255,0.05)';
+    for (let i = 0; i < 12; i += 2) { if (M.vert) c.fillRect(0, (H / 12) * i, W, H / 12); else c.fillRect((W / 12) * i, 0, W / 12, H); }
+    for (const S of M.sides) { // each end in the colour of whoever plays there
+      const a = this.map(M, S.i ? M.LEN - 44 : 0, 0), z = this.map(M, S.i ? M.LEN : 44, M.WID);
+      c.fillStyle = paulRGBA(S.col, 0.3); c.fillRect(Math.min(a.x, z.x), Math.min(a.y, z.y), Math.abs(z.x - a.x), Math.abs(z.y - a.y));
+    }
+    c.restore();
+    c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 5; rrect(c, 9, 9, W - 18, H - 18, 10); c.stroke();
+    const m0 = this.map(M, 9, M.WID / 2), m1 = this.map(M, M.LEN - 9, M.WID / 2);
+    c.lineWidth = 2.5; c.strokeStyle = 'rgba(255,255,255,0.6)'; c.beginPath(); c.moveTo(m0.x, m0.y); c.lineTo(m1.x, m1.y); c.stroke();
+    // the net
+    const n0 = this.map(M, M.LEN / 2, -6), n1 = this.map(M, M.LEN / 2, M.WID + 6);
+    c.lineCap = 'round'; c.strokeStyle = 'rgba(16,14,40,0.45)'; c.lineWidth = 12; c.beginPath(); c.moveTo(n0.x, n0.y); c.lineTo(n1.x, n1.y); c.stroke();
+    c.strokeStyle = '#f4f4ff'; c.lineWidth = 5; c.setLineDash([3, 7]); c.beginPath(); c.moveTo(n0.x, n0.y); c.lineTo(n1.x, n1.y); c.stroke(); c.setLineDash([]);
+    for (const n of [n0, n1]) { c.beginPath(); c.arc(n.x, n.y, 7, 0, 7); blob(c, '#ff6150', 2.5); }
+    // the players
+    const ball = M.ball, bm = this.map(M, ball.u, ball.v);
+    for (const S of M.sides) {
+      const m = this.map(M, S.u, S.v);
+      if (S.paul) {
+        const dx = bm.x - m.x, dy = bm.y - m.y, dl = Math.hypot(dx, dy) || 1, sq = S.hitT > 0 ? (S.hitT / 0.25) * (S.mood === 'smash' ? 0.5 : 1) : 0;
+        if (M.two) { // whose Paul is whose: a ring in that player's colour
+          ell(c, m.x, m.y, (M.vert ? S.B : S.A) + 9, (M.vert ? S.A : S.B) + 9); c.fillStyle = paulRGBA(S.col, 0.35); c.fill();
+          c.lineWidth = 9; c.strokeStyle = INK; c.stroke(); c.lineWidth = 5; c.strokeStyle = S.col; c.stroke();
+        }
+        drawPaulFace(c, m.x, m.y - PAUL_HEAD.cy * S.fs + Math.sin(t * 3 + S.i) * 1.2, S.fs, { mood: S.mood, look: { x: dx / dl, y: dy / dl }, sqx: M.vert ? 0 : sq, sqy: M.vert ? sq : 0, t, shine: S.shineT / 0.8, collar: !M.vert });
+      } else {
+        const top = M.vert && S.i === 1, back = M.vert ? (top ? 6 : 28) : 46, hs = this.map(M, S.u - S.dir * back, S.v);
+        drawHero(c, S.who, hs.x, hs.y + (M.vert ? 0 : 34), { t, pose: S.hitT > 0 ? 'punch' : Math.abs(S.vel) > 40 ? 'run' : 'idle', face: M.vert ? (S.vel < 0 ? -1 : 1) : S.dir, phase: t * 12, scale: 0.85, bike: false, drone: S.who === 'spencer' });
+        const tw = M.vert ? S.len : 16, th = M.vert ? 16 : S.len;
+        rrect(c, m.x - tw / 2, m.y - th / 2, tw, th, 6); blob(c, S.hitT > 0 ? '#ffffff' : S.pl ? '#ffcf9a' : '#bfe0ff', 3);
+        c.strokeStyle = 'rgba(29,27,58,0.35)'; c.lineWidth = 2;
+        for (const f of [-0.2, 0.2]) { c.beginPath(); if (M.vert) { c.moveTo(m.x + S.len * f, m.y - 5); c.lineTo(m.x + S.len * f, m.y + 5); } else { c.moveTo(m.x - 5, m.y + S.len * f); c.lineTo(m.x + 5, m.y + S.len * f); } c.stroke(); }
+      }
+    }
+    // the poo
+    if (M.serveT <= 0 || M.phase !== 'play') {
+      M.trail.forEach((q, i) => { const m = this.map(M, q.u, q.v); c.globalAlpha = (i / M.trail.length) * 0.35; c.fillStyle = ball.smash === 2 ? '#ffd23d' : ball.smash ? '#8bd04a' : '#8b5a2b'; c.beginPath(); c.arc(m.x, m.y, ball.r * 0.6, 0, 7); c.fill(); });
+      c.globalAlpha = 1;
+    }
+    if (M.phase !== 'over') {
+      if (ball.smash === 2) { c.save(); c.shadowColor = '#fff3a0'; c.shadowBlur = 18; }
+      drawPoo(c, bm.x, bm.y + 4, 1.0, { rot: ball.spin * 0.3, face: true, gold: ball.smash === 2, stink: ball.smash === 1, bully: ball.smash === 1 });
+      if (ball.smash === 2) c.restore();
+    }
+    // what they say
+    for (const S of M.sides) {
+      if (S.sayT <= 0 || !S.say) continue;
+      const m = this.map(M, S.u, S.v);
+      let bx = m.x, by;
+      if (!M.vert) { bx = m.x + (S.paul ? 0 : -S.dir * 40); by = m.y - (S.paul ? S.B + 14 : 74); }
+      else if (S.i === 1) { bx = m.x + (m.x < M.w / 2 ? 1 : -1) * 120; by = m.y + 14; }
+      else by = m.y - (S.paul ? S.A + 14 : 86);
+      bubble(c, bx, Math.max(36, by), S.say, true, S.paul);
+    }
+  },
+  hud(c, t, M) {
+    const Bx = miniHudBoxes(c), y = Bx.top, h = Bx.h;
+    const side = (box, S, n) => {
+      miniBox(c, box.x, y, box.w, h);
+      let lx = box.x + 12;
+      if (box.w >= 150) { // room for their face too
+        const r = h * 0.34, fx = box.x + 8 + r, fy = y + h / 2;
+        c.save(); c.beginPath(); c.arc(fx, fy, r, 0, 7); c.clip(); c.drawImage(portraitFor(S.who), fx - r, fy - r, r * 2, r * 2); c.restore();
+        c.beginPath(); c.arc(fx, fy, r, 0, 7); c.lineWidth = 2; c.strokeStyle = INK; c.stroke();
+        lx = fx + r + 8;
+      }
+      miniLabel(c, paulSideName(M, S), lx, y + 31, 16, S.col, 'left', box.x + box.w - 50 - lx);
+      miniLabel(c, String(n), box.x + box.w - 14, y + 37, 30, INK, 'right');
+    };
+    side(Bx.L, M.sides[0], M.score[0]); side(Bx.R, M.sides[1], M.score[1]);
+    miniBox(c, Bx.M.x, y, Bx.M.w, h);
+    miniLabel(c, M.two ? 'POO PONG' : `PAUL LEVEL ${G.arcade.lvl}`, Bx.M.x + Bx.M.w / 2, y + 20, 15, '#ff4f9a', 'center', Bx.M.w - 12);
+    miniLabel(c, `First to ${M.goal} wins`, Bx.M.x + Bx.M.w / 2, y + 40, 16, INK, 'center', Bx.M.w - 12);
+  }
+};
+function paulSideName(M, S) { // two of the same? Say which player
+  const same = M.sides[0].who === M.sides[1].who;
+  return M.two && same ? `${paulWho(S.who)} P${S.pl + 1}` : paulWho(S.who);
+}
+function paulWinnerName(M, w) { return M.sides[0].who === M.sides[1].who ? `Player ${w + 1}` : paulWho(M.sides[w].who); }
+
+/* ---------- from the menu: pick who plays, play, see who won ---------- */
+const PONG = { two: false, hero: [null, null], who: ['hero', 'paul'], view: 'setup', last: null };
+function paulSave() {
+  if (!SAVE.paul || typeof SAVE.paul !== 'object') SAVE.paul = {};
+  const P = SAVE.paul;
+  P.lvl = clamp(Math.round(+P.lvl) || 1, 1, PAUL_LVLS); P.wins = Math.max(0, P.wins | 0); P.games = Math.max(0, P.games | 0); P.lossRun = Math.max(0, P.lossRun | 0);
+  return P;
+}
+const paulDiff = (lvl) => 0.15 + (lvl - 1) * 0.1; // level 1 is gentle, level 8 is a lot like the hardest bully
+function paulRecord(M) { // beat Paul and he goes up a level; lose twice in a row and he goes down one
+  const P = paulSave(), w = M.winner;
+  const R = { two: M.two, who: M.sides.map((S) => S.who), pl: M.sides.map((S) => S.pl), score: M.score.slice(), winner: w, lvl: G.arcade.lvl, newLvl: P.lvl, up: false, down: false, wins: P.wins };
+  if (!M.two) {
+    P.games++;
+    if (w === 0) { P.wins++; P.lossRun = 0; if (P.lvl < PAUL_LVLS) { P.lvl++; R.up = true; } }
+    else if (++P.lossRun >= 2 && P.lvl > 1) { P.lvl--; P.lossRun = 0; R.down = true; }
+    R.newLvl = P.lvl; R.wins = P.wins;
+    writeSave();
+  }
+  PONG.last = R;
+}
+function paulHeroes() { // each player starts as the hero they picked for the main game
+  for (let i = 0; i < 2; i++) if (!HEROES[PONG.hero[i]]) PONG.hero[i] = HEROES[STATE.picks[i]] && (i === 0 || STATE.picks[1] !== PONG.hero[0]) ? STATE.picks[i] : HERO_IDS.find((h) => h !== PONG.hero[0]);
+}
+function openPong() {
+  if (NET.on) return;
+  paulHeroes();
+  PONG.view = 'setup'; G = null;
+  showScreen('pong'); buildPong();
+}
+function startPong() {
+  if (NET.on) return;
+  paulHeroes();
+  const P = paulSave(), two = PONG.two;
+  const sides = two ? [0, 1].map((i) => ({ who: PONG.who[i] === 'paul' ? 'paul' : PONG.hero[i], pl: i })) : [{ who: PONG.hero[0], pl: 0 }, { who: 'paul', pl: -1 }];
+  const h0 = PONG.hero[0], h1 = PONG.hero[1] !== h0 ? PONG.hero[1] : HERO_IDS.find((h) => h !== h0);
+  const keep = { players: STATE.players, picks: STATE.picks, level: STATE.level, friends: STATE.friends };
+  try { // the game runs inside a level nobody sees, so everything else carries on working
+    STATE.players = two ? 2 : 1; STATE.picks = [h0, h1]; STATE.level = `${ADV[0].id}-1`; STATE.friends = [];
+    startLevel();
+  } finally { Object.assign(STATE, keep); }
+  G.bullyPlan = null;
+  G.arcade = { kind: 'paul', two, sides, lvl: P.lvl, diff: paulDiff(P.lvl) };
+  startMini();
+  enterPlay();
+}
+function paulPongOver() { PONG.view = 'end'; showScreen('pong'); buildPong(); }
+function leavePong() { G = null; showScreen('title'); }
+function buildPong() {
+  const end = PONG.view === 'end' && !!PONG.last;
+  $('pongSetup').hidden = end; $('pongEnd').hidden = !end;
+  ['pongBack', 'pongGo'].forEach((id) => { $(id).hidden = end; });
+  ['pongAgain', 'pongChange', 'pongMenu'].forEach((id) => { $(id).hidden = !end; });
+  if (end) buildPongEnd(); else buildPongSetup();
+  paulPanelT = 0;
+}
+function buildPongSetup() {
+  const P = paulSave(), two = PONG.two;
+  $('pongTitle').textContent = 'Can you beat Paul at Poo Pong?';
+  $('pongSub').textContent = two ? 'Play your hero or Paul. First to 5 wins!' : `Paul is on level ${P.lvl} of ${PAUL_LVLS}. First to 5 wins!`;
+  $('pong1').classList.toggle('on', !two); $('pong2').classList.toggle('on', two);
+  const heroCard = (i) => `<div class="pk p${i + 1} ${two && PONG.who[i] === 'paul' ? '' : 'on'}">
+      <button class="pka" data-pl="${i}" data-d="-1" aria-label="Player ${i + 1}: previous hero"><svg viewBox="0 0 24 24"><path d="M15 4 L7 12 L15 20 Z" fill="#1d1b3a"/></svg></button>
+      <button class="pkh" data-pl="${i}"><canvas width="96" height="96" data-face="${PONG.hero[i]}"></canvas><b>${HEROES[PONG.hero[i]].name}</b></button>
+      <button class="pka" data-pl="${i}" data-d="1" aria-label="Player ${i + 1}: next hero"><svg viewBox="0 0 24 24"><path d="M9 4 L17 12 L9 20 Z" fill="#1d1b3a"/></svg></button></div>`;
+  const paulCard = (i, cpu) => `<button class="pkp p${i + 1} ${cpu || PONG.who[i] === 'paul' ? 'on' : ''} ${cpu ? 'cpu' : ''}" data-pl="${i}" ${cpu ? 'disabled' : ''}><canvas width="96" height="96" data-face="paul"></canvas><b>Paul</b>${cpu ? `<small>Level ${P.lvl}</small>` : ''}</button>`;
+  $('pongSides').innerHTML = two
+    ? [0, 1].map((i) => `<div class="pongrow"><span class="pwho p${i + 1}" title="Player ${i + 1}">P${i + 1}</span><div class="pchoice">${heroCard(i)}<span class="por2">or</span>${paulCard(i)}</div></div>`).join('')
+    : `<div class="pongrow solo"><div class="pchoice">${heroCard(0)}<span class="pvs">VS</span>${paulCard(1, true)}</div></div>`;
+  $('pongSides').querySelectorAll('canvas[data-face]').forEach((cv) => cv.getContext('2d').drawImage(portraitFor(cv.dataset.face), 0, 0, 96, 96));
+  $('pongSides').querySelectorAll('.pka').forEach((b) => (b.onclick = () => {
+    const i = +b.dataset.pl, n = HERO_IDS.length;
+    PONG.hero[i] = HERO_IDS[(HERO_IDS.indexOf(PONG.hero[i]) + +b.dataset.d + n) % n]; PONG.who[i] = 'hero';
+    SND.sfx('help'); buildPong(); paulRefocus(b);
+  }));
+  $('pongSides').querySelectorAll('.pkh').forEach((b) => (b.onclick = () => { PONG.who[+b.dataset.pl] = 'hero'; SND.sfx('help'); buildPong(); paulRefocus(b); }));
+  $('pongSides').querySelectorAll('.pkp:not(.cpu)').forEach((b) => (b.onclick = () => { PONG.who[+b.dataset.pl] = 'paul'; SND.sfx('bonk'); buildPong(); paulRefocus(b); }));
+}
+function paulRefocus(b) { // a controller keeps its place after the cards are rebuilt
+  if (!STATE.pad) return;
+  const sel = `[data-pl="${b.dataset.pl}"]${b.dataset.d ? `[data-d="${b.dataset.d}"]` : ''}.${b.classList[0]}`;
+  focusPad($('pongSides').querySelector(sel));
+}
+function buildPongEnd() {
+  const R = PONG.last, w = R.winner, sc = `${R.score[w]} to ${R.score[1 - w]}`;
+  let title, line = '';
+  if (!R.two) {
+    title = w === 0 ? 'You beat Paul!' : 'Paul wins!';
+    if (w === 0) line = (R.up ? `Paul goes up to level ${R.newLvl}. Can you beat him again?` : 'That was Paul at his very best. You\'re a Poo Pong legend!') + ` You've beaten Paul ${R.wins === 1 ? 'once' : R.wins + ' times'}.`;
+    else line = R.down ? `Paul goes down to level ${R.newLvl}. Have another go!` : 'So close! Have another go.';
+  } else {
+    const same = R.who[0] === R.who[1], name = same ? `Player ${w + 1}` : paulWho(R.who[w]);
+    title = `${name} wins!`;
+    line = same ? `${paulWho(R.who[w])} against ${paulWho(R.who[1 - w])}.` : `Player ${w + 1} played ${paulWho(R.who[w])}.`;
+  }
+  $('pongEndTitle').textContent = title; $('pongEndScore').textContent = sc; $('pongEndLine').textContent = line;
+  $('pongTitle').textContent = 'Can you beat Paul at Poo Pong?';
+  $('pongSub').textContent = R.two ? 'Two players' : `Paul level ${R.lvl}`;
+}
+/* Paul's face, alive: on the menu button and at the top of the Poo Pong screen */
+let paulPanelT = 0;
+function paulFaceAnim(cv, t, mood, s) {
+  if (!cv) return;
+  const c = cv.getContext('2d'), W = cv.width, H = cv.height;
+  c.clearRect(0, 0, W, H);
+  const k = W / 140, look = { x: Math.sin(t * 1.1) * 0.9, y: Math.sin(t * 0.7) * 0.3 };
+  const m = mood || ((t % 7) < 1.2 ? 'laugh' : (t % 7) < 2.4 ? 'cheeky' : 'idle');
+  drawPaulFace(c, W / 2, H * 0.48 + Math.sin(t * 3) * 1.5 * k, (s || 1.08) * k, { mood: m, look, t, rot: Math.sin(t * 1.7) * 0.05, shine: (t % 3.5) < 0.5 ? Math.sin(((t % 3.5) / 0.5) * Math.PI) : 0 });
+}
+function paulMenuAnim(t) {
+  if (STATE.screen === 'title') paulFaceAnim($('pongBtnFace'), t);
+  else if (STATE.screen === 'pong') {
+    paulPanelT += 1 / 60;
+    const R = PONG.view === 'end' && PONG.last, cv = $('pongFace');
+    if (R && !R.who.includes('paul')) { // no Paul this time: the winner's face
+      const id = R.who[R.winner];
+      if (cv.dataset.face !== id) { cv.dataset.face = id; const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.drawImage(bigPortrait(id), 8, 8, cv.width - 16, cv.height - 16); }
+      return;
+    }
+    cv.dataset.face = 'paul';
+    const mood = R ? (R.who[R.winner] === 'paul' ? 'laugh' : 'sad') : null;
+    paulFaceAnim(cv, t, mood);
+  }
+}
+
 /* ===================== Online play: two devices, one game ===================== */
 // The host's device runs the game. The friend's device (the guest) sends its buttons to the host and draws
 // what the host sends back, about 20 times a second. The devices find each other with a 4-letter code
 // through PeerJS's free matchmaking service, then talk directly over WebRTC.
-const NET_BUILD = '9f8b018e8856'; // the build puts a fingerprint of the game here: both devices must run the same version
+const NET_BUILD = '0cd1b4ce4d3f'; // the build puts a fingerprint of the game here: both devices must run the same version
 const NET_PREFIX = 'naseer-crew-v1-';
 const NET_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ'; // no vowels, so a code can't spell a word
 const NET_LIB = ['https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js', 'https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js'];
@@ -8920,6 +9612,7 @@ function netRoleUi() {
   $('netPill').hidden = !(host && ['title', 'adv', 'levels', 'crew', 'help'].includes(STATE.screen));
   $('netPill').classList.toggle('away', !!(host && NET.away)); $('netPill').querySelector('span').textContent = host && NET.away ? 'Waiting for your friend…' : 'Online with a friend';
   $('onlineBtn').textContent = host ? 'Online: friend joined' : 'Play online';
+  $('pongBtn').hidden = NET.on; // Poo Pong with Paul is for one device
   $('crewScreen').classList.toggle('online', host);
 }
 
@@ -9640,7 +10333,7 @@ const cv = document.getElementById('game'), ctx = cv.getContext('2d');
 const VIEW = { scale: 1, w: 960, offY: 0, portrait: false, W: 0, H: 0, dpr: 1, top: 0, bottom: VIEW_H, ctlTop: 0 };
 const PORTRAITS = {};
 function portraitFor(id) {
-  if (!PORTRAITS[id]) { const p = document.createElement('canvas'); p.width = p.height = 96; paintPortrait(p, id); PORTRAITS[id] = p; }
+  if (!PORTRAITS[id]) { const p = document.createElement('canvas'); p.width = p.height = 96; if (id === 'paul') paintPaulPortrait(p); else paintPortrait(p, id); PORTRAITS[id] = p; }
   return PORTRAITS[id];
 }
 function refreshPortraits() { HERO_IDS.forEach((id) => { if (PORTRAITS[id]) paintPortrait(PORTRAITS[id], id); }); }
@@ -9695,7 +10388,7 @@ function render() {
   const c = ctx, d = VIEW.dpr, s = VIEW.scale;
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.fillStyle = '#16183a'; c.fillRect(0, 0, cv.width, cv.height);
-  const playing = G && ['play', 'pause', 'done', 'story', 'bully'].includes(STATE.screen);
+  const playing = G && (['play', 'pause', 'done', 'story', 'bully'].includes(STATE.screen) || (STATE.screen === 'pong' && G.arcade)); // (Poo Pong's table stays behind who won)
   const t = playing ? G.t : performance.now() / 1000;
   const duel = playing && G.duel, mini = playing && G.mini, camX = playing && !duel && !mini ? G.cam.x : 0;
   let sx = 0, sy = 0;
@@ -10048,7 +10741,8 @@ const padClear = (P) => { P.left = P.right = P.jump = P.action = P.throw = P.ann
 
 function joyZone(i) {
   const W = VIEW.W, H = VIEW.H, top = VIEW.portrait ? VIEW.ctlTop - 12 : SAFE.top + 100;
-  const jx = VIEW.joyX || [W * 0.5, W];
+  const jx = VIEW.joyX || [W * 0.5, W], mg = G && G.mini && MINI_GAMES[G.mini.kind];
+  if (mg && mg.zone) return mg.zone(i, W, H); // Poo Pong with Paul: each player's own part of the screen
   if (G && (G.duel || (G.mini && G.players.length === 1))) return { x0: 0, x1: jx[0], y0: top, y1: H }; // one player in a duel or boss game: the left thumb moves
   return i === 0 ? { x0: 0, x1: jx[0], y0: top, y1: H } : { x0: jx[1], x1: W, y0: top, y1: H };
 }
@@ -10197,12 +10891,13 @@ function menuNav(pressed) {
   }
   if (pressed('a')) { if (cur) cur.click(); else focusPrimary(); }
   if (pressed('b')) {
-    const back = scr.querySelector('[data-go]') || (STATE.screen === 'pause' ? $('resumeBtn') : null) || (STATE.screen === 'help' ? $('helpClose') : null);
+    const back = scr.querySelector('[data-go]') || (STATE.screen === 'pause' ? $('resumeBtn') : null) || (STATE.screen === 'help' ? $('helpClose') : null) || (STATE.screen === 'pong' ? ($('pongBack').hidden ? $('pongMenu') : $('pongBack')) : null);
     if (back) back.click();
   }
   if (pressed('start')) {
     if (STATE.screen === 'pause') showScreen('play');
     else if (STATE.screen === 'story') $('storyGo').click();
+    else if (STATE.screen === 'pong') ($('pongGo').hidden ? $('pongAgain') : $('pongGo')).click();
   }
 }
 window.addEventListener('gamepadconnected', (e) => { firstGesture(); if (!STATE.pad) padConnected(e.gamepad); });
@@ -10220,7 +10915,7 @@ function readSafe() {
     d.remove();
   } catch (e) { /* defaults */ }
 }
-const SCREENS = ['title', 'adv', 'levels', 'crew', 'story', 'pause', 'done', 'help', 'bully', 'net'];
+const SCREENS = ['title', 'adv', 'levels', 'crew', 'story', 'pause', 'done', 'help', 'bully', 'net', 'pong'];
 let helpReturn = 'title';
 function showScreen(name) {
   if (NET.on && !NET.mirror) { // playing online: pausing and resuming happen on both devices
@@ -10240,6 +10935,7 @@ function showScreen(name) {
   if (name === 'crew') buildCrewSelect();
   if (name === 'adv') buildAdventures();
   if (name === 'levels') buildLevels();
+  if (name === 'pause') { const pp = !!(G && G.arcade); $('restartBtn').textContent = pp ? 'Start again' : 'Restart level'; $('quitBtn').textContent = pp ? 'Main menu' : 'Level map'; }
   if (name !== 'play') { Input.keys.clear(); Input.held.clear(); pointers.clear(); joyEnd(); }
   netRoleUi();
 }
@@ -10580,7 +11276,7 @@ const ICON = {
   jump: '<svg viewBox="0 0 24 24"><path d="M12 3 L21 13 H15 V21 H9 V13 H3 Z" fill="#1d1b3a"/></svg>',
   action: '<svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="#1d1b3a"/></svg>'
 };
-function twoPlayers() { return !!(STATE.players === 2 && G && G.players.length === 2 && !NET.on); } // two players on this device
+function twoPlayers() { return !!(G && G.players.length === 2 && !NET.on && (STATE.players === 2 || G.arcade)); } // two players on this device
 function touchControlsOn() { return !!(STATE.touch && !STATE.pad); }
 function ctlButtons(W, H, two, as) { // as: lay out a boss game ('maze'...) or the Annoy-Off ('duel') before it starts
   const m = 14, r = SAFE.right + m, b = SAFE.bottom + m;
@@ -10628,7 +11324,7 @@ function layoutControls() {
   VIEW.joyX = joyX;
   VIEW.ctlSide = Math.max(two ? 0 : 170, ...btns.map((q) => Math.min(q.x + q.s, W - q.x))) + 4;
   VIEW.toastTop = two && !duel;
-  const joys = duel ? (NET.on ? (duel.pl === NET.me ? [0] : []) : [duel.pl]) : two ? [0, 1] : [0];
+  const joys = mini && MINI_GAMES[mini.kind].follow ? [] : duel ? (NET.on ? (duel.pl === NET.me ? [0] : []) : [duel.pl]) : two ? [0, 1] : [0]; // (Poo Pong's bats follow your finger: no joystick)
   const face = (q) => mini ? `<span class="big">${mb(q).label}<small>${q.label}</small></span>` : duel ? `<span class="big">${q.k === 'throw' ? 'ANNOY' : 'SUPER'}<small>${q.label}</small></span>` : q.k === 'throw' ? `<canvas width="96" height="96" data-obj="${heroThrow(G ? gp(q).id : 'naseer')}"></canvas>` : ICON[q.k];
   box.innerHTML = btns.map((q) => `<div class="tb ${two && !duel ? 'p' + (q.pl + 1) : ''} ${duel ? (q.k === 'throw' ? 'duelann' : 'duelsup') : mini ? 'duelann' : ''}" data-b="${q.pl}:${q.k}" style="left:${q.x}px;top:${q.y}px;width:${q.s}px;height:${q.s}px">${face(q)}${q.label && !duel && !mini ? `<span class="lbl">${q.label}</span>` : ''}</div>`).join('') +
     joys.map((i) => `<div class="joy ghost ${two && !duel ? 'p' + (i + 1) : ''}" id="joy${i}"><i></i><span class="lbl">Move</span></div>`).join('');
@@ -10714,6 +11410,14 @@ function beginPlay() {
 function enterPlay() { Input.ctrl.forEach((c) => { c.pj = c.pa = true; }); showScreen('play'); buildHUD(); toastT = 0; $('toast').hidden = true; $('banner').hidden = true; resize(); }
 function wireButtons() {
   $('playBtn').onclick = () => { if (netGuest()) { netOpen(); return; } showScreen('adv'); };
+  $('pongBtn').onclick = () => { firstGesture(); SND.sfx('bonk'); openPong(); };
+  $('pong1').onclick = () => { PONG.two = false; SND.sfx('help'); buildPong(); };
+  $('pong2').onclick = () => { PONG.two = true; SND.sfx('help'); buildPong(); };
+  $('pongBack').onclick = () => leavePong();
+  $('pongGo').onclick = () => startPong();
+  $('pongAgain').onclick = () => startPong();
+  $('pongChange').onclick = () => { PONG.view = 'setup'; buildPong(); $('s-pong').scrollTop = 0; };
+  $('pongMenu').onclick = () => leavePong();
   $('onlineBtn').onclick = () => netOpen();
   $('netPill').onclick = () => { showScreen('net'); netUi('status'); };
   $('leaveBtn').onclick = () => netLeave();
@@ -10733,8 +11437,8 @@ function wireButtons() {
   $('storyGo').onclick = () => (netGuest() ? netAsk('go') : enterPlay());
   $('pauseBtn').onclick = () => showScreen('pause');
   $('resumeBtn').onclick = () => showScreen('play');
-  $('restartBtn').onclick = () => { startLevel(); enterPlay(); };
-  $('quitBtn').onclick = () => { G = null; showScreen('levels'); };
+  $('restartBtn').onclick = () => { if (G && G.arcade) { startPong(); return; } startLevel(); enterPlay(); };
+  $('quitBtn').onclick = () => { if (G && G.arcade) { leavePong(); return; } G = null; showScreen('levels'); };
   $('againBtn').onclick = () => { startLevel(); enterPlay(); };
   $('nextBtn').onclick = () => { const nx = nextLevelId(STATE.level); if (nx) { STATE.level = nx; STATE.crewStep = 'friends'; G = null; showScreen('crew'); } };
   $('unlockBtn').onclick = () => { SAVE.unlockAll = !SAVE.unlockAll; writeSave(); buildAdventures(); };
@@ -10761,6 +11465,7 @@ function frame(now) {
     render();
     if (STATE.screen === 'crew') animateCrewCards(now / 1000);
     if (STATE.screen === 'done') drawPhoto(now / 1000);
+    if (STATE.screen === 'title' || STATE.screen === 'pong') paulMenuAnim(now / 1000);
   } catch (err) { console.error(err); }
   requestAnimationFrame(frame);
 }
