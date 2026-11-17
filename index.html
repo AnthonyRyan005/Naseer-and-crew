@@ -145,7 +145,7 @@ h2.title {
 .seg button { font-family: var(--font-display); font-size: 18px; padding: 8px 16px; border: 0; background: #fff; color: var(--ink); cursor: pointer; }
 .seg button + button { border-left: 3px solid var(--ink); }
 .seg button.on { background: var(--sun); }
-.crewgrid { display: grid; gap: 10px; width: 100%; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.crewgrid { display: grid; gap: 10px; width: 100%; grid-template-columns: repeat(8, minmax(0, 1fr)); }
 @media (max-width: 820px) { .crewgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } }
 .hero {
   background: var(--paper); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink);
@@ -178,7 +178,7 @@ h2.title {
 .hero .badge.b2 { background: var(--p2); }
 .detail {
   width: 100%; background: var(--paper); border: 3px solid var(--ink); border-radius: 20px; box-shadow: 0 6px 0 var(--ink);
-  padding: 14px 16px; display: grid; gap: 10px 22px; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); color: var(--ink);
+  padding: 14px 16px; display: grid; gap: 10px 22px; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); color: var(--ink);
 }
 @media (max-width: 700px) { .detail { grid-template-columns: minmax(0, 1fr); } }
 .detail h3 { font-family: var(--font-display); font-weight: 400; font-size: 26px; margin: 0; }
@@ -187,11 +187,12 @@ h2.title {
 .swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .sw { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--ink); cursor: pointer; padding: 0; }
 .sw.on { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ink); }
-.throws { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
-.thr { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 2px 6px; border: 3px solid var(--ink); border-radius: 12px; background: #fff;
+.throws { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.thr { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 6px; border: 3px solid var(--ink); border-radius: 12px; background: #fff;
   cursor: pointer; color: var(--ink); font-family: var(--font-body); touch-action: manipulation; min-width: 0; }
 .thr canvas { width: 44px; height: 44px; }
-.thr b { font-size: 11px; font-weight: 600; line-height: 1.15; text-align: center; }
+.thr b { font-size: 10px; font-weight: 600; line-height: 1.15; text-align: center; letter-spacing: -0.2px; }
+@media (min-width: 900px) and (min-height: 560px) { .thr b { white-space: nowrap; } } /* one line each where there's room */
 .thr.on { background: var(--sun); box-shadow: 0 3px 0 var(--ink); }
 .throw-desc { margin-top: 8px !important; font-size: 14px !important; }
 .tb canvas { width: 62%; height: 62%; }
@@ -378,7 +379,7 @@ h2.title {
   .path { gap: 10px; }
   .node { width: 124px; }
   .node .num { width: 44px; height: 44px; font-size: 28px; }
-  .crewgrid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .crewgrid { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
   .hero { padding: 4px 4px 6px; }
   .hero canvas { max-width: 66px; }
   .hero b { font-size: 16px; }
@@ -439,7 +440,7 @@ h2.title {
 .netconn small { font-weight: 500; font-size: 13px; }
 .netthrowrow { display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .netthrowrow > b { font-size: 15px; }
-.netthrows { display: grid; grid-template-columns: repeat(4, minmax(0, 76px)); gap: 6px; justify-content: center; }
+.netthrows { display: grid; grid-template-columns: repeat(5, minmax(0, 76px)); gap: 6px; justify-content: center; }
 .netthrows .thr canvas { width: 40px; height: 40px; }
 @media (max-height: 560px) { .netcode { font-size: 52px; } .netcodein { font-size: 38px; } .nh canvas { width: 48px; height: 48px; } }
 </style>
@@ -473,7 +474,7 @@ h2.title {
   <section class="screen" id="s-title">
     <div class="inner">
       <h1 class="logo">Naseer<small>and the</small>Crew</h1>
-      <p class="tag">Seven friends. One crew. Total school chaos.</p>
+      <p class="tag">Eight friends. One crew. Total school chaos.</p>
       <div class="title-gap"></div>
       <div class="row">
         <button class="btn big go" id="playBtn">Play</button>
@@ -603,7 +604,7 @@ h2.title {
         <h2>How to play</h2>
         <ul>
           <li>You play one hero. The rest of the crew follows you and helps out.</li>
-          <li>Tap a friend's face at the top to call for help. Frankie smashes, Spencer hacks, Jaxxs pranks, James pulls you up, Ollie kicks, Ben freezes baddies with a spell, and Naseer slows time.</li>
+          <li>Tap a friend's face at the top to call for help. Frankie smashes, Spencer hacks, Jaxxs pranks, James pulls you up, Ollie kicks, Ben freezes baddies with a spell, Ryan bumps baddies out of the way, and Naseer slows time.</li>
           <li>Jump on Glitch Bots to bop them, throw your object at them, or use your special move. Pick what each hero throws on the "Pick your hero" screen.</li>
           <li>Before each level, pick your hero and up to 3 friends. Any mix works: if a job needs a friend who isn't in your crew, they pop in to help.</li>
           <li>If a baddie gets you, a friend is sent home and you lose a heart. Lose all 4 hearts and you start the level again.</li>
@@ -630,7 +631,7 @@ h2.title {
 'use strict';
 /* ===================== Core constants & helpers ===================== */
 const VIEW_H = 540, GRAV = 2200, STEP = 1 / 60, GROUND = 460, MAXFALL = 1150;
-const HERO_IDS = ['naseer', 'frankie', 'spencer', 'jaxxs', 'james', 'ollie', 'ben'];
+const HERO_IDS = ['naseer', 'frankie', 'spencer', 'jaxxs', 'james', 'ollie', 'ben', 'ryan'];
 const INK = '#1d1b3a';
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -775,6 +776,9 @@ const SND = {
       case 'whack': this.noise(0.12, 0.3, 1500); this.tone(160, 0.12, 'triangle', 0.25, -60); break;
       case 'honk': this.tone(330, 0.22, 'square', 0.08); this.tone(330, 0.3, 'square', 0.08, 0, 0.28); break;
       case 'thud': this.noise(0.12, 0.2, 500); break;
+      case 'speccy': this.tone(240, 0.38, 'sine', 0.16, 760); this.noise(0.3, 0.1, 2600); break; // Ryan launches into a speccy
+      case 'mark': this.noise(0.07, 0.3, 1600); this.tone(190, 0.12, 'triangle', 0.3, -70); break; // the thwack of a clean catch
+      case 'crowd': this.noise(0.9, 0.11, 1000); this.noise(0.7, 0.05, 2600, 0.12); break; // the crowd goes up
       case 'senthome': // bonk, a slide whistle up into the sky, then a twinkle
         this.noise(0.1, 0.3, 1500); this.tone(170, 0.14, 'triangle', 0.25, -70);
         this.tone(420, 1.0, 'sine', 0.13, 1300, 0.38);
@@ -933,6 +937,13 @@ const HEROES = {
     object: 'Spell Book', objectDesc: 'A freeze spell that stops every baddie on screen for a few seconds.',
     skin: 0, hair: 8, hairStyle: 'wizard', top: '#6a3fc0', top2: '#ffd23d', pants: '#3b2d6b', shoes: '#8a5a3c',
     lines: ['Abracadabra!', 'Wands at the ready!', 'That was meant to happen.'], color: '#7b4fd6'
+  },
+  ryan: {
+    name: 'Ryan', role: 'Fearless Footy Star', speed: 300, jump: 860, hp: 3, w: 32, h: 62, size: 1,
+    move: 'Speccy', moveDesc: 'A huge flying leap that knocks over baddies. Land on one to take a mark and bounce up again. In the air, it\'s a shoulder bump.',
+    object: 'Captain\'s Armband', objectDesc: 'Ryan shepherds the crew. For a few seconds, baddies that come close get bumped out of the way.',
+    skin: 1, hair: 8, hairStyle: 'flow', top: '#22357f', top2: '#ffcb2f', pants: '#f4f4f8', shoes: '#1b1b2f',
+    lines: ['Scared? Never!', 'Carn the crew!', 'Kick it to me!'], color: '#2a3566'
   }
 };
 function heroSkin(id) { return SKINS[HEROES[id].skin]; }
@@ -968,7 +979,7 @@ function drawHero(c, id, x, y, o) {
   const H = HEROES[id], face = o.face || 1, t = o.t || 0, pose = o.pose || 'idle';
   const skin = heroSkin(id), hair = heroHair(id);
   const legLen = id === 'frankie' ? 20 : id === 'ollie' ? 18 : 16;
-  const tw = id === 'ollie' ? 26 : id === 'frankie' ? 24 : 22;
+  const ryan = id === 'ryan', tw = id === 'ollie' ? 26 : id === 'frankie' || ryan ? 24 : 22;
   const p = o.phase || 0;
   c.save();
   c.translate(x, y);
@@ -991,6 +1002,7 @@ function drawHero(c, id, x, y, o) {
     case 'pound': la = 0.9; lb = 0.6; aa = 2.6; ab = 2.6; break;
     case 'punch': aa = 1.55; ab = -0.6; la = 0.35; lb = -0.35; break;
     case 'flail': aa = 2.6 + Math.sin(t * 20) * 0.5; ab = -2.6 + Math.sin(t * 20 + 1) * 0.5; break;
+    case 'mark': la = 1.25; lb = -0.15; aa = 2.25; ab = 2.0; break; // Ryan's speccy: knee up, both hands reaching for the footy
     default: bob = Math.sin(t * 3) * 0.8; la = 0.05; lb = -0.05;
   }
   if (pose === 'idle' && id === 'james') bob = -Math.abs(Math.sin(t * 6)) * 5; // never stands still
@@ -1027,8 +1039,8 @@ function drawHero(c, id, x, y, o) {
     fB = [-3 + Math.sin(lb) * legLen, hipY + Math.cos(lb) * legLen];
   }
   const shoe = (f, a) => { ell(c, f[0] + 3, f[1] - 1, 6.8, 4.3, a * 0.3); blob(c, H.shoes, 2); };
-  const arm = (sx, a, col, back) => {
-    let hxp = sx + Math.sin(a) * 14, hyp = shY + Math.cos(a) * 14;
+  const arm = (sx, a, col, back, len = 14) => {
+    let hxp = sx + Math.sin(a) * len, hyp = shY + Math.cos(a) * len;
     if (bike && !['cheer', 'flail', 'kick'].includes(pose)) { hxp = back ? 11 : 13; hyp = -34; }
     limb(c, [sx, shY, hxp, hyp], 7, back ? dark(col) : col);
     c.beginPath(); c.arc(hxp, hyp, 3.7, 0, Math.PI * 2); blob(c, skin, 2);
@@ -1039,9 +1051,18 @@ function drawHero(c, id, x, y, o) {
     c.beginPath(); c.moveTo(-6, shY - 3); c.quadraticCurveTo(-16 + fl * 0.5, hipY - 4, -15 + fl, hipY + legLen - 3); c.lineTo(5, hipY + legLen - 6); c.lineTo(7, shY - 3); c.closePath(); blob(c, '#4a2f8f', 2.5);
   }
   // back arm + back leg
-  const sleeve = id === 'frankie' ? H.top : id === 'spencer' ? H.top : H.top;
-  arm(-4, ab, sleeve, true);
+  const sleeve = ryan ? skin : H.top, armLen = ryan && pose === 'mark' ? 17 : 14; // Ryan's guernsey has no sleeves
+  const footyLeg = (sx, f, back) => { // footy shorts, bare knees, long socks with a gold band
+    const dk = (col) => (back ? dark(col) : col), at = (k) => [lerp(sx, f[0], k), lerp(hipY, f[1], k)];
+    const k1 = at(0.4), k2 = at(0.62), k3 = at(0.76);
+    limb(c, [k2[0], k2[1], f[0], f[1]], 7.5, dk(H.top));
+    limb(c, [k2[0], k2[1], k3[0], k3[1]], 7.5, dk(H.top2));
+    limb(c, [k1[0], k1[1], k2[0], k2[1]], 6.5, dk(skin));
+    limb(c, [sx, hipY, k1[0], k1[1]], 10, dk(H.pants));
+  };
+  arm(-4, ab, sleeve, true, armLen);
   if (bike) limb(c, [-1, hipY, kB[0], kB[1], fB[0], fB[1]], 8, dark(H.pants));
+  else if (ryan) footyLeg(-3, fB, true);
   else limb(c, [-3, hipY, fB[0], fB[1]], 8, dark(H.pants));
   shoe(fB, lb);
   if (id === 'spencer' && pose !== 'hack') { // tablet tucked under the back arm
@@ -1049,6 +1070,7 @@ function drawHero(c, id, x, y, o) {
     c.fillStyle = '#7ff3ff'; c.fillRect(-3, -5, 6, 9); c.restore();
   }
   if (bike) limb(c, [2, hipY, kA[0], kA[1], fA[0], fA[1]], 8, H.pants);
+  else if (ryan) footyLeg(4, fA, false);
   else limb(c, [4, hipY, fA[0], fA[1]], 8, H.pants);
   shoe(fA, la);
   if (id === 'frankie' && pose === 'idle' && Math.sin(t * 1.7) > 0.96) { // spotless trainers sparkle
@@ -1059,9 +1081,18 @@ function drawHero(c, id, x, y, o) {
     c.beginPath(); c.moveTo(-tw / 2, hipY - 6); c.lineTo(tw / 2, hipY - 6); c.lineTo(tw / 2 + 4, hipY + 9); c.quadraticCurveTo(0, hipY + 12, -tw / 2 - 4, hipY + 9); c.closePath(); blob(c, H.top, 2.5);
     c.strokeStyle = H.top2; c.lineWidth = 2; c.beginPath(); c.moveTo(tw / 2 + 2, hipY + 7); c.quadraticCurveTo(0, hipY + 9.5, -tw / 2 - 2, hipY + 7); c.stroke();
   }
-  const armBehind = Math.abs(aa) > 1.95 || pose === 'climb';
+  const armBehind = (Math.abs(aa) > 1.95 && pose !== 'mark') || pose === 'climb';
   let hand = null;
-  if (armBehind) { hand = arm(5, aa, H.top, false); if (id === 'ben') drawWand(c, hand, aa, pose, t); }
+  const frontArm = () => {
+    if (ryan && !o.noBall && ['idle', 'run', 'jump', 'fall', 'dash', 'mark'].includes(pose)) { // his footy, under his hand
+      const hx0 = 5 + Math.sin(aa) * armLen, hy0 = shY + Math.cos(aa) * armLen;
+      if (pose === 'mark') drawFootyBall(c, hx0 + 5, hy0 - 4, 0.35, 1.05); else drawFootyBall(c, hx0 + 4, hy0 - 1, -0.7, 0.9);
+    }
+    hand = arm(5, aa, sleeve, false, armLen);
+    if (ryan) { c.save(); c.translate(5 + Math.sin(aa) * 6, shY + Math.cos(aa) * 6); c.rotate(-aa); rrect(c, -5.2, -1.9, 10.4, 3.8, 1.2); blob(c, H.top2, 1.6); c.restore(); } // captain's armband
+    if (id === 'ben') drawWand(c, hand, aa, pose, t);
+  };
+  if (armBehind) frontArm();
   /* --- torso --- */
   rrect(c, -tw / 2, shY - 4, tw, hipY - shY + 8, 7); blob(c, H.top);
   c.save(); rrect(c, -tw / 2, shY - 4, tw, hipY - shY + 8, 7); c.clip();
@@ -1083,6 +1114,11 @@ function drawHero(c, id, x, y, o) {
   } else if (id === 'ben') { // gold belt and a star on his robe
     c.fillStyle = H.top2; c.fillRect(-tw / 2, hipY - 1, tw, 3);
     starPath(c, 4, shY + 9, 4.6, 2); c.fill();
+  } else if (ryan) { // footy guernsey: a gold V and his number
+    c.fillStyle = H.top2; c.beginPath();
+    c.moveTo(-tw / 2, shY - 4); c.lineTo(-tw / 2 + 7, shY - 4); c.lineTo(3, shY + 4); c.lineTo(tw / 2 - 6, shY - 4); c.lineTo(tw / 2, shY - 4);
+    c.lineTo(tw / 2, shY + 2); c.lineTo(3, shY + 11); c.lineTo(-tw / 2, shY + 2); c.closePath(); c.fill();
+    c.font = 'bold 10px sans-serif'; c.textAlign = 'center'; c.fillText('5', 3, shY + 22);
   } else if (id === 'ollie') {
     c.fillStyle = H.top2; c.fillRect(-tw / 2, shY - 4, tw, 4);
     c.font = 'bold 11px ' + 'sans-serif'; c.fillText('10', -6, shY + 14);
@@ -1102,7 +1138,7 @@ function drawHero(c, id, x, y, o) {
   eye(hx + 3); eye(hx + 11);
   c.strokeStyle = INK; c.lineWidth = 2.2; c.lineCap = 'round';
   const brow = (x1, y1, x2, y2) => { c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); };
-  if (id === 'frankie') { brow(hx, hy - 7, hx + 6, hy - 5.5); brow(hx + 9, hy - 5.5, hx + 14, hy - 7); }
+  if (id === 'frankie' || ryan) { brow(hx, hy - 7, hx + 6, hy - 5.5); brow(hx + 9, hy - 5.5, hx + 14, hy - 7); } // determined
   else if (id === 'jaxxs') { brow(hx, hy - 6, hx + 6, hy - 6.5); brow(hx + 9, hy - 9, hx + 14, hy - 7.5); }
   else { brow(hx, hy - 6.5, hx + 6, hy - 8); brow(hx + 9, hy - 8, hx + 14, hy - 6.5); }
   if (id === 'spencer') {
@@ -1128,7 +1164,7 @@ function drawHero(c, id, x, y, o) {
   }
 
   /* --- front arm (+ held things) --- */
-  if (!armBehind) { hand = arm(5, aa, H.top, false); if (id === 'ben') drawWand(c, hand, aa, pose, t); }
+  if (!armBehind) frontArm();
   if (id === 'spencer' && pose === 'hack') {
     c.save(); c.translate(hand[0] + 3, hand[1] - 2); c.rotate(-0.2); rrect(c, -2, -9, 14, 11, 2); blob(c, '#2a2d4a', 2);
     c.fillStyle = Math.sin(t * 20) > 0 ? '#7ff3ff' : '#b9ffcf'; c.fillRect(0, -7, 10, 7); c.restore();
@@ -1145,6 +1181,14 @@ function drawHero(c, id, x, y, o) {
   c.restore();
 }
 
+function drawFootyBall(c, x, y, rot, s) { // an oval footy with white laces
+  c.save(); c.translate(x, y); c.rotate(rot || 0); c.scale(s || 1, s || 1);
+  ell(c, 0, 0, 10.5, 6.6); blob(c, '#c8432b', 2.2);
+  c.strokeStyle = 'rgba(255,255,255,0.4)'; c.lineWidth = 1.1; c.beginPath(); c.moveTo(-9, 1.5); c.quadraticCurveTo(0, 4.5, 9, 1.5); c.stroke(); // a seam
+  c.strokeStyle = '#fff'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(-4.5, -2.6); c.lineTo(4.5, -2.6);
+  for (let k = -3; k <= 3; k += 2) { c.moveTo(k, -4); c.lineTo(k, -1.2); }
+  c.stroke(); c.restore();
+}
 function drawWand(c, hand, aa, pose, t) { // Ben's wand, with a star that glows when he casts
   const wa = aa + 0.9, tx = hand[0] + Math.sin(wa) * 17, ty = hand[1] + Math.cos(wa) * 17, cast = pose === 'punch' || pose === 'cheer';
   limb(c, [hand[0], hand[1], tx, ty], 3.2, '#8a5a3c');
@@ -1199,6 +1243,13 @@ function drawHair(c, id, hx, hy, r, hair, t) {
       c.beginPath(); c.moveTo(hx + Math.cos(a) * (r - 2), hy + Math.sin(a) * (r - 2)); c.lineTo(hx + Math.cos(a + 0.12) * (r + 6), hy + Math.sin(a + 0.12) * (r + 6));
       c.lineTo(hx + Math.cos(a + 0.26) * (r - 1), hy + Math.sin(a + 0.26) * (r - 1)); c.closePath(); c.fill(); c.stroke();
     }
+  } else if (id === 'ryan') { // blond footy flow: swept up at the front, long at the back
+    c.beginPath(); c.moveTo(hx - r + 2, hy - 5); c.quadraticCurveTo(hx - r - 8, hy + 5, hx - r - 1, hy + 17); c.quadraticCurveTo(hx - r + 6, hy + 11, hx - 4, hy + 2); c.closePath(); blob(c, hair, 2);
+    c.beginPath(); c.moveTo(hx - 4, hy - r + 3); c.quadraticCurveTo(hx + 4, hy - r - 7, hx + 15, hy - r - 3); c.quadraticCurveTo(hx + 13, hy - r + 3, hx + 8, hy - r + 5); c.closePath(); blob(c, hair, 2); // a flick at the front
+    cap(150 * D, 345 * D, r + 2);
+    c.strokeStyle = shade(hair, -0.18); c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(hx - 6, hy - r + 2); c.quadraticCurveTo(hx + 1, hy - r - 1, hx + 7, hy - r + 3); c.stroke();
+    c.beginPath(); c.moveTo(hx - r - 2, hy + 4); c.quadraticCurveTo(hx - r - 1, hy + 10, hx - r + 1, hy + 13); c.stroke();
   } else if (id === 'james') { // smooth hair swept forward, no spikes
     cap(150 * D, 350 * D, r + 3);
     c.beginPath(); c.moveTo(hx - 2, hy - r - 2); c.quadraticCurveTo(hx + 10, hy - r - 5, hx + 17, hy - 11);
@@ -2215,7 +2266,8 @@ function startLevel() {
     needHero: null, need: null, chargeFlash: 0, winT: 0, pulse: null, hackTalk: 0, eshots: [], boss: null, hits: 0, ropeFrom: null, puddles: [],
     goop: [], darkK: L.dark ? 1 : 0, darkTo: L.dark ? 1 : 0, flashT: 0, boltT: rand(5, 9), chain: 0, chainT: -9, callouts: [], scene: null, party: null, chaseX: 0, thief: null,
     sp: null, movers: [], gravK: 1, wind: 0, windK: 0, slip: null, belts: null, bouncy: null, fogK: 0, rainK: 0, disco: 0, boltFlash: 0,
-    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null, cameo: null, duel: null, mini: null, miniDone: false, miniStarting: false
+    lost: 0, homeIds: [], sent: [], lose: null, battle: null, battleNext: null, bully: null, bullyPlan: null, cameo: null, duel: null, mini: null, miniDone: false, miniStarting: false,
+    shepherd: null
   };
   G.bullyPlan = planBully(L); // Crusher the bully may turn up somewhere in this level
   // your hero (or two players' heroes) and up to 3 friends, always including friends with a job here
@@ -2239,7 +2291,7 @@ function playerOf(id) { return G.players.find((p) => p.id === id); }
 
 function placeCrewAt(cp) {
   G.players.forEach((p, i) => {
-    p.x = cp.x - p.w / 2 + i * 40; p.y = cp.y - p.h; p.vx = p.vy = 0; p.hp = p.maxHp; p.inv = 1; p.hidden = false; p.climbing = false; p.pull = null; p.dashT = p.chargeT = 0; p.pound = false;
+    p.x = cp.x - p.w / 2 + i * 40; p.y = cp.y - p.h; p.vx = p.vy = 0; p.hp = p.maxHp; p.inv = 1; p.hidden = false; p.climbing = false; p.pull = null; p.dashT = p.chargeT = 0; p.pound = false; p.speccy = false;
     if (p.bubble) p.bubble.dead = true; p.bubble = null; p.inGoo = false;
   });
   followers().forEach((f) => { f.x = cp.x - 50 - f.slot * 34; f.y = cp.y - f.h; f.vx = f.vy = 0; f.pull = null; f.task = null; f.hacking = false; });
@@ -2358,9 +2410,9 @@ function updatePlayer(p, dt) {
   p.inv = Math.max(0, p.inv - dt); p.actCd -= dt; p.invis = Math.max(0, p.invis - dt); p.sayT -= dt; p.cheer -= dt;
   p.punchT -= dt; p.kickT -= dt; p.bonkT = Math.max(0, (p.bonkT || 0) - dt); p.throwCd = (p.throwCd || 0) - dt;
   if (p.power) { p.powerT -= dt; if (p.powerT <= 0) { p.power = null; } }
-  if (p.pull) { updatePull(p, dt); return; }
+  if (p.pull) { p.speccy = false; p.speccyT = null; updatePull(p, dt); return; }
   p.bubbleCd = Math.max(0, (p.bubbleCd || 0) - dt);
-  if (p.bubble) { rideBubble(p, dt); return; }
+  if (p.bubble) { p.speccy = false; rideBubble(p, dt); return; }
   const solids = solidsFor(p, false);
   if (p.onGround) { p.coyote = 0.1; p.jumps = p.id === 'naseer' ? 1 : 0; } else p.coyote -= dt;
   p.jumpBuf = c.jumpP ? 0.13 : p.jumpBuf - dt;
@@ -2378,6 +2430,8 @@ function updatePlayer(p, dt) {
   }
   if (p.chargeT > 0) { p.chargeT -= dt; p.vx = p.face * 700; }
   else if (p.bonkT > 0.2) { /* knocked back */ }
+  else if (p.speccy && speccySteer(p, dir)) { /* a Speccy flies onto the baddie he's going for */ }
+  else if (p.speccy && !dir) { /* and keeps flying forward unless you steer */ }
   else p.vx = approach(p.vx, dir * speed * (slip ? 1.15 : 1), (slip ? 380 : p.onGround ? 2800 : 1800) * dt);
   if (dir && p.chargeT <= 0) p.face = dir;
 
@@ -2410,6 +2464,7 @@ function updatePlayer(p, dt) {
   if (G.wind && !p.hidden) { const dx = G.wind * (p.onGround ? 0.85 : 1.1) * dt; p.x += dx; if (solids.some((s) => !s.shutter && overlap(p, s))) p.x -= dx; }
   if (G.belts) beltPush(p, dt);
   if (p.pound && p.onGround) { p.pound = false; poundImpact(p); }
+  if (p.speccy && p.onGround) { p.speccy = false; p.speccyT = null; }
   if (p.y > 1000) { p.x = G.L.checkpoints[G.cp].x; p.y = G.L.checkpoints[G.cp].y - p.h; p.vy = 0; }
 
   // hiding in an open locker: stand still inside it
@@ -2466,6 +2521,18 @@ function doMove(p) {
       p.chargeT = 0.38; p.actCd = 0.7; p.inv = Math.max(p.inv, 0.4); SND.sfx('dash');
       break;
     case 'ollie': kickBall(p, false); p.actCd = 0.5; break;
+    case 'ryan':
+      if (p.onGround || p.coyote > 0) { // Speccy: a huge flying leap. Nothing scares him, so anything in the way gets knocked over
+        p.vy = -SPECCY_VY; p.speccyT = speccyTarget(p); // the nearest baddie in front: he leaps onto its head
+        const aim = p.speccyT ? speccyAimAt(p, p.speccyT) : null;
+        p.vx = aim != null ? aim : f * Math.max(Math.abs(p.vx), 330);
+        p.coyote = 0; p.jumpBuf = 0; p.onGround = false; p.boost = true; p.speccy = true; p.climbing = false;
+        p.actCd = 0.55; SND.sfx('speccy'); puff(cxOf(p), p.y + p.h, 10, '#fff', 160);
+        if (Math.random() < 0.4) say(p, pick(['Speccy time!', 'Up, up, UP!']), 1.2);
+      } else { // in the air: a fearless shoulder bump
+        p.chargeT = 0.2; p.actCd = 0.6; p.inv = Math.max(p.inv, 0.3); SND.sfx('dash');
+      }
+      break;
     case 'ben': { // Magic Bolt: zaps the nearest baddie in front and turns it into a frog
       const front = (e) => sign(cxOf(e) - cxOf(p)) === f || Math.abs(cxOf(e) - cxOf(p)) < 30;
       let tgt = G.bots.filter((b) => live(b) && front(b) && Math.abs(cxOf(b) - cxOf(p)) < 560 && Math.abs(b.y + b.h / 2 - (p.y + p.h / 2)) < 170)
@@ -2477,6 +2544,36 @@ function doMove(p) {
       break;
     }
   }
+}
+
+const SPECCY_VY = 1000; // about a third higher than a normal jump: still not high enough to skip the climbing walls
+function speccyTarget(p) { // the nearest baddie in front that Ryan can land on
+  const feet = p.y + p.h, list = G.bots.filter(live);
+  if (bullyActive()) list.push(G.bully);
+  if (bossActive()) list.push(G.boss);
+  let best = null, bd = 0;
+  for (const T of list) {
+    const dx = (T === G.boss ? cxB(T) : cxOf(T)) - cxOf(p), h = feet - T.y;
+    if (Math.abs(dx) > 330 || (Math.abs(dx) > 24 && sign(dx) !== p.face) || h < -40 || h > 200) continue;
+    if (!best || Math.abs(dx) < bd) { best = T; bd = Math.abs(dx); }
+  }
+  return best;
+}
+function speccyAimAt(p, T) { // how fast to fly sideways to come down right on T's head (it may be walking)
+  const g = GRAV * (G.gravK || 1), h = p.y + p.h - T.y, disc = p.vy * p.vy - 2 * g * h;
+  if (disc < 0) return null;
+  const t = (-p.vy + Math.sqrt(disc)) / g; // when his feet come back down to its head
+  if (t < 0.03) return null;
+  const tx = (T === G.boss ? cxB(T) : cxOf(T)) + (T.vx || 0) * t * 0.5;
+  return clamp((tx - cxOf(p)) / t, -420, 420);
+}
+function speccySteer(p, dir) { // a Speccy homes in on the baddie's head, unless you steer the other way
+  const T = p.speccyT; if (!T) return false;
+  const ok = T === G.bully ? bullyActive() : T === G.boss ? bossActive() : live(T) && !T.dead;
+  const a = ok ? speccyAimAt(p, T) : null;
+  if (a == null) { p.speccyT = null; return false; }
+  if (dir && dir !== sign(a)) return false;
+  p.vx = a; return true;
 }
 
 function kickBall(p, help) {
@@ -2505,11 +2602,14 @@ function playerVsBots(p) {
   for (const b of G.bots) {
     if (!live(b) || !overlap(p, b)) continue;
     const stomp = p.vy > 40 && p.y + p.h - b.y < 24;
-    if (p.dashT > 0 || p.chargeT > 0 || p.pound || stomp) {
+    if (p.dashT > 0 || p.chargeT > 0 || p.pound || p.speccy || stomp) {
       bop(b, p);
-      if (stomp && !p.pound) { p.vy = -560; p.boost = true; }
+      if (stomp && !p.pound) {
+        p.vy = p.speccy ? -720 : -560; p.boost = true;
+        if (p.speccy) { p.speccyT = null; floatText(cxOf(p), p.y - 14, 'MARK!', '#ffcb2f', true); SND.sfx('mark'); SND.sfx('crowd'); } // a speccy off a baddie's head
+      }
     } else if (p.invis > 0) { /* sneaks straight through */ }
-    else if (b.state !== 'stun' && b.state !== 'dance' && !(b.frozenT > 0)) hurt(p, b);
+    else if (b.state !== 'stun' && b.state !== 'dance' && !(b.frozenT > 0)) { if (G.shepherd) shepherdBump(b); else hurt(p, b); } // (Ryan's shepherd gets in the way first)
   }
 }
 
@@ -2521,7 +2621,7 @@ function hurt(p, src) {
     else floatText(cxOf(p), p.y - 10, 'Blocked!', '#bff6ff');
     p.inv = 0.7; p.vx = dirAway * 260; p.vy = -260; p.bonkT = 0.3; SND.sfx('shield'); return;
   }
-  G.hits++; p.inv = 1.8; p.hitAt = G.t; p.vx = dirAway * 330; p.vy = -380; p.bonkT = 0.35; p.dashT = p.chargeT = 0; p.climbing = false;
+  G.hits++; p.inv = 1.8; p.hitAt = G.t; p.vx = dirAway * 330; p.vy = -380; p.bonkT = 0.35; p.dashT = p.chargeT = 0; p.climbing = false; p.speccy = false;
   G.shake = 0.3; SND.sfx('hurt');
   sendHome(); // a random friend takes the hit and gets sent home
 }
@@ -2532,6 +2632,7 @@ function setPose(e, dt) {
   else if (e.climbing) pose = 'climb';
   else if (e.dashT > 0 || e.chargeT > 0) pose = 'dash';
   else if (e.pound) pose = 'pound';
+  else if (e.speccy) pose = 'mark'; // Ryan flying up for a speccy
   else if (e.punchT > 0) pose = 'punch';
   else if (e.kickT > 0) pose = 'kick';
   else if (e.hacking) pose = 'hack';
@@ -2634,6 +2735,11 @@ function aiAttack(f, b) {
     case 'spencer': G.proj.push({ kind: 'drone', x: from.x, y: from.y - 20, vx: 0, vy: 0, life: 1.5, target: b, owner: f }); SND.sfx('zap'); break;
     case 'jaxxs': G.proj.push({ kind: 'peel', x: from.x, y: from.y, vx: 0, vy: 0, life: 1.4, target: b, owner: f, t: 0, sx: from.x, sy: from.y }); break;
     case 'ollie': f.kickT = 0.25; G.proj.push({ kind: 'homer', x: from.x, y: f.y + f.h - 12, vx: 0, vy: 0, life: 1.4, target: b, owner: f, r: 9, spin: 0 }); SND.sfx('kick'); break;
+    case 'ryan':
+      if (f.onGround) { f.vy = -620; f.boost = true; }
+      G.parts.push({ kind: 'streak', x: from.x, y: from.y - 6, x2: cxOf(b), y2: b.y + 10, life: 0.25, max: 0.25, col: '#ffcb2f' });
+      if (b === G.boss) hitBoss(1, f); else { bop(b, f); floatText(cxOf(b), b.y - 26, pick(['BUMP!', 'MARK!']), '#ffcb2f'); }
+      SND.sfx('mark'); break;
     case 'ben': f.punchT = 0.25; G.proj.push({ kind: 'spell', x: from.x + f.face * 14, y: from.y - 4, vx: f.face * 300, vy: 0, life: 1.5, target: b, owner: f, t: 0 }); SND.sfx('spell'); break;
   }
 }
@@ -2831,6 +2937,7 @@ function update(dt) {
   recordTrail();
   followers().forEach((f) => updateFollower(f, dt));
   G.bots.forEach((b) => updateBot(b, wdt));
+  if (G.shepherd) updateShepherd(dt);
   G.bots = G.bots.filter((b) => !b.dead);
   G.teachers.forEach((T) => updateTeacher(T, wdt, dt));
   if (G.boss) updateBoss(dt, wdt);
@@ -3045,7 +3152,7 @@ function updateObstacles(dt) {
 }
 
 /* ===================== Calling the crew for help ===================== */
-const HELP_CD = { naseer: 15, frankie: 12, spencer: 10, jaxxs: 10, james: 8, ollie: 8, ben: 12 };
+const HELP_CD = { naseer: 15, frankie: 12, spencer: 10, jaxxs: 10, james: 8, ollie: 8, ben: 12, ryan: 12 };
 function heroById(id) { return G.crew.find((h) => h.id === id); }
 function bringOver(h, ld) {
   if (h.ctrl >= 0) return;
@@ -3144,6 +3251,12 @@ const HELP = {
     if (bossActive()) { const B = G.boss; B.state = 'stun'; B.stunT = 2.5; B.vx = 0; floatText(cxB(B), B.y - 20, 'Frozen!', '#bff6ff', true); }
     G.freezeFlash = 0.5;
   },
+  ryan(h, ld) { // Shepherd: for a few seconds Ryan bumps away any baddie that comes near the crew
+    const bots = botsOnScreen();
+    if (!bots.length) { toast('ryan', 'No baddies around to shepherd the crew past.'); return false; }
+    bringOver(h, ld); h.cheer = 0.5; say(h, pick(['I\'ve got you!', 'Follow me!', 'Nothing gets past me!']), 1.6); SND.sfx('shield');
+    G.shepherd = { t: 6, by: h, cd: 0 };
+  },
   ollie(h, ld) {
     const gt = G.L.gates.find((g) => !g.button.hit && Math.abs(cxOf(ld) - g.button.x) < 760 && ld.y + ld.h > 300 && cxOf(ld) < g.x);
     if (gt) {
@@ -3160,6 +3273,23 @@ const HELP = {
     G.proj.push({ kind: 'super', x: cxOf(h), y: h.y + h.h - 14, vx: h.face * 300, vy: -300, life: 4, list, target: null, owner: h, r: 11, spin: 0 });
   }
 };
+
+/* Ryan's shepherd: baddies that come close to a player get bumped out of the way */
+function updateShepherd(dt) {
+  const S = G.shepherd, h = S.by;
+  S.t -= dt; S.cd -= dt;
+  if (S.t <= 0 || !G.crew.includes(h) || G.over) { G.shepherd = null; return; }
+  if (S.cd > 0) return;
+  const b = G.bots.find((o) => live(o) && o.state !== 'stun' && G.players.some((p) => Math.abs(cxOf(o) - cxOf(p)) < 110 && Math.abs(o.y + o.h - (p.y + p.h)) < 90));
+  if (b) shepherdBump(b);
+}
+function shepherdBump(b) {
+  const S = G.shepherd, h = S && S.by;
+  if (!h || !live(b)) return;
+  S.cd = 0.3; h.face = sign(cxOf(b) - cxOf(h)) || h.face; h.punchT = 0.2;
+  G.parts.push({ kind: 'streak', x: cxOf(h), y: h.y + 26, x2: cxOf(b), y2: b.y + 18, life: 0.25, max: 0.25, col: '#ffcb2f' });
+  bop(b, h); floatText(cxOf(b), b.y - 26, pick(['BUMP!', 'SHEPHERD!', 'NOT TODAY!']), '#ffcb2f'); SND.sfx('whack');
+}
 
 function frogPop(x, y) { // a baddie zapped by Ben hops away as a frog
   puff(x, y, 8, '#7fff6a', 120); floatText(x, y - 20, 'Ribbit!', '#9bff8a'); SND.sfx('ribbit');
@@ -3422,8 +3552,8 @@ function updateBoss(dt, wdt) {
   for (const p of G.players) {
     if (p.pull || !overlap(p, B)) continue;
     const stomp = p.vy > 40 && p.y + p.h - B.y < 36;
-    if (stomp) { hitBoss(1, p); p.vy = -760; p.boost = true; }
-    else if (p.dashT > 0 || p.chargeT > 0 || p.pound) { hitBoss(1, p); p.dashT = p.chargeT = 0; p.pound = false; p.vx = (cxOf(p) < cxB(B) ? -1 : 1) * 380; p.vy = -300; p.bonkT = 0.3; }
+    if (stomp) { hitBoss(1, p); p.vy = -760; p.boost = true; if (p.speccy) { p.speccy = false; p.speccyT = null; floatText(cxOf(p), p.y - 14, 'MARK!', '#ffcb2f', true); SND.sfx('crowd'); } }
+    else if (p.dashT > 0 || p.chargeT > 0 || p.pound || p.speccy) { hitBoss(1, p); p.dashT = p.chargeT = 0; p.pound = false; p.speccy = false; p.vx = (cxOf(p) < cxB(B) ? -1 : 1) * 380; p.vy = -300; p.bonkT = 0.3; }
     else if (B.state !== 'stun') hurt(p, B);
   }
 }
@@ -3572,12 +3702,13 @@ const THROWS = {
   star: { name: 'Foam Ninja Star', desc: 'Super fast. Zips through three baddies in a row.', cd: 0.45 },
   chicken: { name: 'Rubber Chicken', desc: 'Squeaks, spins and bounces. Very silly.', cd: 0.7 },
   snowball: { name: 'Snowball', desc: 'A quick, classic throw that bursts into snow.', cd: 0.4 },
-  disc: { name: 'Flying Disc', desc: 'Floats up as it flies and hits two baddies.', cd: 0.6 }
+  disc: { name: 'Flying Disc', desc: 'Floats up as it flies and hits two baddies.', cd: 0.6 },
+  footy: { name: 'Footy', desc: 'A low kick that bounces any which way!', cd: 0.6 }
 };
 const THROW_IDS = Object.keys(THROWS);
-const THROW_DEFAULT = { naseer: 'plane', frankie: 'snowball', spencer: 'disc', jaxxs: 'balloon', james: 'star', ollie: 'chicken', ben: 'slime' };
+const THROW_DEFAULT = { naseer: 'plane', frankie: 'snowball', spencer: 'disc', jaxxs: 'balloon', james: 'star', ollie: 'chicken', ben: 'slime', ryan: 'footy' };
 function heroThrow(id) { let k = netGuest() && NET.throws ? NET.throws[id] : netHost() && NET.p2throw && id === STATE.picks[1] ? NET.p2throw : SAVE.throws && SAVE.throws[id]; if (k === 'boomerang') k = 'soccer'; return THROWS[k] ? k : THROW_DEFAULT[id]; }
-function throwSfx(kind) { return kind === 'chicken' ? 'squeak' : kind === 'soccer' ? 'kick' : 'throw'; }
+function throwSfx(kind) { return kind === 'chicken' ? 'squeak' : kind === 'soccer' || kind === 'footy' ? 'kick' : 'throw'; }
 
 function doThrow(p) {
   const kind = heroThrow(p.id), f = p.face;
@@ -3591,10 +3722,11 @@ function doThrow(p) {
     case 'chicken': q.vx = f * 520; q.vy = -470; q.g = 1400; q.r = 13; q.maxHits = 3; break;
     case 'snowball': q.vx = f * 720; q.vy = -260; q.g = 1100; q.r = 9; break;
     case 'disc': q.vx = f * 780; q.vy = -60; q.g = -120; q.r = 12; q.life = 1.3; q.maxHits = 2; break;
+    case 'footy': q.x = cxOf(p) + f * 18; q.y = p.y + p.h - 16; q.vx = f * 640; q.vy = -360; q.g = 1200; q.r = 11; q.life = 2.4; q.maxHits = 2; break;
   }
   G.proj.push(q);
   p.throwCd = THROWS[kind].cd;
-  if (kind === 'soccer') p.kickT = 0.25; else p.punchT = 0.2;
+  if (kind === 'soccer' || kind === 'footy') p.kickT = 0.25; else p.punchT = 0.2;
   SND.sfx(throwSfx(kind));
 }
 
@@ -3628,7 +3760,10 @@ function updateThrow(q, dt) {
       else { q.vy = 0; q.vx *= Math.max(0, 1 - dt * 1.6); }
     }
     else if (q.obj === 'chicken' && q.bounces < 2) { q.y = gy - q.r; q.vy = -q.vy * 0.6; q.bounces++; SND.sfx('squeak'); }
-    else if (['balloon', 'slime', 'snowball', 'chicken'].includes(q.obj)) { throwBurst(q); return; }
+    else if (q.obj === 'footy' && q.bounces < 3 && q.vy > 120) { // a footy bounces any which way
+      q.y = gy - q.r; q.vy = -q.vy * rand(0.4, 0.75); q.vx *= Math.random() < 0.3 ? -rand(0.5, 0.9) : rand(0.6, 1.15); q.bounces++; SND.sfx('bounce');
+    }
+    else if (['balloon', 'slime', 'snowball', 'chicken', 'footy'].includes(q.obj)) { throwBurst(q); return; }
     else { q.y = gy - q.r; q.vy = 0; }
   }
   const walls = G.L.solids.concat(G.L.barriers.filter((B) => !B.broken));
@@ -3731,6 +3866,7 @@ function drawThrowable(c, kind, x, y, spin, s) {
       c.beginPath(); c.arc(0, 0, 10, 0, 7); blob(c, '#ffffff', 2.5);
       c.fillStyle = '#cfe6ff'; c.beginPath(); c.arc(3, 3, 6, 0, 7); c.fill();
       break;
+    case 'footy': drawFootyBall(c, 0, 0, spin, 1.15); break;
     case 'disc':
       c.rotate(Math.sin(spin * 0.5) * 0.2);
       c.beginPath(); c.ellipse(0, 0, 15, 6, 0, 0, 7); blob(c, '#6a4cff', 2.5);
@@ -4399,13 +4535,21 @@ function updateParty(dt) {
 // Each friend has their own dance
 function drawDancer(c, id, x, y, t, sc, bike) {
   const o = { t, pose: 'cheer', face: 1, scale: sc, phase: 0 };
-  let dx = 0, dy = 0, rot = 0, ball = false, magic = false;
+  let dx = 0, dy = 0, rot = 0, ball = false, magic = false, footy = null;
   switch (id) {
     case 'naseer': o.pose = 'run'; o.phase = t * 14; o.face = Math.floor(t * 3) % 2 ? 1 : -1; dy = -Math.abs(Math.sin(t * 6)) * 6; break; // the shuffle
     case 'frankie': o.pose = Math.floor(t * 2.5) % 2 ? 'punch' : 'cheer'; o.face = Math.floor(t * 1.25) % 2 ? 1 : -1; break; // flexing
     case 'spencer': o.pose = 'hack'; o.drone = true; rot = Math.floor(t * 4) % 2 ? 0.12 : -0.12; dy = Math.floor(t * 4) % 2 ? -3 : 0; break; // the robot
     case 'jaxxs': o.pose = 'run'; o.phase = t * 10; dx = Math.sin(t * 1.6) * 22; o.face = Math.cos(t * 1.6) > 0 ? -1 : 1; o.halo = true; break; // moonwalk
     case 'james': { const cy = t % 1.6; if (cy < 0.6) { const k = cy / 0.6; dy = -Math.sin(k * Math.PI) * 70; rot = k * Math.PI * 2; o.pose = 'jump'; } break; } // backflips
+    case 'ryan': { // kicks the footy up high, then leaps for a speccy
+      const cy = (t % 1.9 + 1.9) % 1.9;
+      if (cy < 0.3) { o.pose = 'kick'; footy = { x: 18, y: -14 - cy * 60 }; }
+      else if (cy < 1.0) { const k = (cy - 0.3) / 0.7; o.pose = 'idle'; o.noBall = true; footy = { x: 18 + k * 4, y: -32 - Math.sin(k * Math.PI * 0.75) * 120 }; }
+      else if (cy < 1.5) { const k = (cy - 1.0) / 0.5; o.pose = 'mark'; dy = -Math.sin(k * Math.PI) * 46; }
+      else o.pose = 'idle';
+      break;
+    }
     case 'ben': dy = -14 - Math.sin(t * 2.5) * 10; o.pose = Math.floor(t * 2) % 2 ? 'cheer' : 'punch'; o.face = Math.floor(t) % 2 ? 1 : -1; magic = true; break; // floats and casts sparkles
     case 'ollie':
       if (bike) { o.bike = true; o.pose = 'idle'; rot = -0.2 - Math.abs(Math.sin(t * 3)) * 0.15; } // wheelies
@@ -4421,6 +4565,7 @@ function drawDancer(c, id, x, y, t, sc, bike) {
     c.save(); c.translate(x + Math.cos(a) * 30 * sc, y + (dy - 40 + Math.sin(a) * 14) * sc); c.rotate(t * 4);
     starPath(c, 0, 0, 5 * sc, 2.2 * sc); c.fillStyle = ['#ffe066', '#c9a6ff', '#9fe8ff', '#ff8ad8'][k]; c.fill(); c.restore();
   }
+  if (footy) drawFootyBall(c, x + footy.x * sc, y + footy.y * sc, t * 9, sc * 0.95);
   if (ball) {
     const by = y - (40 + Math.abs(Math.sin(t * 6)) * 46) * sc;
     c.save(); c.translate(x + 14 * sc, by); c.rotate(t * 8); c.beginPath(); c.arc(0, 0, 9 * sc, 0, 7); blob(c, '#fff', 2);
@@ -5500,7 +5645,8 @@ const HOME_LINES = {
   jaxxs: ['It wasn\'t me!', 'I was framed!'],
   james: ['Worth it!', 'Wheeeee!'],
   ollie: ['Red card?!', 'See ya, crew!'],
-  ben: ['Abraca-OOPS!', 'My spell backfired!']
+  ben: ['Abraca-OOPS!', 'My spell backfired!'],
+  ryan: ['Free kick, umpire!', 'Back next quarter!']
 };
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
@@ -5985,7 +6131,7 @@ function startBully(ld, ax) {
   G.bots.forEach((b) => { if (live(b) && cxOf(b) > x0 - 100 && cxOf(b) < x1 + 100) { b.dead = true; puff(cxOf(b), b.y + b.h / 2, 8, '#fff', 120); } });
   banner('UH-OH!', 'It\'s Crusher the bully!', { huge: true, dur: 2.4 });
   SND.setTrack('boss');
-  const o = pick(followers()); if (o) say(o, pick(['Eek! Crusher!', 'He\'s so big!', 'Run!']), 1.6);
+  const o = pick(followers()); if (o) say(o, o.id === 'ryan' ? 'Bring it on!' : pick(['Eek! Crusher!', 'He\'s so big!', 'Run!']), 1.6);
 }
 
 function bullyHit(p, how) {
@@ -6052,11 +6198,20 @@ function updateBully(dt) {
   else if (B.state === 'hurt') { B.vx *= 0.9; if (B.t > 0.6 && B.onGround) { B.state = 'walk'; B.t = 0; B.actT = 0.8; } }
   else if (B.state === 'roar') {
     B.vx = 0;
-    for (const p of G.players) if (Math.abs(cxOf(p) - cxOf(B)) < 260 && p.onGround) p.vx += sign(cxOf(p) - cxOf(B)) * 600 * dt; // his roar blows you back
+    for (const p of G.players) {
+      if (Math.abs(cxOf(p) - cxOf(B)) >= 260 || !p.onGround) continue;
+      if (p.id === 'ryan') { if (!B.roarSaid) { B.roarSaid = true; floatText(cxOf(p), p.y - 14, 'NOT SCARED!', '#ffcb2f', true); } continue; } // Ryan has no fear
+      p.vx += sign(cxOf(p) - cxOf(B)) * 600 * dt; // his roar blows you back
+    }
     if (B.t > 1.1) { B.state = 'walk'; B.t = 0; B.actT = 1; }
   } else if (B.state === 'wind') { B.vx = 0; if (B.t > 0.45) { B.state = 'shove'; B.t = 0; B.vx = B.dir * 380; SND.sfx('whack'); } }
   else if (B.state === 'shove') {
     for (const p of G.players) if (p.inv <= 0 && overlap(p, { x: B.x - 12, y: B.y, w: B.w + 24, h: B.h })) {
+      if (p.id === 'ryan') { // Ryan doesn't budge, so Crusher bounces off him
+        p.inv = 0.8; B.state = 'walk'; B.t = 0; B.actT = 1.2; B.vx = -B.dir * 160; G.shake = 0.2; SND.sfx('thud');
+        floatText(cxOf(p), p.y - 14, 'NOT SCARED!', '#ffcb2f', true); say(B, pick(['Huh?!', 'Why aren\'t you scared?!']), 1.4);
+        break;
+      }
       p.vx = B.dir * 460; p.vy = -340; p.inv = 0.8; p.bonkT = 0.35; p.onGround = false; G.shake = 0.3; SND.sfx('thud');
       say(B, pick(['Move it, shrimp!', 'Out of my way!', 'Ha ha ha!']), 1.4);
     }
@@ -6064,13 +6219,17 @@ function updateBully(dt) {
   } else { // walk towards the nearest player
     B.dir = sign(dx) || B.dir; B.vx = Math.abs(dx) > 40 ? B.dir * 115 : 0; B.walk += dt * 7;
     B.actT -= dt; B.roarT -= dt;
-    if (B.roarT <= 0) { B.state = 'roar'; B.t = 0; B.roarT = rand(6, 8); SND.sfx('roar'); G.shake = 0.5; say(B, 'RAAAAH!', 1.1); const o = pick(followers()); if (o) say(o, pick(['Eek!', 'Mum!', 'I\'m scared!']), 1.2); }
+    if (B.roarT <= 0) { B.state = 'roar'; B.t = 0; B.roarT = rand(6, 8); B.roarSaid = false; SND.sfx('roar'); G.shake = 0.5; say(B, 'RAAAAH!', 1.1); const o = pick(followers()); if (o) say(o, o.id === 'ryan' ? 'Not scared of you!' : pick(['Eek!', 'Mum!', 'I\'m scared!']), 1.2); }
     else if (B.actT <= 0 && Math.abs(dx) < 90) { B.state = 'wind'; B.t = 0; }
   }
   // how the crew touches him
   for (const p of G.players) {
     if (!overlap(p, B)) continue;
     if (p.dashT > 0 || p.chargeT > 0) { bullyHit(p, 'dash'); p.dashT = p.chargeT = 0; p.vx = -p.face * 220; continue; }
+    if (p.speccy) { // Ryan's Speccy: a mark right off Crusher's head
+      if (bullyHit(p, 'speccy')) { floatText(cxOf(p), p.y - 14, 'MARK!', '#ffcb2f', true); SND.sfx('mark'); SND.sfx('crowd'); }
+      p.speccy = false; p.vy = -520; p.boost = true; p.vx = (cxOf(p) < cxOf(B) ? -1 : 1) * 240; continue;
+    }
     if (p.invis > 0) { bullyHit(p, 'prank'); p.invis = 0; continue; }
     const stomp = p.vy > 40 && p.y + p.h - B.y < 26;
     if (stomp) { p.vy = -600; p.boost = true; tooTough(B); }
@@ -6276,9 +6435,10 @@ const DUEL_MOVES = {
   jaxxs: { annoy: 'Kick Me Stickers', kind: 'spread', look: 'sticker', speed: 600, range: 450, dmg: 4.5, r: 14, n: 3, spread: 0.16, reload: 1.05, spd: 250, hit: ['KICK ME!', 'STUCK!'], sup: 'Whoopee Cushion', supLine: 'Take a seat!', tip: 'Get close and all three stickers stick.' },
   james: { annoy: 'Yo-yo', kind: 'yoyo', look: 'yoyo', speed: 650, range: 360, dmg: 5, r: 15, reload: 1.0, spd: 255, hit: ['BOING!', 'YOINK!'], sup: 'Copycat', supLine: 'Stop copying me!', tip: 'Your yo-yo can annoy him twice.' },
   ollie: { annoy: 'Bike Bell', kind: 'wave', look: 'bell', speed: 480, range: 410, dmg: 6, r: 24, reload: 1.0, spd: 250, hit: ['DING!', 'RING RING!'], sup: 'Wheelie Dash', supLine: 'Coming through!', tip: 'Ring your bell when he is close.' },
+  ryan: { annoy: 'Banana Kick', kind: 'banana', look: 'footy', speed: 600, range: 560, dmg: 7, r: 16, reload: 1.0, spd: 255, hit: ['GOAL!', 'BONK!'], sup: 'Speccy', supLine: 'Mark of the year!', tip: 'Banana kicks curve around to him. And nothing rattles you much.' },
   ben: { annoy: 'Tickle Spell', kind: 'shot', look: 'tickle', speed: 620, range: 580, dmg: 7, r: 16, bounce: 1, reload: 1.0, spd: 245, hit: ['TEE-HEE!', 'TICKLE!'], sup: 'Frog Voice', supLine: 'Abraca-ribbit!', tip: 'Tickle spells bounce off things.' }
 };
-const DUEL_SFX = { naseer: 'throw', frankie: 'burp', spencer: 'beep', jaxxs: 'squeak', james: 'boing', ollie: 'ding', ben: 'spell' };
+const DUEL_SFX = { naseer: 'throw', frankie: 'burp', spencer: 'beep', jaxxs: 'squeak', james: 'boing', ollie: 'ding', ben: 'spell', ryan: 'kick' };
 const CRUSHER_SOCK = { flight: 0.8, range: 480, dmg: 8, splash: 58 };
 const DUEL_LINES = {
   crAnnoyed: ['Quit it!', 'Stop that!', 'So annoying!', 'Grrr!', 'Hey!'],
@@ -6349,7 +6509,7 @@ function duelDiff() {
 function duelFighter(id, x, y) {
   const cr = id === 'crusher';
   return { id, cr, x, y, vx: 0, vy: 0, face: cr ? -1 : 1, heat: 0, ammo: cr ? 2 : DUEL_AMMO, reload: 0, gap: 0, sup: 0, atkT: 0, hitT: 0, walk: 0,
-    say: '', sayT: 0, stun: 0, croak: 0, boost: 0, aura: 0, auraT: 0, dash: null, burst: null, wind: 0, windSup: false, kb: null,
+    say: '', sayT: 0, stun: 0, croak: 0, boost: 0, aura: 0, auraT: 0, dash: null, burst: null, wind: 0, windSup: false, kb: null, leap: null, jz: 0, banana: 1,
     dodge: 0, dx: 0, dy: 0, strafe: rand(0, 6), r: cr ? 30 : 22, steamT: 0 };
 }
 
@@ -6428,7 +6588,7 @@ function duelEnd(loser) {
   const D = G.duel;
   D.phase = 'end'; D.t = 0; D.loser = loser; D.won = loser === D.cr;
   D.shots = []; D.fx = []; D.lolly = null;
-  for (const f of [D.me, D.cr]) { f.vx = f.vy = 0; f.dash = null; f.burst = null; f.aura = 0; f.wind = 0; f.kb = null; f.croak = 0; }
+  for (const f of [D.me, D.cr]) { f.vx = f.vy = 0; f.dash = null; f.burst = null; f.aura = 0; f.wind = 0; f.kb = null; f.croak = 0; f.leap = null; f.jz = 0; }
   say(loser, loser.cr ? 'AAARGH! FINE! I GIVE UP!' : 'I can\'t take it! I give up!', 2.6);
   G.shake = 0.6; SND.sfx('meltdown'); SND.sfx(D.won ? 'win' : 'sad');
   banner(D.won ? 'YOU WIN!' : 'YOU LOST YOUR COOL!', D.won ? 'Crusher lost his cool and gave up' : 'Crusher wins the Annoy-Off', { huge: true, dur: 2.8 });
@@ -6557,6 +6717,7 @@ function duelHero(f, o, dt) {
   const supP = inp.sup && !D.supWas; D.supWas = inp.sup;
   if (f.stun > 0) { f.vx = f.vy = 0; return; }
   if (f.dash) { duelDash(f, o, dt); return; }
+  if (f.leap) { duelLeap(f, o, dt); return; }
   const sp = M.spd * (f.boost > 0 ? 1.4 : 1) * (f.aura > 0 ? 1.2 : 1);
   f.vx = inp.mx * sp; f.vy = inp.my * sp * 0.8;
   f.face = Math.abs(inp.mx) > 0.2 ? sign(inp.mx) : sign(o.x - f.x) || f.face;
@@ -6582,6 +6743,7 @@ function duelAnnoy(f, o) {
   const a = duelAim(f, o, M.speed);
   if (M.kind === 'cone') duelCone(f, o, a, M.range, M.arc, M.dmg, false);
   else if (M.kind === 'spread') for (let i = 0; i < M.n; i++) duelShot(f, a + (i - (M.n - 1) / 2) * M.spread, M);
+  else if (M.kind === 'banana') { f.banana = -f.banana; duelShot(f, a + f.banana * 0.55, M, { homing: 3.2 }); } // it curves round to him, from the left, then the right
   else duelShot(f, a, M, M.kind === 'homing' ? { homing: 1.8 } : M.kind === 'wave' ? { wave: 1 } : M.kind === 'yoyo' ? { yoyo: 'out' } : null);
   SND.sfx(DUEL_SFX[f.id] || 'throw');
 }
@@ -6608,7 +6770,22 @@ function duelSuper(f, o) {
     case 'james': f.aura = 4.5; f.auraT = 0.15; SND.sfx('prank'); break;
     case 'ollie': f.dash = { t: 0.75, a, hit: false }; SND.sfx('dash'); break;
     case 'ben': duelShot(f, a, { look: 'frogbolt', speed: 480, range: 640, dmg: 15, r: 24 }, { frog: true, sup: true }); SND.sfx('spell'); break;
+    case 'ryan': f.leap = { t: 0, T: 0.7, x0: f.x, y0: f.y, tx, ty, a: Math.atan2(ty - f.y, tx - f.x), hit: false }; SND.sfx('speccy'); break;
   }
+}
+function duelLeap(f, o, dt) { // Ryan's Speccy: he leaps up and takes a mark right off Crusher's head
+  const s = f.leap; s.t += dt;
+  const p = Math.min(1, s.t / s.T);
+  s.tx += clamp(o.x - s.tx, -260 * dt, 260 * dt); s.ty += clamp(o.y - s.ty, -180 * dt, 180 * dt); // he follows Crusher a little in the air
+  f.vx = f.vy = 0;
+  f.x = lerp(s.x0, s.tx - Math.cos(s.a) * 24, p); f.y = lerp(s.y0, s.ty - Math.sin(s.a) * 10, p);
+  f.jz = Math.sin(p * Math.PI) * 150; f.face = sign(s.tx - s.x0) || f.face;
+  if (!s.hit && p > 0.55 && duelDist(f, o) < f.r + o.r + 34) {
+    s.hit = true; duelHurt(o, 20, f, 'MARK!', { sup: true }); duelKnock(o, Math.atan2(o.y - f.y, o.x - f.x), 120);
+    SND.sfx('mark'); SND.sfx('crowd'); G.shake = 0.35;
+    const F = pick(G.duel.fans); if (F) { F.say = 'WHAT A MARK!'; F.sayT = 1.6; F.cheer = 1.6; }
+  }
+  if (p >= 1) { f.leap = null; f.jz = 0; }
 }
 function duelDash(f, o, dt) { // Ollie's Wheelie Dash: he bikes straight at Crusher, ringing his bell
   const s = f.dash; s.t -= dt;
@@ -6689,6 +6866,7 @@ function duelHurt(v, dmg, by, word, o) {
   o = o || {};
   const D = G.duel;
   if (!D || D.phase !== 'fight' || v.heat >= 100) return;
+  if (!v.cr && v.id === 'ryan') dmg *= 0.85; // nothing rattles Ryan much
   v.heat = Math.min(100, v.heat + dmg); v.hitT = 0.35;
   if (by && by !== v && !o.sup) by.sup = Math.min(100, by.sup + dmg * (by.cr ? 1.5 + D.diff : DUEL_MOVES[by.id].charge || 3.4)); // landing annoying moves charges your Super (a Super doesn't)
   const k = duelK(v.y);
@@ -6980,8 +7158,8 @@ function drawDuelFighter(c, f, t) {
     if (f.wind > 0) mark(c, f.x, f.y - 162 * k, '!', '#ff6150');
     if (f.croak > 0) { const fy = f.y - 172 * k + Math.sin(t * 8) * 3; c.save(); c.translate(f.x + 26, fy); ell(c, 0, 0, 12, 9); blob(c, '#7fd36b', 2); c.fillStyle = INK; c.beginPath(); c.arc(-4, -6, 2, 0, 7); c.arc(5, -6, 2, 0, 7); c.fill(); c.restore(); }
   } else {
-    const pose = lost ? 'flail' : won ? 'cheer' : f.dash ? 'dash' : f.stun > 0 || f.hitT > 0.18 ? 'flail' : f.atkT > 0 ? 'punch' : moving ? 'run' : 'idle';
-    drawHero(c, f.id, f.x + (lost ? rand(-1.5, 1.5) : 0), f.y, { t, pose, face: f.face, phase: f.walk, scale: k * 1.1, bike: f.id === 'ollie' && pose !== 'flail' && pose !== 'cheer', drone: f.id === 'spencer' }); // Ollie stays on his bike
+    const pose = lost ? 'flail' : won ? 'cheer' : f.leap ? 'mark' : f.dash ? 'dash' : f.stun > 0 || f.hitT > 0.18 ? 'flail' : f.atkT > 0 ? 'punch' : moving ? 'run' : 'idle';
+    drawHero(c, f.id, f.x + (lost ? rand(-1.5, 1.5) : 0), f.y - (f.jz || 0) * k, { t, pose, face: f.face, phase: f.walk, scale: k * 1.1, bike: f.id === 'ollie' && pose !== 'flail' && pose !== 'cheer', drone: f.id === 'spencer' }); // Ollie stays on his bike
   }
   const hot = f.heat / 100;
   if (hot > 0.5) { // getting red in the face
@@ -7033,6 +7211,7 @@ function drawDuelShot(c, q, t) {
       c.rotate(-Math.atan2(q.vy, q.vx)); c.font = '700 11px Fredoka, sans-serif'; c.textAlign = 'center'; c.lineWidth = 3; c.strokeStyle = INK; c.strokeText('DING', 0, -q.r - 6); c.fillStyle = '#fff'; c.fillText('DING', 0, -q.r - 6);
       break;
     }
+    case 'footy': drawFootyBall(c, 0, 0, q.t * 12, 1.5); break;
     case 'tickle': c.rotate(t * 10); c.shadowColor = '#ff8ad8'; c.shadowBlur = 10; starPath(c, 0, 0, 13, 6); blob(c, '#ff8ad8', 2.5); break;
     case 'frogbolt':
       c.shadowColor = '#9bff8a'; c.shadowBlur = 16; c.beginPath(); c.arc(0, 0, 20, 0, 7); blob(c, '#7fd36b', 2.5); c.shadowBlur = 0;
@@ -8187,7 +8366,7 @@ MINI_GAMES.fighter = {
 // The host's device runs the game. The friend's device (the guest) sends its buttons to the host and draws
 // what the host sends back, about 20 times a second. The devices find each other with a 4-letter code
 // through PeerJS's free matchmaking service, then talk directly over WebRTC.
-const NET_BUILD = '1de509969c38'; // the build puts a fingerprint of the game here: both devices must run the same version
+const NET_BUILD = '9f8b018e8856'; // the build puts a fingerprint of the game here: both devices must run the same version
 const NET_PREFIX = 'naseer-crew-v1-';
 const NET_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ'; // no vowels, so a code can't spell a word
 const NET_LIB = ['https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js', 'https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js'];
@@ -8896,8 +9075,8 @@ function netInstall() {
 const REP_LOCAL = ['cam', 'trail', 'parts', 'texts', 'callouts']; // each device keeps these itself
 const REP_SPAWN = ['parts', 'texts', 'callouts'];                  // little effects: sent once, then each device moves them
 const REP_SKIP = new Set(['sayCd', 'aiCd', 'trickCd', 'warpCd', 'lastX', 'stuckT', 'actCd', 'throwCd', 'dropCheck', 'hitWall', 'wallS', 'autoT',
-  'prev', 'cache', 'trail']); // only the host's game needs these (trails and the maze picture: each device makes its own)
-const REP_POS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v']);
+  'prev', 'cache', 'trail', 'speccyT']); // only the host's game needs these (trails and the maze picture: each device makes its own)
+const REP_POS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v', 'jz']);
 const REP_DOWN = new Set(['sayT', 'punchT', 'kickT', 'cheer', 'armT', 'coyote', 'jumpBuf']); // count down past zero: anything below zero means off
 const REP = { ids: new WeakMap(), next: 1, last: new Map(), alive: new Set(), spawned: new WeakSet(), root: null, statics: null };
 function repReset() { REP.ids = new WeakMap(); REP.next = 1; REP.last = new Map(); REP.alive = new Set(); REP.spawned = new WeakSet(); REP.root = null; }
@@ -8986,8 +9165,8 @@ function repSpawns() {
    nearly always here in time. Things that move glide between updates, timed by the host's clock. */
 const NETG = { map: new Map(), shadow: new Map(), ip: new Map(), dq: [], mode: null, prevHT: 0, lastHT: 0, qw: [], X: null, S: null, R: 0 };
 const NETP = { acc: 0, seq: 0, hist: [], prevK: 0, up: false, body: null, on: false, auth: null, hero: null, off: { x: 0, y: 0 } }; // the friend's own hero, moved on their device
-const IP_KEYS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v', 'phase', 'walk', 'spin', 'rot', 't', 'wt', 'time']); // these glide between updates
-const IP_POS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v']);
+const IP_KEYS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v', 'jz', 'phase', 'walk', 'spin', 'rot', 't', 'wt', 'time']); // these glide between updates
+const IP_POS = new Set(['x', 'y', 'cx', 'cy', 'u', 'v', 'jz']);
 const DQ_KEYS = new Set(['pose', 'face', 'dir']); // what characters are doing and which way they face: changes when their moves show
 const IP_EXTRA = 60; // an update is late: keep things moving the same way for up to this long (ms)
 function netGuestReset() { NETG.map.clear(); NETG.shadow.clear(); NETG.ip.clear(); NETG.dq.length = 0; NETG.prevHT = NETG.lastHT = 0; }
@@ -9197,7 +9376,7 @@ function netPredStep(B, c) { // one step of running and jumping, the same as upd
 function netPredictable(P) { // can this device move its own hero itself right now?
   if (!NET_PREDICT || window.__netNoPredict || !G || STATE.screen !== 'play' || G.duel || G.mini || G.over || G.lose || G.trans || G.freeze > 0 || G.party || G.scene || G.battleNext) return false;
   if (G.bully && G.bully.state === 'trouble') return false;
-  return !!(P && P.H && P.ctrl === NET.me && !P.pull && !P.bubble && !(P.dashT > 0) && !(P.chargeT > 0) && !P.pound && !P.climbing && !P.hacking);
+  return !!(P && P.H && P.ctrl === NET.me && !P.pull && !P.bubble && !(P.dashT > 0) && !(P.chargeT > 0) && !P.pound && !P.speccy && !P.climbing && !P.hacking);
 }
 function netAuthOf(P) { const A = {}; for (const k of PRED_KEYS) A[k] = P[k]; return A; }
 function netReconcile(ack) { // line your own hero up with the host's game, then replay the buttons it hasn't used yet
@@ -9706,6 +9885,10 @@ function drawCrewMember(c, e, t) {
   if ((e.ctrl >= 0 && (e.power === 'shield' || G.shield > 0)) || (e.ctrl < 0 && G.shield > 0)) {
     c.save(); c.globalAlpha = 0.35 + Math.sin(t * 8) * 0.1; c.strokeStyle = G.shield > 0 ? '#ff8ad8' : '#4fc3f7'; c.lineWidth = 4;
     c.beginPath(); c.ellipse(cxOf(e), e.y + e.h / 2, e.w * 0.95, e.h * 0.68, 0, 0, 7); c.stroke(); c.restore();
+  }
+  if (e.id === 'ryan' && G.shepherd && G.shepherd.by === e) { // Ryan shepherding the crew
+    c.save(); c.globalAlpha = 0.5 + Math.sin(t * 10) * 0.2; c.strokeStyle = '#ffcb2f'; c.lineWidth = 4; c.setLineDash([9, 7]); c.lineDashOffset = -t * 30;
+    c.beginPath(); c.ellipse(cxOf(e), e.y + e.h / 2, e.w * 1.05, e.h * 0.72, 0, 0, 7); c.stroke(); c.restore();
   }
   if (e.ctrl >= 0 && e.power === 'speed') { c.fillStyle = 'rgba(198,255,61,0.7)'; for (let i = 0; i < 3; i++) c.fillRect(cxOf(e) - e.face * (24 + i * 9), e.y + 18 + i * 12, -e.face * 14, 3); }
   if (e.ctrl >= 0 && e.power === 'magnet') { c.strokeStyle = 'rgba(255, 97, 80, 0.35)'; c.lineWidth = 2; c.beginPath(); c.arc(cxOf(e), e.y + e.h / 2, 40 + ((t * 60) % 30), 0, 7); c.stroke(); }
