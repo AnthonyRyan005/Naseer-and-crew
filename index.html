@@ -504,6 +504,10 @@ h2.title {
   text-shadow: 0 4px 0 var(--ink); line-height: 1.05; margin: 2px 0 0; }
 #pongEnd .pongscore { font-family: var(--font-display); font-size: 28px; line-height: 1.1; }
 #pongEnd .pongline { text-align: center; max-width: 440px; }
+.pongsays { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; margin: 4px 0 2px; }
+#pongEnd .pongsay { position: relative; font-family: var(--font-display); font-size: 22px; line-height: 1.1; color: var(--ink); background: #fff;
+  border: 3px solid var(--ink); border-radius: 16px; padding: 6px 14px 7px; box-shadow: 0 3px 0 var(--ink); text-align: center; }
+#pongEnd .pongsay small { display: block; font-family: var(--font-body); font-weight: 700; font-size: 12px; color: #c2185b; margin-bottom: 1px; }
 @media (orientation: landscape) and (max-height: 500px) {
   .pongbtn { top: calc(var(--sat) + 8px); padding: 2px 9px 2px 2px; }
   .pb-face { width: 42px; height: 42px; margin: -8px -1px -4px -2px; }
@@ -515,6 +519,7 @@ h2.title {
   .pkh canvas, .pkp canvas { width: 48px; height: 48px; }
   .pka { height: 42px; width: 28px; }
   #pongEnd .pongres { font-size: 36px; }
+  #pongEnd .pongsay { font-size: 18px; padding: 4px 12px 5px; }
   #s-pong .row .btn { font-size: 19px; padding: 9px 18px; }
 }
 /* short phones held upright: the logo starts right at the top, so the button folds up into a badge beside it */
@@ -722,6 +727,7 @@ h2.title {
         <div id="pongEnd" hidden>
           <p class="pongres" id="pongEndTitle"></p>
           <p class="pongscore" id="pongEndScore"></p>
+          <div class="pongsays" id="pongEndSay" hidden></div>
           <p class="pongline" id="pongEndLine"></p>
         </div>
         <div class="row stick">
@@ -8682,8 +8688,8 @@ const PAUL_LINES = {
   score: ['Too easy!', 'Ha ha ha!', 'Paul wins that one!', 'You\'re dreaming!', 'Have another go!', 'Get in!'],
   miss: ['Oi!', 'Lucky shot!', 'Not fair!', 'Strewth!', 'How?!', 'Rematch!'],
   hit: ['Eww!', 'Yuck!', 'Gross!', 'Bonk!', 'Ewww, poo!'],
-  win: ['Paul is the champ!', 'Too good!'],
-  lose: ['Best of three?', 'You got me!']
+  win: ['Another orange tsunami!', 'That\'s for the old Roy boys!', 'Billy Slater time!'], // what Paul says when he wins a game...
+  lose: ['I hate Cats!', 'Ohhh Jezza!', 'No more Toby time!'] // ...and when he loses one
 };
 MINI_INFO.paul = { title: 'POO PONG!', goal: 'Bat the poo past Paul. First to 5 wins!', col: '#ff4f9a', music: 'pong' };
 const paulRGBA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
@@ -8940,7 +8946,8 @@ function paulSave() {
 const paulDiff = (lvl) => 0.15 + (lvl - 1) * 0.1; // level 1 is gentle, level 8 is a lot like the hardest bully
 function paulRecord(M) { // beat Paul and he goes up a level; lose twice in a row and he goes down one
   const P = paulSave(), w = M.winner;
-  const R = { two: M.two, who: M.sides.map((S) => S.who), pl: M.sides.map((S) => S.pl), score: M.score.slice(), winner: w, lvl: G.arcade.lvl, newLvl: P.lvl, up: false, down: false, wins: P.wins };
+  const R = { two: M.two, who: M.sides.map((S) => S.who), pl: M.sides.map((S) => S.pl), score: M.score.slice(), winner: w, lvl: G.arcade.lvl, newLvl: P.lvl, up: false, down: false, wins: P.wins,
+    said: M.sides.map((S) => (S.paul ? S.say : '')) }; // what Paul said at the end, for the results
   if (!M.two) {
     P.games++;
     if (w === 0) { P.wins++; P.lossRun = 0; if (P.lvl < PAUL_LVLS) { P.lvl++; R.up = true; } }
@@ -9025,6 +9032,10 @@ function buildPongEnd() {
     line = same ? `${paulWho(R.who[w])} against ${paulWho(R.who[1 - w])}.` : `Player ${w + 1} played ${paulWho(R.who[w])}.`;
   }
   $('pongEndTitle').textContent = title; $('pongEndScore').textContent = sc; $('pongEndLine').textContent = line;
+  const pauls = [0, 1].filter((i) => R.who[i] === 'paul' && R.said && R.said[i]), two = pauls.length === 2; // the winner first
+  if (two && R.winner === 1) pauls.reverse();
+  $('pongEndSay').innerHTML = pauls.map((i) => `<p class="pongsay"><small>${two ? `Player ${i + 1}'s Paul says` : 'Paul says'}</small>${R.said[i]}</p>`).join('');
+  $('pongEndSay').hidden = !pauls.length;
   $('pongTitle').textContent = 'Can you beat Paul at Poo Pong?';
   $('pongSub').textContent = R.two ? 'Two players' : `Paul level ${R.lvl}`;
 }
@@ -9058,7 +9069,7 @@ function paulMenuAnim(t) {
 // The host's device runs the game. The friend's device (the guest) sends its buttons to the host and draws
 // what the host sends back, about 20 times a second. The devices find each other with a 4-letter code
 // through PeerJS's free matchmaking service, then talk directly over WebRTC.
-const NET_BUILD = '0cd1b4ce4d3f'; // the build puts a fingerprint of the game here: both devices must run the same version
+const NET_BUILD = '09895b1df01d'; // the build puts a fingerprint of the game here: both devices must run the same version
 const NET_PREFIX = 'naseer-crew-v1-';
 const NET_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ'; // no vowels, so a code can't spell a word
 const NET_LIB = ['https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js', 'https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js'];
